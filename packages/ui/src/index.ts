@@ -10,6 +10,10 @@ export {
 	CardHeader,
 	CardTitle,
 } from "./components/ui/card"
+export {
+	DoorControls,
+	type DoorControlsProps,
+} from "./components/ui/door-controls"
 export { Input } from "./components/ui/input"
 export { Label } from "./components/ui/label"
 export { LoginForm, type LoginFormProps } from "./components/ui/login-form"

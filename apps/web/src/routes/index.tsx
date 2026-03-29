@@ -4,10 +4,12 @@ import {
 	CardContent,
 	CardHeader,
 	CardTitle,
+	DoorControls,
 	Text,
 } from "@batchmate/ui"
-import { useQuery } from "@tanstack/react-query"
+import { useMutation, useQuery } from "@tanstack/react-query"
 import { createFileRoute, redirect, useNavigate } from "@tanstack/react-router"
+import { useState } from "react"
 import { api } from "@/lib/api"
 import { authClient, signOut, useSession } from "@/lib/auth"
 
@@ -30,6 +32,17 @@ function HomePage() {
 		error,
 	} = useQuery(api.health.queryOptions({}))
 
+	const [pendingDoor, setPendingDoor] = useState<{
+		floor: "4" | "5"
+		entry: "elevator" | "stairs"
+	} | null>(null)
+
+	const openDoor = useMutation({
+		...api.doorsOpen.mutationOptions({}),
+		onMutate: (input) => setPendingDoor(input),
+		onSettled: () => setPendingDoor(null),
+	})
+
 	async function handleSignOut() {
 		await signOut()
 		navigate({ to: "/login" })
@@ -42,6 +55,14 @@ function HomePage() {
 				<Button variant="outline" onPress={handleSignOut}>
 					<Text>Sign out</Text>
 				</Button>
+			</div>
+
+			<div className="mb-6">
+				<DoorControls
+					onOpenDoor={(floor, entry) => openDoor.mutate({ floor, entry })}
+					isPending={openDoor.isPending}
+					pendingDoor={pendingDoor}
+				/>
 			</div>
 
 			{session?.user && (

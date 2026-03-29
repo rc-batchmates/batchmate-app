@@ -4,10 +4,12 @@ import {
 	CardContent,
 	CardHeader,
 	CardTitle,
+	DoorControls,
 	Text,
 } from "@batchmate/ui"
-import { useQuery } from "@tanstack/react-query"
+import { useMutation, useQuery } from "@tanstack/react-query"
 import { useRouter } from "expo-router"
+import { useState } from "react"
 import { ScrollView, View } from "react-native"
 import { api } from "../../src/lib/api"
 import { signOut, useSession } from "../../src/lib/auth"
@@ -16,6 +18,17 @@ export default function HomeScreen() {
 	const router = useRouter()
 	const { data: session } = useSession()
 	const health = useQuery(api.health.queryOptions({}))
+
+	const [pendingDoor, setPendingDoor] = useState<{
+		floor: "4" | "5"
+		entry: "elevator" | "stairs"
+	} | null>(null)
+
+	const openDoor = useMutation({
+		...api.doorsOpen.mutationOptions({}),
+		onMutate: (input) => setPendingDoor(input),
+		onSettled: () => setPendingDoor(null),
+	})
 
 	async function handleSignOut() {
 		await signOut()
@@ -33,6 +46,12 @@ export default function HomeScreen() {
 					<Text>Sign out</Text>
 				</Button>
 			</View>
+
+			<DoorControls
+				onOpenDoor={(floor, entry) => openDoor.mutate({ floor, entry })}
+				isPending={openDoor.isPending}
+				pendingDoor={pendingDoor}
+			/>
 
 			<View className="items-center gap-2">
 				<Text className="text-sm text-muted-foreground">
