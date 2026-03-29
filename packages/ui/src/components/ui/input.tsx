@@ -1,4 +1,4 @@
-import * as React from "react"
+import type * as React from "react"
 import { TextInput } from "react-native"
 
 import { cn } from "../../lib/cn"
