@@ -1,9 +1,9 @@
+import { createRequire } from "node:module"
 import path from "node:path"
 import { DEV_API_URL } from "@batchmate/api-client"
 import tailwindcss from "@tailwindcss/vite"
 import tanstackRouter from "@tanstack/router-plugin/vite"
 import react from "@vitejs/plugin-react"
-import { createRequire } from "node:module"
 import { defineConfig, transformWithEsbuild } from "vite"
 
 const require = createRequire(import.meta.url)
