@@ -1,10 +1,10 @@
-import { server } from "./context";
-import { doorsOpen } from "./procedures/doors-open";
-import { health } from "./procedures/health";
+import { server } from "./context"
+import { doorsOpen } from "./procedures/doors-open"
+import { health } from "./procedures/health"
 
 export const router = server.router({
-  health,
-  doorsOpen,
-});
+	health,
+	doorsOpen,
+})
 
-export type Router = typeof router;
+export type Router = typeof router

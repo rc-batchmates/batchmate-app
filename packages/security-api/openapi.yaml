@@ -1,0 +1,482 @@
+openapi: 3.1.0
+info:
+  title: AC-215 Proxy API
+  version: 0.1.0
+  description: Internal API for controlling an AC-215 panel through the proxy.
+
+servers:
+  - url: http://security.tail29f4f.ts.net:8181
+
+paths:
+  /v1/panel/outputs:
+    get:
+      summary: Get output relay states
+      description: >
+        Returns the current state of all output relays that are either unlocked
+        or overridden. Returns an empty array when the panel has just booted or
+        been reset and no output activity has occurred.
+      responses:
+        "200":
+          description: Current output states.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [outputs]
+                properties:
+                  outputs:
+                    type: array
+                    items:
+                      type: object
+                      required: [output_id, is_unlocked, is_overridden]
+                      properties:
+                        output_id:
+                          type: integer
+                          minimum: 0
+                          maximum: 31
+                          description: Output relay index (0-indexed).
+                        is_unlocked:
+                          type: boolean
+                          description: >
+                            Whether the output is currently active (unlocked).
+                            People can access whatever is controlled by this output.
+                        is_overridden:
+                          type: boolean
+                          description: >
+                            Whether this output is being held open by the AxTraxNG
+                            server, rather than a decision made by the panel.
+              examples:
+                some_active:
+                  summary: Two outputs active
+                  value:
+                    outputs:
+                      - output_id: 0
+                        is_unlocked: true
+                        is_overridden: true
+                      - output_id: 3
+                        is_unlocked: true
+                        is_overridden: false
+                none_active:
+                  summary: No outputs active
+                  value:
+                    outputs: []
+    post:
+      summary: Control output relays
+      description: >
+        Send manual output operations to the panel. Each operation targets a
+        specific output relay by index and specifies what to do with it.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [operations]
+              properties:
+                operations:
+                  type: array
+                  items:
+                    type: object
+                    required: [output_id, operation]
+                    properties:
+                      output_id:
+                        type: integer
+                        minimum: 0
+                        maximum: 31
+                        description: Output relay index (0-indexed).
+                      operation:
+                        type: string
+                        enum: [pulse, open, close]
+                        description: >
+                          `pulse` -- open momentarily for `duration` seconds, then re-lock.
+                          `open` -- open permanently until explicitly closed.
+                          `close` -- close and return to default state.
+                      duration:
+                        type: integer
+                        minimum: 0
+                        maximum: 3599
+                        default: 0
+                        description: Duration in seconds. Used by `pulse` and `open`.
+            examples:
+              pulse_and_close:
+                summary: Pulse output 0 and close output 5
+                value:
+                  operations:
+                    - output_id: 0
+                      operation: pulse
+                      duration: 60
+                    - output_id: 5
+                      operation: close
+      responses:
+        "200":
+          description: The panel acknowledged the command.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SuccessResponse"
+        "400":
+          description: The request body is malformed or contains invalid values.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/FormatExceptionResponse"
+        "502":
+          description: The panel rejected the command (NACK).
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/NackResponse"
+        "500":
+          description: The panel responded with an unexpected packet.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UnexpectedPacketResponse"
+
+  /v1/webhooks:
+    get:
+      summary: List registered webhooks
+      description: Returns all registered webhook endpoints.
+      responses:
+        "200":
+          description: List of webhooks.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [webhooks]
+                properties:
+                  webhooks:
+                    type: array
+                    items:
+                      type: object
+                      required: [id, url]
+                      properties:
+                        id:
+                          type: string
+                          format: uuid
+                          description: Unique webhook identifier.
+                        url:
+                          type: string
+                          format: uri
+                          description: The URL that will receive POST deliveries.
+              examples:
+                one_registered:
+                  summary: One webhook registered
+                  value:
+                    webhooks:
+                      - id: "b1c2d3e4-5678-4a9b-0cde-f1234567890a"
+                        url: "https://my-worker.example.workers.dev/events"
+    post:
+      summary: Register a webhook
+      description: >
+        Register a new URL to receive event deliveries. Each delivery is signed
+        with the provided key using HMAC-SHA256, sent in the `X-Webhook-Signature`
+        header as a hex-encoded digest.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [url, signing_key]
+              properties:
+                url:
+                  type: string
+                  format: uri
+                  description: The URL that will receive POST deliveries.
+                signing_key:
+                  type: string
+                  description: Secret key used to compute the HMAC-SHA256 signature.
+            examples:
+              register:
+                summary: Register a Cloudflare Worker
+                value:
+                  url: "https://my-worker.example.workers.dev/events"
+                  signing_key: "whsec_supersecretkey123"
+      callbacks:
+        onEvent:
+          "{$request.body#/url}":
+            post:
+              summary: Webhook event delivery
+              description: >
+                POSTed to the registered URL when a panel event occurs.
+                The request is signed with the registered key using HMAC-SHA256;
+                the hex-encoded digest is in the `X-Webhook-Signature` header.
+              parameters:
+                - name: X-Webhook-Signature
+                  in: header
+                  required: true
+                  schema:
+                    type: string
+                  description: HMAC-SHA256 hex digest of the request body, computed with the registered signing key.
+                - name: X-Webhook-Id
+                  in: header
+                  required: true
+                  schema:
+                    type: string
+                    format: uuid
+                  description: The webhook registration ID.
+              requestBody:
+                required: true
+                content:
+                  application/json:
+                    schema:
+                      $ref: "#/components/schemas/WebhookEvent"
+                    examples:
+                      output_enabled:
+                        summary: Door unlocked
+                        value:
+                          time: 1711648923000
+                          type: "output.enabled"
+                          data:
+                            output_id: 0
+                            is_overridden: true
+                      output_disabled:
+                        summary: Door locked
+                        value:
+                          time: 1711648926000
+                          type: "output.disabled"
+                          data:
+                            output_id: 0
+                            is_overridden: false
+              responses:
+                "200":
+                  description: Event received successfully.
+      responses:
+        "201":
+          description: Webhook registered successfully.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [ok, webhook]
+                properties:
+                  ok:
+                    type: boolean
+                    const: true
+                  webhook:
+                    type: object
+                    required: [id, url]
+                    properties:
+                      id:
+                        type: string
+                        format: uuid
+                      url:
+                        type: string
+                        format: uri
+              examples:
+                created:
+                  value:
+                    ok: true
+                    webhook:
+                      id: "b1c2d3e4-5678-4a9b-0cde-f1234567890a"
+                      url: "https://my-worker.example.workers.dev/events"
+
+  /v1/webhooks/{id}:
+    delete:
+      summary: Remove a webhook
+      description: Unregister a webhook by its ID. Future events will no longer be delivered to it.
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+          description: The webhook ID returned at registration time.
+      responses:
+        "200":
+          description: Webhook removed.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SuccessResponse"
+        "404":
+          description: No webhook with that ID exists.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ok:
+                    type: boolean
+                    const: false
+                  error:
+                    type: string
+
+components:
+  schemas:
+    WebhookEvent:
+      type: object
+      required: [time, type, data]
+      properties:
+        time:
+          type: integer
+          description: Milliseconds since Unix epoch when the event was observed.
+        type:
+          type: string
+          enum: [output.enabled, output.disabled]
+          description: The event type.
+        data:
+          oneOf:
+            - $ref: "#/components/schemas/OutputEventData"
+      discriminator:
+        propertyName: type
+        mapping:
+          output.enabled: "#/components/schemas/OutputEventData"
+          output.disabled: "#/components/schemas/OutputEventData"
+
+    OutputEventData:
+      type: object
+      required: [output_id, is_overridden]
+      properties:
+        output_id:
+          type: integer
+          minimum: 0
+          maximum: 31
+          description: Output relay index (0-indexed).
+        is_overridden:
+          type: boolean
+          description: >
+            Whether this output is being held open by the AxTraxNG server,
+            rather than a decision made by the panel.
+
+    SuccessResponse:
+      type: object
+      required: [ok]
+      properties:
+        ok:
+          type: boolean
+          const: true
+      examples:
+        - ok: true
+
+    FormatExceptionResponse:
+      type: object
+      required: [ok, error]
+      properties:
+        ok:
+          type: boolean
+          const: false
+        error:
+          type: object
+          required: [type, message]
+          properties:
+            type:
+              type: string
+              const: format_exception
+            message:
+              type: string
+              description: Human-readable description of what went wrong.
+      examples:
+        - ok: false
+          error:
+            type: format_exception
+            message: "output_id 33 out of range (0-31)"
+
+    NackResponse:
+      type: object
+      required: [ok, error]
+      properties:
+        ok:
+          type: boolean
+          const: false
+        error:
+          type: object
+          required: [type, associated_logs]
+          properties:
+            type:
+              type: string
+              const: nack
+            associated_logs:
+              type: array
+              description: >
+                Log messages the panel sent before the NACK. May be empty if the
+                panel did not send a PrepareNackResponse log.
+              items:
+                $ref: "#/components/schemas/LogPacket"
+      examples:
+        - ok: false
+          error:
+            type: nack
+            associated_logs:
+              - destination: [log, event]
+                severity: Error
+                message: "01:03:25:450 PrepareNackResponse: You failed to set the ObviousFlag you big dumb idiot"
+
+    UnexpectedPacketResponse:
+      type: object
+      required: [ok, error]
+      properties:
+        ok:
+          type: boolean
+          const: false
+        error:
+          type: object
+          required: [type, packet]
+          properties:
+            type:
+              type: string
+              const: unexpected_packet
+            packet:
+              $ref: "#/components/schemas/Frame"
+      examples:
+        - ok: false
+          error:
+            type: unexpected_packet
+            packet:
+              direction: FromPanel
+              source: "Panel (Dual Addressing, Main Controller)"
+              destination: Server
+              transaction_id: "0x03"
+              command_id: 107
+              command_name: RequestFirmVer825
+              event_flag: Unset
+              payload: "0a1b2c"
+
+    LogPacket:
+      type: object
+      required: [destination, severity, message]
+      properties:
+        destination:
+          type: array
+          items:
+            type: string
+            enum: [log, event]
+          description: Where the panel intended this log to go.
+        severity:
+          type: string
+          enum: [Trace, Debug, Info, Warning, Error, Fatal, Disable, NotAvailable]
+        message:
+          type: string
+          description: The raw log message text from the panel.
+
+    Frame:
+      type: object
+      required: [direction, source, destination, transaction_id, command_id, command_name, event_flag, payload]
+      properties:
+        direction:
+          type: string
+          enum: [ToPanel, FromPanel]
+        source:
+          type: string
+          description: Source address (e.g. `"Server"`, `"Panel (Dual Addressing, Main Controller)"`).
+        destination:
+          type: string
+          description: Destination address.
+        transaction_id:
+          type: string
+          description: Transaction ID as hex (e.g. `"0x03"`).
+        command_id:
+          type: integer
+          description: Raw command byte.
+        command_name:
+          type: [string, "null"]
+          description: Human-readable command name, or null if unknown.
+        event_flag:
+          type: string
+          enum: [Set, Unset]
+        payload:
+          type: string
+          description: Hex-encoded payload bytes.

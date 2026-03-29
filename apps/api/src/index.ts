@@ -10,6 +10,7 @@ type Env = {
 	Bindings: {
 		ASSETS: Fetcher
 		DB: D1Database
+		SECURITY_COMPUTER: Fetcher
 		BETTER_AUTH_SECRET: string
 		RC_CLIENT_ID: string
 		RC_CLIENT_SECRET: string
@@ -66,6 +67,7 @@ app.use("/api/v1/*", async (c, next) => {
 		prefix: "/api/v1",
 		context: {
 			db,
+			securityComputer: c.env.SECURITY_COMPUTER,
 			user: session?.user ?? null,
 			session: session?.session ?? null,
 		},

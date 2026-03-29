@@ -1,11 +1,28 @@
-import { implement } from "@orpc/server";
-import type { Database } from "@batchmate/db";
-import { contract } from "./contract";
+import type { Database } from "@batchmate/db"
+import {
+	createSecurityApi,
+	type SecurityApiClient,
+} from "@batchmate/security-api"
+import { implement } from "@orpc/server"
+import { contract } from "./contract"
 
-export interface Context {
-  db: Database;
-  user: { id: string; name: string; email: string } | null;
-  session: { id: string } | null;
+export interface BaseContext {
+	db: Database
+	securityComputer: Fetcher
+	user: { id: string; name: string; email: string } | null
+	session: { id: string } | null
 }
 
-export const server = implement(contract).$context<Context>();
+export interface Context extends Omit<BaseContext, "securityComputer"> {
+	securityApi: SecurityApiClient
+}
+
+const base = implement(contract).$context<BaseContext>()
+
+export const server = base.use(async ({ context, next }) => {
+	return next({
+		context: {
+			securityApi: createSecurityApi(context.securityComputer),
+		},
+	})
+})

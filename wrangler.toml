@@ -1,3 +1,4 @@
+account_id = "df47ca455a1c1dd3ed2f61d9192b0f32"
 name = "batchmate"
 main = "apps/api/src/index.ts"
 compatibility_date = "2025-04-01"
@@ -16,3 +17,8 @@ binding = "DB"
 database_name = "batchmate"
 database_id = "bdce32aa-261e-4ea3-9d8e-0ad0e149ba3f"
 migrations_dir = "packages/db/drizzle"
+
+[[vpc_services]]
+binding = "SECURITY_COMPUTER"
+service_id = "019d3b5c-0656-75c0-9a92-da593cdb8c17"
+remote = true
