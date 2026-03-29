@@ -7,6 +7,8 @@ onlyBuiltDependencies:
   - workerd
 
 overrides:
+  react: 19.1.0
+  react-dom: 19.1.0
   esbuild@<=0.24.2: '>=0.25.0'
   lodash@>=4.0.0 <=4.17.22: '>=4.17.23'
   lightningcss: 1.30.1
