@@ -20,7 +20,11 @@ const rnIndexPath = require.resolve("react-native", { paths: [__dirname] })
 
 const nativewindResolveRequest = nativewindConfig.resolver.resolveRequest
 if (nativewindResolveRequest) {
-	nativewindConfig.resolver.resolveRequest = (context, moduleName, platform) => {
+	nativewindConfig.resolver.resolveRequest = (
+		context,
+		moduleName,
+		platform,
+	) => {
 		if (
 			moduleName === "react-native" &&
 			context.originModulePath.includes(rnCssMarker)
