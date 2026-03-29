@@ -20,7 +20,8 @@
 	"pnpm": {
 		"overrides": {
 			"react-native": "0.81.5",
-			"@types/react": "~19.1.0"
+			"@types/react": "~19.1.0",
+			"lightningcss": "1.30.1"
 		}
 	}
 }
