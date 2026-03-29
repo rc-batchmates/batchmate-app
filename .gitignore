@@ -37,5 +37,6 @@ dist-ssr
 
 ios/
 android/
+**/.maestro/output/
 *.jsbundle
 *.hbc

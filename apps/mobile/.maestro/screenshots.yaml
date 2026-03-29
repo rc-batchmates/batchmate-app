@@ -1,0 +1,7 @@
+appId: app.batchmate.app
+
+---
+
+- launchApp
+- waitForAnimationToEnd
+- takeScreenshot: screenshot
