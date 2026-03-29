@@ -4,10 +4,21 @@
 	"private": true,
 	"main": "expo-router/entry",
 	"scripts": {
-		"dev": "expo start",
-		"build": "expo export",
+		"start": "expo start --dev-client",
+		"go": "expo start",
 		"android": "expo run:android",
-		"ios": "expo run:ios"
+		"android:device": "expo run:android --device",
+		"ios": "expo run:ios",
+		"ios:device": "expo run:ios --device",
+		"clear": "expo start --dev-client -c",
+		"clean": "rm -rf node_modules ios android && pnpm install",
+		"deploy:ios": "eas build -p ios --profile production --auto-submit",
+		"deploy:android": "eas build -p android --profile production --auto-submit",
+		"deploy:all": "eas build --platform all --profile production --auto-submit",
+		"deploy:update": "eas update --channel production",
+		"build:ios": "eas build --platform ios --profile production --local",
+		"build:android": "eas build --platform android --profile production --local",
+		"build:all": "eas build --platform all --profile production --local"
 	},
 	"dependencies": {
 		"@batchmate/api-client": "workspace:*",
@@ -38,6 +49,7 @@
 	"devDependencies": {
 		"@tailwindcss/postcss": "^4.2.2",
 		"@types/react": "~19.1.0",
+		"babel-preset-expo": "^55.0.13",
 		"postcss": "^8.5.8",
 		"shadcn": "^3.8.5",
 		"tailwindcss": "^4.2.2",
