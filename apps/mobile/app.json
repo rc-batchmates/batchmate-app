@@ -43,6 +43,12 @@
 				"projectId": "40d6ad07-c63a-46ca-ad13-db4d8f87e38b"
 			}
 		},
-		"owner": "leftshift"
+		"owner": "leftshift",
+		"runtimeVersion": {
+			"policy": "appVersion"
+		},
+		"updates": {
+			"url": "https://u.expo.dev/40d6ad07-c63a-46ca-ad13-db4d8f87e38b"
+		}
 	}
 }
