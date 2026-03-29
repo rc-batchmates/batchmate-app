@@ -1,0 +1,9 @@
+@import "@batchmate/ui/theme.css";
+@source "../../../packages/ui/src";
+
+/* react-native-web reset: ensure RN primitives work with Tailwind classes */
+html,
+body,
+#root {
+	height: 100%;
+}

@@ -1,0 +1,24 @@
+{
+	"name": "@batchmate/db",
+	"version": "0.0.0",
+	"private": true,
+	"type": "module",
+	"exports": {
+		".": "./src/index.ts",
+		"./schema": "./src/schema.ts",
+		"./auth-schema": "./src/auth-schema.ts"
+	},
+	"scripts": {
+		"db:generate": "drizzle-kit generate",
+		"db:migrate": "wrangler d1 migrations apply batchmate --local"
+	},
+	"dependencies": {
+		"better-auth": "^1.4.19",
+		"drizzle-orm": "^0.45.1",
+		"typeid-js": "^1.2.0"
+	},
+	"devDependencies": {
+		"drizzle-kit": "^0.31.9",
+		"typescript": "^5.7.0"
+	}
+}

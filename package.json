@@ -1,0 +1,20 @@
+{
+	"name": "@batchmate/monorepo",
+	"private": true,
+	"scripts": {
+		"build": "turbo build",
+		"dev": "turbo dev",
+		"db:generate-auth": "pnpm --filter @batchmate/auth db:generate-auth",
+		"db:generate": "pnpm --filter @batchmate/db db:generate",
+		"db:migrate": "pnpm --filter @batchmate/db db:migrate",
+		"check": "biome check .",
+		"check:fix": "biome check . --write",
+		"ship": "turbo build && wrangler deploy"
+	},
+	"devDependencies": {
+		"@biomejs/biome": "^2.4.4",
+		"turbo": "^2.8.10",
+		"wrangler": "^4.68.1"
+	},
+	"packageManager": "pnpm@10.28.0"
+}

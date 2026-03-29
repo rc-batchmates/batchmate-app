@@ -1,0 +1,12 @@
+packages:
+  - apps/*
+  - packages/*
+
+onlyBuiltDependencies:
+  - better-sqlite3
+  - workerd
+
+overrides:
+  esbuild@<=0.24.2: '>=0.25.0'
+  lodash@>=4.0.0 <=4.17.22: '>=4.17.23'
+  lightningcss: 1.30.1

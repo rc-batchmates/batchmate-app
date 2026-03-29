@@ -1,0 +1,18 @@
+name = "batchmate"
+main = "apps/api/src/index.ts"
+compatibility_date = "2025-04-01"
+compatibility_flags = ["nodejs_compat"]
+
+[[routes]]
+pattern = "recurse.rocks"
+custom_domain = true
+
+[assets]
+directory = "apps/web/dist"
+binding = "ASSETS"
+
+[[d1_databases]]
+binding = "DB"
+database_name = "batchmate"
+database_id = "bdce32aa-261e-4ea3-9d8e-0ad0e149ba3f"
+migrations_dir = "packages/db/drizzle"

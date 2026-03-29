@@ -1,0 +1,21 @@
+{
+	"name": "@batchmate/api",
+	"version": "0.0.0",
+	"private": true,
+	"type": "module",
+	"exports": {
+		".": "./src/index.ts",
+		"./router": "./src/router.ts",
+		"./contract": "./src/contract.ts"
+	},
+	"dependencies": {
+		"@orpc/contract": "^1.0.0",
+		"@orpc/server": "^1.0.0",
+		"@batchmate/db": "workspace:*",
+		"drizzle-orm": "^0.45.1",
+		"zod": "^3.24.0"
+	},
+	"devDependencies": {
+		"typescript": "^5.7.0"
+	}
+}

@@ -1,0 +1,23 @@
+{
+	"name": "@batchmate/auth",
+	"version": "0.0.0",
+	"private": true,
+	"type": "module",
+	"exports": {
+		".": "./src/index.ts"
+	},
+	"scripts": {
+		"db:generate-auth": "better-auth generate --config auth.config.ts --output ../db/src/auth-schema.ts -y"
+	},
+	"dependencies": {
+		"@better-auth/expo": "^1.4.19",
+		"@batchmate/db": "workspace:*",
+		"better-auth": "^1.4.19"
+	},
+	"devDependencies": {
+		"@better-auth/cli": "^1.4.19",
+		"better-sqlite3": "^12.0.0",
+		"drizzle-orm": "^0.45.1",
+		"typescript": "^5.7.0"
+	}
+}

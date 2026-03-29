@@ -1,0 +1,35 @@
+{
+	"name": "@batchmate/web",
+	"private": true,
+	"version": "0.0.0",
+	"type": "module",
+	"scripts": {
+		"dev": "vite",
+		"build": "tsc -p tsconfig.app.json --noEmit && vite build",
+		"preview": "vite preview"
+	},
+	"dependencies": {
+		"@batchmate/api-client": "workspace:*",
+		"@batchmate/ui": "workspace:*",
+		"@tanstack/react-query": "^5.90.21",
+		"@tanstack/react-router": "^1.162.9",
+		"better-auth": "^1.4.19",
+		"react": "^19.2.0",
+		"react-dom": "^19.2.0",
+		"react-native-css": "^3.0.6",
+		"react-native-web": "^0.21.0",
+		"tailwindcss": "^4.2.1"
+	},
+	"devDependencies": {
+		"@tailwindcss/vite": "^4.2.1",
+		"@tanstack/router-plugin": "^1.162.9",
+		"@types/node": "^24.10.1",
+		"@types/react": "^19.2.7",
+		"@types/react-dom": "^19.2.3",
+		"@vitejs/plugin-react": "^5.1.1",
+		"babel-plugin-react-compiler": "^1.0.0",
+		"tslib": "^2.8.1",
+		"typescript": "~5.9.3",
+		"vite": "^7.3.1"
+	}
+}

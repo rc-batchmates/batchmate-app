@@ -1,0 +1,19 @@
+{
+	"name": "@batchmate/api-client",
+	"version": "0.0.0",
+	"private": true,
+	"type": "module",
+	"exports": {
+		".": "./src/index.ts"
+	},
+	"dependencies": {
+		"@orpc/client": "^1.0.0",
+		"@orpc/openapi-client": "^1.0.0",
+		"@orpc/tanstack-query": "^1.0.0",
+		"@batchmate/api": "workspace:*"
+	},
+	"devDependencies": {
+		"@orpc/server": "^1.0.0",
+		"typescript": "^5.7.0"
+	}
+}

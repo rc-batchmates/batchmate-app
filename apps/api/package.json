@@ -1,0 +1,23 @@
+{
+	"name": "@batchmate/api-server",
+	"version": "0.0.0",
+	"private": true,
+	"type": "module",
+	"scripts": {
+		"dev": "wrangler dev"
+	},
+	"dependencies": {
+		"@orpc/openapi": "^1.0.0",
+		"@orpc/server": "^1.0.0",
+		"@orpc/zod": "^1.0.0",
+		"@batchmate/api": "workspace:*",
+		"@batchmate/auth": "workspace:*",
+		"@batchmate/db": "workspace:*",
+		"hono": "^4.7.0"
+	},
+	"devDependencies": {
+		"@cloudflare/workers-types": "^4.20260303.0",
+		"@types/node": "^22.0.0",
+		"typescript": "^5.7.0"
+	}
+}

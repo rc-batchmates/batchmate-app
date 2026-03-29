@@ -1,0 +1,158 @@
+@import "tailwindcss" important;
+@import "tw-animate-css";
+@import "shadcn/tailwind.css";
+
+@custom-variant dark (&:is(.dark *));
+
+@theme inline {
+	--color-background: #ffffff;
+	--color-foreground: #2a2d2d;
+	--color-card: #ffffff;
+	--color-card-foreground: #2a2d2d;
+	--color-primary: #3dc06c;
+	--color-primary-foreground: #ffffff;
+	--color-secondary: #f7f8f8;
+	--color-secondary-foreground: #2a2d2d;
+	--color-muted: #f7f8f8;
+	--color-muted-foreground: #626a6a;
+	--color-accent: #f7f8f8;
+	--color-accent-foreground: #2a2d2d;
+	--color-destructive: #d95a88;
+	--color-destructive-foreground: #ffffff;
+	--color-border: #d7dada;
+	--color-input: #b5bfbf;
+	--color-ring: #3dc06c;
+	--color-brand: #3dc06c;
+	--color-brand-foreground: #ffffff;
+	--color-popover: #ffffff;
+	--color-popover-foreground: #2a2d2d;
+	--color-green-tint: #eef8f1;
+	--color-green-light: #69dc92;
+	--color-green: #3dc06c;
+	--color-green-dark: #23a050;
+	--color-blue: #4d9bd8;
+	--color-purple: #956bc3;
+	--color-pink: #d95a88;
+	--color-orange: #e6a56e;
+	--color-yellow: #e7dd6f;
+	--radius-sm: 0.25rem;
+	--radius-md: 0.375rem;
+	--radius-lg: 0.5rem;
+	--radius-xl: 0.75rem;
+	--color-sidebar-ring: var(--sidebar-ring);
+	--color-sidebar-border: var(--sidebar-border);
+	--color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+	--color-sidebar-accent: var(--sidebar-accent);
+	--color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+	--color-sidebar-primary: var(--sidebar-primary);
+	--color-sidebar-foreground: var(--sidebar-foreground);
+	--color-sidebar: var(--sidebar);
+	--color-chart-1: #3dc06c;
+	--color-chart-2: #4d9bd8;
+	--color-chart-3: #956bc3;
+	--color-chart-4: #d95a88;
+	--color-chart-5: #e6a56e;
+	--radius-2xl: calc(var(--radius) + 8px);
+	--radius-3xl: calc(var(--radius) + 12px);
+	--radius-4xl: calc(var(--radius) + 16px);
+}
+
+@layer base {
+	* {
+		@apply border-border outline-ring/50;
+	}
+	html,
+	body {
+		height: 100%;
+	}
+	body {
+		@apply bg-background text-foreground;
+		margin: 0;
+	}
+	#root {
+		height: 100%;
+	}
+	.font-primary {
+		font-family: "Helvetica", "Arial", sans-serif;
+	}
+	.font-serif {
+		font-family: "Libre Baskerville", "Georgia", serif;
+	}
+}
+
+:root {
+	--radius: 0.625rem;
+	--brand: #3dc06c;
+	--brand-foreground: #ffffff;
+	--page-bg: #f7f8f8;
+	--text-dark: #2a2d2d;
+	--text-muted: #626a6a;
+	--text-placeholder: #919c9c;
+	--input-bg: #f7f8f8;
+	--divider: #d7dada;
+	--background: #ffffff;
+	--foreground: #2a2d2d;
+	--card: #ffffff;
+	--card-foreground: #2a2d2d;
+	--popover: #ffffff;
+	--popover-foreground: #2a2d2d;
+	--primary: #3dc06c;
+	--primary-foreground: #ffffff;
+	--secondary: #f7f8f8;
+	--secondary-foreground: #2a2d2d;
+	--muted: #f7f8f8;
+	--muted-foreground: #626a6a;
+	--accent: #f7f8f8;
+	--accent-foreground: #2a2d2d;
+	--destructive: #d95a88;
+	--border: #d7dada;
+	--input: #b5bfbf;
+	--ring: #3dc06c;
+	--chart-1: #3dc06c;
+	--chart-2: #4d9bd8;
+	--chart-3: #956bc3;
+	--chart-4: #d95a88;
+	--chart-5: #e6a56e;
+	--sidebar: #f7f8f8;
+	--sidebar-foreground: #2a2d2d;
+	--sidebar-primary: #3dc06c;
+	--sidebar-primary-foreground: #ffffff;
+	--sidebar-accent: #eef8f1;
+	--sidebar-accent-foreground: #2a2d2d;
+	--sidebar-border: #d7dada;
+	--sidebar-ring: #3dc06c;
+}
+
+.dark {
+	--background: #2a2d2d;
+	--foreground: #f7f8f8;
+	--card: #363a3a;
+	--card-foreground: #f7f8f8;
+	--popover: #363a3a;
+	--popover-foreground: #f7f8f8;
+	--primary: #69dc92;
+	--primary-foreground: #2a2d2d;
+	--secondary: #363a3a;
+	--secondary-foreground: #f7f8f8;
+	--muted: #363a3a;
+	--muted-foreground: #919c9c;
+	--accent: #363a3a;
+	--accent-foreground: #f7f8f8;
+	--destructive: #fb70a7;
+	--border: #626a6a;
+	--input: #626a6a;
+	--ring: #69dc92;
+	--chart-1: #69dc92;
+	--chart-2: #66bdff;
+	--chart-3: #b883f1;
+	--chart-4: #fb70a7;
+	--chart-5: #ffb980;
+	--sidebar: #363a3a;
+	--sidebar-foreground: #f7f8f8;
+	--sidebar-primary: #69dc92;
+	--sidebar-primary-foreground: #2a2d2d;
+	--sidebar-accent: #2a2d2d;
+	--sidebar-accent-foreground: #f7f8f8;
+	--sidebar-border: #626a6a;
+	--sidebar-ring: #69dc92;
+}
