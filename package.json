@@ -3,7 +3,7 @@
 	"private": true,
 	"scripts": {
 		"build": "turbo build",
-		"dev": "turbo dev",
+		"dev": "turbo dev --filter=!@batchmate/mobile",
 		"db:generate-auth": "pnpm --filter @batchmate/auth db:generate-auth",
 		"db:generate": "pnpm --filter @batchmate/db db:generate",
 		"db:migrate": "pnpm --filter @batchmate/db db:migrate",
