@@ -16,5 +16,11 @@
 		"turbo": "^2.8.10",
 		"wrangler": "^4.68.1"
 	},
-	"packageManager": "pnpm@10.28.0"
+	"packageManager": "pnpm@10.28.0",
+	"pnpm": {
+		"overrides": {
+			"react-native": "0.81.5",
+			"@types/react": "~19.1.0"
+		}
+	}
 }
