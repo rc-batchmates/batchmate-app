@@ -16,6 +16,7 @@ dist-ssr
 .wxt
 .output
 .expo
+.tanstack
 
 # Environment
 .env
@@ -33,3 +34,8 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+ios/
+android/
+*.jsbundle
+*.hbc
