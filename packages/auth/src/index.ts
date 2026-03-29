@@ -53,6 +53,7 @@ export function createAuth(db: Database, env: AuthEnv) {
 			"http://recurse.rocks",
 			"https://recurse.rocks",
 			"http://localhost:5173",
+			"http://localhost:8787",
 			"batchmate://",
 			"exp://",
 		],
