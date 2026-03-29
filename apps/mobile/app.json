@@ -3,6 +3,7 @@
     "name": "Batchmate",
     "slug": "batchmate",
     "version": "1.0.0",
+    "icon": "./assets/icon.png",
     "scheme": "batchmate",
     "platforms": [
       "ios",
@@ -15,7 +16,11 @@
       }
     },
     "android": {
-      "package": "app.batchmate.app"
+      "package": "app.batchmate.app",
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/icon.png",
+        "backgroundColor": "#ffffff"
+      }
     },
     "plugins": [
       "expo-router",
