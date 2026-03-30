@@ -47,10 +47,7 @@ function RoomChip({
 	}
 
 	return (
-		<Pressable
-			className={className}
-			onPress={() => Linking.openURL(href)}
-		>
+		<Pressable className={className} onPress={() => Linking.openURL(href)}>
 			{content}
 		</Pressable>
 	)
@@ -60,9 +57,7 @@ function PairingButton({ n }: { n: number }) {
 	const href = `https://www.recurse.com/zoom/pairing_station_${n}`
 
 	const content = (
-		<Text className="font-mono text-sm font-semibold text-foreground">
-			{n}
-		</Text>
+		<Text className="font-mono text-sm font-semibold text-foreground">{n}</Text>
 	)
 
 	if (Platform.OS === "web") {
