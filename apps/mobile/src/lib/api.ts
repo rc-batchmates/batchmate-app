@@ -15,7 +15,9 @@ const link = new OpenAPILink(contract, {
 	fetch: async (input, init) => {
 		const cookieJson = SecureStore.getItem("batchmate_cookie") || "{}"
 		const cookie = getCookie(cookieJson)
-		const headers = new Headers(init?.headers)
+		const headers = new Headers(
+			input instanceof Request ? input.headers : init?.headers,
+		)
 		if (cookie) {
 			headers.set("cookie", cookie)
 		}

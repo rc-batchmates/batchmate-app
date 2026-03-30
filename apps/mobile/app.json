@@ -1,54 +1,58 @@
 {
-	"expo": {
-		"name": "Batchmate",
-		"slug": "batchmate",
-		"version": "1.0.0",
-		"icon": "./assets/icon.png",
-		"scheme": "batchmate",
-		"platforms": ["ios", "android"],
-		"ios": {
-			"bundleIdentifier": "app.batchmate.app",
-			"infoPlist": {
-				"ITSAppUsesNonExemptEncryption": false
-			}
-		},
-		"android": {
-			"package": "app.batchmate.app",
-			"adaptiveIcon": {
-				"foregroundImage": "./assets/icon.png",
-				"backgroundColor": "#ffffff"
-			}
-		},
-		"plugins": [
-			"expo-router",
-			[
-				"expo-build-properties",
-				{
-					"ios": {
-						"newArchEnabled": true
-					},
-					"android": {
-						"newArchEnabled": true
-					}
-				}
-			],
-			"expo-web-browser"
-		],
-		"experiments": {
-			"autolinkingModuleResolution": true
-		},
-		"extra": {
-			"router": {},
-			"eas": {
-				"projectId": "40d6ad07-c63a-46ca-ad13-db4d8f87e38b"
-			}
-		},
-		"owner": "leftshift",
-		"runtimeVersion": {
-			"policy": "appVersion"
-		},
-		"updates": {
-			"url": "https://u.expo.dev/40d6ad07-c63a-46ca-ad13-db4d8f87e38b"
-		}
-	}
+  "expo": {
+    "name": "Batchmate",
+    "slug": "batchmate",
+    "version": "1.0.0",
+    "icon": "./assets/icon.png",
+    "scheme": "batchmate",
+    "platforms": [
+      "ios",
+      "android"
+    ],
+    "ios": {
+      "bundleIdentifier": "app.batchmate.app",
+      "infoPlist": {
+        "ITSAppUsesNonExemptEncryption": false
+      },
+      "appleTeamId": "KNBPD99JQM"
+    },
+    "android": {
+      "package": "app.batchmate.app",
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/icon.png",
+        "backgroundColor": "#ffffff"
+      }
+    },
+    "plugins": [
+      "expo-router",
+      [
+        "expo-build-properties",
+        {
+          "ios": {
+            "newArchEnabled": true
+          },
+          "android": {
+            "newArchEnabled": true
+          }
+        }
+      ],
+      "expo-web-browser"
+    ],
+    "experiments": {
+      "autolinkingModuleResolution": true
+    },
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "40d6ad07-c63a-46ca-ad13-db4d8f87e38b"
+      }
+    },
+    "owner": "leftshift",
+    "runtimeVersion": {
+      "policy": "appVersion"
+    },
+    "updates": {
+      "url": "https://u.expo.dev/40d6ad07-c63a-46ca-ad13-db4d8f87e38b"
+    }
+  }
 }
