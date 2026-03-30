@@ -49,6 +49,8 @@ function SocialRow({
 	return (
 		<Pressable
 			className="flex-row items-center gap-3 px-4 py-3.5"
+			role={href && value ? "link" : undefined}
+			href={href && value ? href : undefined}
 			onPress={href && value ? () => Linking.openURL(href) : undefined}
 		>
 			<Icon size={18} color="#64748B" />
@@ -101,6 +103,8 @@ export default function ProfileScreen() {
 				</Pressable>
 				<Text className="text-[17px] font-semibold">Profile</Text>
 				<Pressable
+					role="link"
+					href="https://www.recurse.com/settings/general"
 					onPress={() =>
 						Linking.openURL("https://www.recurse.com/settings/general")
 					}

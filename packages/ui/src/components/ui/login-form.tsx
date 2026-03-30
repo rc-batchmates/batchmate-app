@@ -63,7 +63,7 @@ export function LoginForm({ onSubmit, logoSource }: LoginFormProps) {
 					) : null}
 				</View>
 				<Text className="font-mono text-[32px] font-bold">batchmate</Text>
-				<Text className="font-mono text-sm text-text-tertiary">
+				<Text className="text-center font-mono text-sm text-text-tertiary">
 					The next generation of recurse tooling
 				</Text>
 			</View>
@@ -88,8 +88,8 @@ export function LoginForm({ onSubmit, logoSource }: LoginFormProps) {
 			{/* Features */}
 			<View className="items-center gap-4">
 				<FeatureRow icon={DoorOpen} label="Building door access" />
-				<FeatureRow icon={Calendar} label="Hub & schedule management" />
-				<FeatureRow icon={Users} label="Recurse Center community" />
+				<FeatureRow icon={Calendar} label="Hub & schedule management (coming soon)" />
+				<FeatureRow icon={Users} label="Recurse Center community (coming soon)" />
 			</View>
 
 			{/* Footer */}
@@ -98,6 +98,8 @@ export function LoginForm({ onSubmit, logoSource }: LoginFormProps) {
 					Built by your fellow
 				</Text>
 				<Pressable
+					role="link"
+					href="https://github.com/rc-batchmates"
 					onPress={() => Linking.openURL("https://github.com/rc-batchmates")}
 				>
 					<Text className="font-mono text-[11px] font-medium text-primary">
