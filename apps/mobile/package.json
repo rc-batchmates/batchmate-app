@@ -18,7 +18,7 @@
 		"deploy:update": "eas update --channel production",
 		"build:ios": "eas build --platform ios --profile production --local",
 		"build:android": "eas build --platform android --profile production --local",
-		"build:all": "eas build --platform all --profile production --local",
+		"build:all": "eas build --platform all --profile production --local"
 	},
 	"dependencies": {
 		"@batchmate/api": "workspace:*",
