@@ -13,24 +13,27 @@ export const doorsOpen = server.doorsOpen.handler(
 			throw new ORPCError("UNAUTHORIZED")
 		}
 
-		const RECURSE_CENTER_VIRTUAL_READER_ID = 5;
+		const RECURSE_CENTER_VIRTUAL_READER_ID = 5
 
-		const { error } = await context.securityApi.POST("/v1/cards/{id}/simulate", {
-			params: {
-				path: {
-					id: parseInt(context.user.accessControlVirtualCardId),
+		const { error } = await context.securityApi.POST(
+			"/v1/cards/{id}/simulate",
+			{
+				params: {
+					path: {
+						id: Number.parseInt(context.user.accessControlVirtualCardId, 10),
+					},
+				},
+				body: {
+					reader: RECURSE_CENTER_VIRTUAL_READER_ID,
+					outputs: [
+						{
+							output_id: outputId[input.floor][input.entry],
+							duration: 5,
+						},
+					],
 				},
 			},
-			body: {
-				reader: RECURSE_CENTER_VIRTUAL_READER_ID,
-				outputs: [
-					{
-						output_id: outputId[input.floor][input.entry],
-						duration: 5,
-					},
-				],
-			},
-		})
+		)
 
 		if (error) {
 			console.error("Failed to simulate card swipe in security system:", error)
