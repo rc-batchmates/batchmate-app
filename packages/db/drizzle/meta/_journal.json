@@ -8,6 +8,13 @@
       "when": 1774762057785,
       "tag": "0000_talented_jubilee",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "6",
+      "when": 1774762057786,
+      "tag": "0001_calm_victor_mancha",
+      "breakpoints": true
     }
   ]
 }
