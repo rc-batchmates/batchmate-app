@@ -1,8 +1,8 @@
-import { Text } from "@batchmate/ui"
+import { ExternalLink, Text } from "@batchmate/ui"
 import { useRouter } from "expo-router"
 import {
 	ChevronLeft,
-	ExternalLink,
+	ExternalLink as ExternalLinkIcon,
 	Github,
 	Globe,
 	Hash,
@@ -12,7 +12,7 @@ import {
 	Twitter,
 	User,
 } from "lucide-react-native"
-import { Image, Linking, Pressable, ScrollView, View } from "react-native"
+import { Image, Pressable, ScrollView, View } from "react-native"
 import { signOut, useSession } from "../../src/lib/auth"
 
 function InfoRow({
@@ -46,13 +46,8 @@ function SocialRow({
 	value?: string | null
 	href?: string
 }) {
-	return (
-		<Pressable
-			className="flex-row items-center gap-3 px-4 py-3.5"
-			role={href && value ? "link" : undefined}
-			href={href && value ? href : undefined}
-			onPress={href && value ? () => Linking.openURL(href) : undefined}
-		>
+	const content = (
+		<>
 			<Icon size={18} color="#64748B" />
 			<View className="flex-1 gap-0.5">
 				<Text className="text-xs text-text-tertiary">{label}</Text>
@@ -60,8 +55,22 @@ function SocialRow({
 					{value || "—"}
 				</Text>
 			</View>
-			{value && <ExternalLink size={16} color="#475569" />}
-		</Pressable>
+			{value && <ExternalLinkIcon size={16} color="#475569" />}
+		</>
+	)
+
+	if (href && value) {
+		return (
+			<ExternalLink href={href} className="flex-row items-center gap-3 px-4 py-3.5">
+				{content}
+			</ExternalLink>
+		)
+	}
+
+	return (
+		<View className="flex-row items-center gap-3 px-4 py-3.5">
+			{content}
+		</View>
 	)
 }
 
@@ -102,15 +111,9 @@ export default function ProfileScreen() {
 					<Text className="text-sm font-medium text-text-secondary">Back</Text>
 				</Pressable>
 				<Text className="text-[17px] font-semibold">Profile</Text>
-				<Pressable
-					role="link"
-					href="https://www.recurse.com/settings/general"
-					onPress={() =>
-						Linking.openURL("https://www.recurse.com/settings/general")
-					}
-				>
+				<ExternalLink href="https://www.recurse.com/settings/general">
 					<Text className="text-sm font-medium text-primary">Edit</Text>
-				</Pressable>
+				</ExternalLink>
 			</View>
 
 			{/* Avatar */}

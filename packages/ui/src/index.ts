@@ -1,6 +1,7 @@
 /// <reference path="./nativewind-env.d.ts" />
 
 export { Button, buttonVariants } from "./components/ui/button"
+export { ExternalLink } from "./components/ui/external-link"
 export {
 	Card,
 	CardAction,
