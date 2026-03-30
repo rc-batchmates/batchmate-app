@@ -7,7 +7,7 @@ export type Floor = z.infer<typeof FloorSchema>
 export const EntrySchema = z.enum(["elevator", "stairs"])
 export type Entry = z.infer<typeof EntrySchema>
 
-const HubVisitSchema = z.object({
+const HubVisitorSchema = z.object({
 	personId: z.number(),
 	name: z.string(),
 	imageUrl: z.string().nullable(),
@@ -16,7 +16,13 @@ const HubVisitSchema = z.object({
 	checkedInAt: z.string(),
 })
 
-export type HubVisit = z.infer<typeof HubVisitSchema>
+const HubResponseSchema = z.object({
+	isCheckedIn: z.boolean(),
+	visitors: z.array(HubVisitorSchema),
+})
+
+export type HubVisitor = z.infer<typeof HubVisitorSchema>
+export type HubResponse = z.infer<typeof HubResponseSchema>
 
 const MemberProfileSchema = z.object({
 	id: z.number(),
@@ -65,7 +71,10 @@ export const contract = oc.router({
 		),
 	hubVisits: oc
 		.route({ method: "GET", path: "/hub" })
-		.output(z.array(HubVisitSchema)),
+		.output(HubResponseSchema),
+	hubCheckin: oc
+		.route({ method: "POST", path: "/hub/checkin" })
+		.output(z.object({ success: z.boolean() })),
 	memberProfile: oc
 		.route({ method: "GET", path: "/members/{id}" })
 		.input(z.object({ id: z.coerce.number() }))

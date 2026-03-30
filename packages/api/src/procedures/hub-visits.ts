@@ -1,4 +1,6 @@
+import { account } from "@batchmate/db/auth-schema"
 import { ORPCError } from "@orpc/server"
+import { and, eq } from "drizzle-orm"
 import { server } from "../context"
 
 export const hubVisits = server.hubVisits.handler(async ({ context }) => {
@@ -12,6 +14,20 @@ export const hubVisits = server.hubVisits.handler(async ({ context }) => {
 		})
 	}
 
+	// Get the user's RC ID to check if they're checked in
+	const rcAccount = await context.db
+		.select({ accountId: account.accountId })
+		.from(account)
+		.where(
+			and(
+				eq(account.userId, context.user.id),
+				eq(account.providerId, "recurse"),
+			),
+		)
+		.get()
+
+	const rcId = rcAccount ? Number(rcAccount.accountId) : null
+
 	const { data, error } = await context.recurseApi.GET("/hub_visits")
 
 	if (error || !data) {
@@ -19,6 +35,10 @@ export const hubVisits = server.hubVisits.handler(async ({ context }) => {
 			message: "Failed to fetch hub visits",
 		})
 	}
+
+	const isCheckedIn = rcId
+		? data.some((visit) => visit.person.id === rcId)
+		: false
 
 	// Hub visits only return person {id, name}. Fetch profiles in parallel
 	// to get images and batch info. This is N+1 but unavoidable — the RC API
@@ -46,15 +66,18 @@ export const hubVisits = server.hubVisits.handler(async ({ context }) => {
 		}),
 	)
 
-	return data.map((visit) => {
-		const profile = profiles.get(visit.person.id)
-		return {
-			personId: visit.person.id,
-			name: visit.person.name,
-			imageUrl: profile?.imageUrl ?? null,
-			batch: profile?.batch ?? null,
-			notes: visit.notes ?? "",
-			checkedInAt: visit.created_at ?? "",
-		}
-	})
+	return {
+		isCheckedIn,
+		visitors: data.map((visit) => {
+			const profile = profiles.get(visit.person.id)
+			return {
+				personId: visit.person.id,
+				name: visit.person.name,
+				imageUrl: profile?.imageUrl ?? null,
+				batch: profile?.batch ?? null,
+				notes: visit.notes ?? "",
+				checkedInAt: visit.created_at ?? "",
+			}
+		}),
+	}
 })

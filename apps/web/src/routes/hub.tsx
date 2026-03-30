@@ -1,6 +1,6 @@
-import { useQuery } from "@tanstack/react-query"
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 import { createFileRoute, Link, redirect } from "@tanstack/react-router"
-import { ChevronRight, User, Users } from "lucide-react"
+import { CheckCircle, ChevronRight, MapPin, User, Users } from "lucide-react"
 import { api } from "@/lib/api"
 import { authClient, useSession } from "@/lib/auth"
 
@@ -58,11 +58,24 @@ function PersonCard({
 
 function HubPage() {
 	const { data: session } = useSession()
+	const queryClient = useQueryClient()
 	const {
-		data: visits,
+		data: hub,
 		isLoading,
 		error,
 	} = useQuery(api.hubVisits.queryOptions({}))
+
+	const checkin = useMutation({
+		...api.hubCheckin.mutationOptions({}),
+		onSuccess: () => {
+			queryClient.invalidateQueries({
+				queryKey: api.hubVisits.queryOptions({}).queryKey,
+			})
+		},
+	})
+
+	const visitors = hub?.visitors
+	const isCheckedIn = hub?.isCheckedIn ?? false
 
 	return (
 		<div className="mx-auto flex h-full max-w-md flex-col gap-6 px-6 py-8 md:max-w-4xl md:py-12">
@@ -89,28 +102,52 @@ function HubPage() {
 						</Link>
 					</nav>
 				</div>
-				<Link
-					to="/profile"
-					className="flex h-11 w-11 items-center justify-center overflow-hidden rounded-full bg-card"
-				>
-					{session?.user?.image ? (
-						<img
-							src={session.user.image}
-							alt=""
-							className="h-full w-full object-cover"
-						/>
-					) : (
-						<User size={22} color="#22D3EE" />
+				<div className="flex items-center gap-4">
+					{visitors && (
+						<div className="flex items-center gap-1.5 rounded-full bg-cyan/10 px-3.5 py-1.5">
+							<div className="h-2 w-2 rounded-full bg-cyan" />
+							<span className="text-[13px] font-medium text-cyan">
+								{visitors.length} {visitors.length === 1 ? "person" : "people"}
+							</span>
+						</div>
 					)}
-				</Link>
+					<Link
+						to="/profile"
+						className="flex h-11 w-11 items-center justify-center overflow-hidden rounded-full bg-card"
+					>
+						{session?.user?.image ? (
+							<img
+								src={session.user.image}
+								alt=""
+								className="h-full w-full object-cover"
+							/>
+						) : (
+							<User size={22} color="#22D3EE" />
+						)}
+					</Link>
+				</div>
 			</div>
 
-			{/* Count badge */}
-			{visits && (
-				<div className="flex items-center gap-1.5 self-start rounded-full bg-cyan/10 px-3.5 py-1.5">
-					<div className="h-2 w-2 rounded-full bg-cyan" />
-					<span className="text-[13px] font-medium text-cyan">
-						{visits.length} {visits.length === 1 ? "person" : "people"}
+			{/* Check in */}
+			{hub && !isCheckedIn && (
+				<button
+					type="button"
+					onClick={() => checkin.mutate({})}
+					disabled={checkin.isPending}
+					className="flex h-12 w-full cursor-pointer items-center justify-center gap-2 rounded-xl bg-cyan text-background disabled:opacity-50"
+				>
+					<MapPin size={18} />
+					<span className="text-[15px] font-semibold">
+						{checkin.isPending ? "Checking in..." : "Check in to the Hub"}
+					</span>
+				</button>
+			)}
+
+			{hub && isCheckedIn && (
+				<div className="flex h-12 w-full items-center justify-center gap-2 rounded-xl border border-cyan/20 bg-cyan/10">
+					<CheckCircle size={18} color="#22D3EE" />
+					<span className="text-sm font-medium text-cyan">
+						You're checked in
 					</span>
 				</div>
 			)}
@@ -130,7 +167,7 @@ function HubPage() {
 				</div>
 			)}
 
-			{visits && visits.length === 0 && (
+			{visitors && visitors.length === 0 && (
 				<div className="flex flex-1 flex-col items-center justify-center gap-3">
 					<Users size={48} color="#475569" />
 					<span className="text-sm text-text-tertiary">
@@ -139,9 +176,9 @@ function HubPage() {
 				</div>
 			)}
 
-			{visits && visits.length > 0 && (
+			{visitors && visitors.length > 0 && (
 				<div className="flex flex-col gap-2.5 md:grid md:grid-cols-2 md:gap-3">
-					{visits.map((visit) => (
+					{visitors.map((visit) => (
 						<PersonCard
 							key={visit.personId}
 							personId={visit.personId}
