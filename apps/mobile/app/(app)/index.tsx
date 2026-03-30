@@ -1,4 +1,4 @@
-import { DoorControls, Text } from "@batchmate/ui"
+import { DoorControls, Text, ZoomLinks } from "@batchmate/ui"
 import { useMutation, useQuery } from "@tanstack/react-query"
 import { useRouter } from "expo-router"
 import { User } from "lucide-react-native"
@@ -76,6 +76,9 @@ export default function HomeScreen() {
 				isPending={openDoor.isPending}
 				pendingDoor={pendingDoor}
 			/>
+
+			{/* Zoom Rooms */}
+			<ZoomLinks />
 		</ScrollView>
 	)
 }

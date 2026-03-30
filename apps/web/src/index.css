@@ -2,8 +2,11 @@
 @source "../../../packages/ui/src";
 
 /* react-native-web reset: ensure RN primitives work with Tailwind classes */
-html,
+html {
+	height: 100%;
+}
+
 body,
 #root {
-	height: 100%;
+	min-height: 100%;
 }

@@ -1,4 +1,4 @@
-import { DoorControls } from "@batchmate/ui"
+import { DoorControls, ZoomLinks } from "@batchmate/ui"
 import { useMutation, useQuery } from "@tanstack/react-query"
 import { createFileRoute, Link, redirect } from "@tanstack/react-router"
 import { User } from "lucide-react"
@@ -36,7 +36,7 @@ function HomePage() {
 	})
 
 	return (
-		<div className="mx-auto flex h-full max-w-md flex-col gap-7 px-6 py-8 md:max-w-4xl md:py-12">
+		<div className="mx-auto flex min-h-full max-w-md flex-col gap-7 px-6 py-8 md:max-w-4xl md:py-12">
 			{/* Header */}
 			<div className="flex items-center justify-between">
 				<div className="flex flex-col gap-1">
@@ -107,6 +107,9 @@ function HomePage() {
 				isPending={openDoor.isPending}
 				pendingDoor={pendingDoor}
 			/>
+
+			{/* Zoom Rooms */}
+			<ZoomLinks />
 		</div>
 	)
 }
