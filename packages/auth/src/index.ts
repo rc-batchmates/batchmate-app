@@ -3,7 +3,7 @@ import { createSecurityApi } from "@batchmate/security-api"
 import { expo } from "@better-auth/expo"
 import { type BetterAuthOptions, betterAuth } from "better-auth"
 import { drizzleAdapter } from "better-auth/adapters/drizzle"
-import { genericOAuth, sec } from "better-auth/plugins"
+import { genericOAuth } from "better-auth/plugins"
 
 const RC_BASE = "https://www.recurse.com"
 
@@ -79,7 +79,11 @@ export function createAuth(db: Database, env: AuthEnv) {
 				rcFirstName: { type: "string", required: false, input: false },
 				rcLastName: { type: "string", required: false, input: false },
 				accessControlUserId: { type: "string", required: false, input: false },
-				accessControlVirtualCardId: { type: "string", required: false, input: false },
+				accessControlVirtualCardId: {
+					type: "string",
+					required: false,
+					input: false,
+				},
 				github: { type: "string", required: false },
 				twitter: { type: "string", required: false },
 				linkedin: { type: "string", required: false },
@@ -92,12 +96,18 @@ export function createAuth(db: Database, env: AuthEnv) {
 				create: {
 					before: async (user) => {
 						// believe it or not, all badges are in the same department as the staff!
-						const RECURSE_CENTER_STAFF_DEPARTMENT_ID = 2;
-						const RECURSE_CENTER_ACCESS_GROUP_ID = 2;
-						const VIRTUAL_CARD_SITE_CODE = parseInt(env.VIRTUAL_CARD_SITE_CODE ?? "999");
-						const VIRTUAL_CARD_PREFIX = parseInt(env.VIRTUAL_CARD_PREFIX ?? "99900000000");
+						const RECURSE_CENTER_STAFF_DEPARTMENT_ID = 2
+						const RECURSE_CENTER_ACCESS_GROUP_ID = 2
+						const VIRTUAL_CARD_SITE_CODE = Number.parseInt(
+							env.VIRTUAL_CARD_SITE_CODE ?? "999",
+							10,
+						)
+						const VIRTUAL_CARD_PREFIX = Number.parseInt(
+							env.VIRTUAL_CARD_PREFIX ?? "99900000000",
+							10,
+						)
 
-						const response1 = await securityApi.POST("/v1/users", {
+						const createUserRes = await securityApi.POST("/v1/users", {
 							body: {
 								first_name: user.rcFirstName as string,
 								last_name: user.rcLastName as string,
@@ -106,44 +116,92 @@ export function createAuth(db: Database, env: AuthEnv) {
 								master_user: true,
 								pin: undefined,
 								notes: `Auto-provisioned for Recurse profile ${user.rcId}`,
-							}
-						});
-
-						if (!response1.data?.ok) {
-							console.log("Failed to provision user in security system:", response1);
-							throw new Error(`Failed to provision user in security system.`);
-						}
-
-						const { user: provisionedUser } = response1.data;
-
-						const response2 = await securityApi.POST("/v1/cards", {
-							body: {
-								site_code: VIRTUAL_CARD_SITE_CODE,
-								card_code: String(VIRTUAL_CARD_PREFIX + parseInt(String(user.rcId))),
-							}
+							},
 						})
 
-						if (!response2.data?.ok) {
-							console.log("Failed to provision virtual card in security system:", response2);
-							throw new Error(`Failed to provision virtual card in security system.`);
+						if (!createUserRes.data?.ok) {
+							console.log(
+								"Failed to provision user in security system:",
+								createUserRes,
+							)
+							throw new Error(`Failed to provision user in security system.`)
 						}
 
-						const { card: provisionedCard } = response2.data;
+						const { user: provisionedUser } = createUserRes.data
 
-						const response3 = await securityApi.POST("/v1/cards/{id}/assign", {
-							params: {
-								path: {
-									id: provisionedCard.id,
+						const cardCode = String(
+							VIRTUAL_CARD_PREFIX + Number.parseInt(String(user.rcId), 10),
+						)
+						const createCardRes = await securityApi.POST("/v1/cards", {
+							body: {
+								site_code: VIRTUAL_CARD_SITE_CODE,
+								card_code: cardCode,
+							},
+						})
+
+						let provisionedCard: (typeof createCardRes.data & {
+							ok: true
+						})["card"]
+						if (createCardRes.data?.ok) {
+							provisionedCard = createCardRes.data.card
+						} else if (createCardRes.response.status === 409) {
+							// Card already exists, look it up
+							const lookupCardRes = await securityApi.GET(
+								"/v1/cards/lookup/{site_code}/{card_code}",
+								{
+									params: {
+										path: {
+											site_code: VIRTUAL_CARD_SITE_CODE,
+											card_code: cardCode,
+										},
+									},
+								},
+							)
+							if (!lookupCardRes.data?.ok) {
+								console.log(
+									"Failed to lookup existing virtual card in security system:",
+									lookupCardRes,
+								)
+								throw new Error(
+									`Failed to lookup existing virtual card in security system.`,
+								)
+							}
+							provisionedCard = lookupCardRes.data.card
+						} else {
+							console.log(
+								"Failed to provision virtual card in security system:",
+								createCardRes,
+							)
+							throw new Error(
+								`Failed to provision virtual card in security system.`,
+							)
+						}
+
+						const assignCardRes = await securityApi.POST(
+							"/v1/cards/{id}/assign",
+							{
+								params: {
+									path: {
+										id: provisionedCard.id,
+									},
+								},
+								body: {
+									employee_id: provisionedUser.id,
 								},
 							},
-							body: {
-								employee_id: provisionedUser.id,
-							},
-						});
+						)
 
-						if (!response3.data?.ok) {
-							console.log("Failed to assign virtual card to user in security system:", response3);
-							throw new Error(`Failed to assign virtual card to user in security system.`);
+						if (
+							!assignCardRes.data?.ok &&
+							assignCardRes.response.status !== 409
+						) {
+							console.log(
+								"Failed to assign virtual card to user in security system:",
+								assignCardRes,
+							)
+							throw new Error(
+								`Failed to assign virtual card to user in security system.`,
+							)
 						}
 
 						return {
@@ -151,7 +209,7 @@ export function createAuth(db: Database, env: AuthEnv) {
 								accessControlUserId: String(provisionedUser.id),
 								accessControlVirtualCardId: String(provisionedCard.id),
 								...user,
-							}
+							},
 						}
 					},
 				},
