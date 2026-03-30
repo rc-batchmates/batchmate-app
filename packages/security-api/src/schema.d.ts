@@ -4,417 +4,1163 @@
  */
 
 export interface paths {
-	"/v1/panel/outputs": {
-		parameters: {
-			query?: never
-			header?: never
-			path?: never
-			cookie?: never
-		}
-		/**
-		 * Get output relay states
-		 * @description Returns the current state of all output relays that are either unlocked or overridden. Returns an empty array when the panel has just booted or been reset and no output activity has occurred.
-		 */
-		get: {
-			parameters: {
-				query?: never
-				header?: never
-				path?: never
-				cookie?: never
-			}
-			requestBody?: never
-			responses: {
-				/** @description Current output states. */
-				200: {
-					headers: {
-						[name: string]: unknown
-					}
-					content: {
-						"application/json": {
-							outputs: {
-								/** @description Output relay index (0-indexed). */
-								output_id: number
-								/** @description Whether the output is currently active (unlocked). People can access whatever is controlled by this output. */
-								is_unlocked: boolean
-								/** @description Whether this output is being held open by the AxTraxNG server, rather than a decision made by the panel. */
-								is_overridden: boolean
-							}[]
-						}
-					}
-				}
-			}
-		}
-		put?: never
-		/**
-		 * Control output relays
-		 * @description Send manual output operations to the panel. Each operation targets a specific output relay by index and specifies what to do with it.
-		 */
-		post: {
-			parameters: {
-				query?: never
-				header?: never
-				path?: never
-				cookie?: never
-			}
-			requestBody: {
-				content: {
-					"application/json": {
-						operations: {
-							/** @description Output relay index (0-indexed). */
-							output_id: number
-							/**
-							 * @description `pulse` -- open momentarily for `duration` seconds, then re-lock. `open` -- open permanently until explicitly closed. `close` -- close and return to default state.
-							 * @enum {string}
-							 */
-							operation: "pulse" | "open" | "close"
-							/**
-							 * @description Duration in seconds. Used by `pulse` and `open`.
-							 * @default 0
-							 */
-							duration?: number
-						}[]
-					}
-				}
-			}
-			responses: {
-				/** @description The panel acknowledged the command. */
-				200: {
-					headers: {
-						[name: string]: unknown
-					}
-					content: {
-						"application/json": components["schemas"]["SuccessResponse"]
-					}
-				}
-				/** @description The request body is malformed or contains invalid values. */
-				400: {
-					headers: {
-						[name: string]: unknown
-					}
-					content: {
-						"application/json": components["schemas"]["FormatExceptionResponse"]
-					}
-				}
-				/** @description The panel responded with an unexpected packet. */
-				500: {
-					headers: {
-						[name: string]: unknown
-					}
-					content: {
-						"application/json": components["schemas"]["UnexpectedPacketResponse"]
-					}
-				}
-				/** @description The panel rejected the command (NACK). */
-				502: {
-					headers: {
-						[name: string]: unknown
-					}
-					content: {
-						"application/json": components["schemas"]["NackResponse"]
-					}
-				}
-			}
-		}
-		delete?: never
-		options?: never
-		head?: never
-		patch?: never
-		trace?: never
-	}
-	"/v1/webhooks": {
-		parameters: {
-			query?: never
-			header?: never
-			path?: never
-			cookie?: never
-		}
-		/**
-		 * List registered webhooks
-		 * @description Returns all registered webhook endpoints.
-		 */
-		get: {
-			parameters: {
-				query?: never
-				header?: never
-				path?: never
-				cookie?: never
-			}
-			requestBody?: never
-			responses: {
-				/** @description List of webhooks. */
-				200: {
-					headers: {
-						[name: string]: unknown
-					}
-					content: {
-						"application/json": {
-							webhooks: {
-								/**
-								 * Format: uuid
-								 * @description Unique webhook identifier.
-								 */
-								id: string
-								/**
-								 * Format: uri
-								 * @description The URL that will receive POST deliveries.
-								 */
-								url: string
-							}[]
-						}
-					}
-				}
-			}
-		}
-		put?: never
-		/**
-		 * Register a webhook
-		 * @description Register a new URL to receive event deliveries. Each delivery is signed with the provided key using HMAC-SHA256, sent in the `X-Webhook-Signature` header as a hex-encoded digest.
-		 */
-		post: {
-			parameters: {
-				query?: never
-				header?: never
-				path?: never
-				cookie?: never
-			}
-			requestBody: {
-				content: {
-					"application/json": {
-						/**
-						 * Format: uri
-						 * @description The URL that will receive POST deliveries.
-						 */
-						url: string
-						/** @description Secret key used to compute the HMAC-SHA256 signature. */
-						signing_key: string
-					}
-				}
-			}
-			responses: {
-				/** @description Webhook registered successfully. */
-				201: {
-					headers: {
-						[name: string]: unknown
-					}
-					content: {
-						"application/json": {
-							/** @constant */
-							ok: true
-							webhook: {
-								/** Format: uuid */
-								id: string
-								/** Format: uri */
-								url: string
-							}
-						}
-					}
-				}
-			}
-		}
-		delete?: never
-		options?: never
-		head?: never
-		patch?: never
-		trace?: never
-	}
-	"/v1/webhooks/{id}": {
-		parameters: {
-			query?: never
-			header?: never
-			path?: never
-			cookie?: never
-		}
-		get?: never
-		put?: never
-		post?: never
-		/**
-		 * Remove a webhook
-		 * @description Unregister a webhook by its ID. Future events will no longer be delivered to it.
-		 */
-		delete: {
-			parameters: {
-				query?: never
-				header?: never
-				path: {
-					/** @description The webhook ID returned at registration time. */
-					id: string
-				}
-				cookie?: never
-			}
-			requestBody?: never
-			responses: {
-				/** @description Webhook removed. */
-				200: {
-					headers: {
-						[name: string]: unknown
-					}
-					content: {
-						"application/json": components["schemas"]["SuccessResponse"]
-					}
-				}
-				/** @description No webhook with that ID exists. */
-				404: {
-					headers: {
-						[name: string]: unknown
-					}
-					content: {
-						"application/json": {
-							/** @constant */
-							ok?: false
-							error?: string
-						}
-					}
-				}
-			}
-		}
-		options?: never
-		head?: never
-		patch?: never
-		trace?: never
-	}
+    "/v1/panel/outputs": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get output relay states
+         * @description Returns the current state of all output relays that are either unlocked or overridden. Returns an empty array when the panel has just booted or been reset and no output activity has occurred.
+         */
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Current output states. */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            outputs: {
+                                /** @description Output relay index (0-indexed). */
+                                output_id: number;
+                                /** @description Whether the output is currently active (unlocked). People can access whatever is controlled by this output. */
+                                is_unlocked: boolean;
+                                /** @description Whether this output is being held open by the AxTraxNG server, rather than a decision made by the panel. */
+                                is_overridden: boolean;
+                            }[];
+                        };
+                    };
+                };
+            };
+        };
+        put?: never;
+        /**
+         * Control output relays
+         * @description Send manual output operations to the panel. Each operation targets a specific output relay by index and specifies what to do with it.
+         */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": {
+                        operations: {
+                            /** @description Output relay index (0-indexed). */
+                            output_id: number;
+                            /**
+                             * @description `pulse` -- open momentarily for `duration` seconds, then re-lock. `open` -- open permanently until explicitly closed. `close` -- close and return to default state.
+                             * @enum {string}
+                             */
+                            operation: "pulse" | "open" | "close";
+                            /**
+                             * @description Duration in seconds. Used by `pulse` and `open`.
+                             * @default 0
+                             */
+                            duration?: number;
+                        }[];
+                    };
+                };
+            };
+            responses: {
+                /** @description The panel acknowledged the command. */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["SuccessResponse"];
+                    };
+                };
+                /** @description The request body is malformed or contains invalid values. */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["FormatExceptionResponse"];
+                    };
+                };
+                /** @description The panel responded with an unexpected packet. */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["UnexpectedPacketResponse"];
+                    };
+                };
+                /** @description The panel rejected the command (NACK). */
+                502: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["NackResponse"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/webhooks": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List registered webhooks
+         * @description Returns all registered webhook endpoints.
+         */
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description List of webhooks. */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            webhooks: {
+                                /**
+                                 * Format: uuid
+                                 * @description Unique webhook identifier.
+                                 */
+                                id: string;
+                                /**
+                                 * Format: uri
+                                 * @description The URL that will receive POST deliveries.
+                                 */
+                                url: string;
+                            }[];
+                        };
+                    };
+                };
+            };
+        };
+        put?: never;
+        /**
+         * Register a webhook
+         * @description Register a new URL to receive event deliveries. Each delivery is signed with the provided key using HMAC-SHA256, sent in the `X-Webhook-Signature` header as a hex-encoded digest.
+         */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": {
+                        /**
+                         * Format: uri
+                         * @description The URL that will receive POST deliveries.
+                         */
+                        url: string;
+                        /** @description Secret key used to compute the HMAC-SHA256 signature. */
+                        signing_key: string;
+                    };
+                };
+            };
+            responses: {
+                /** @description Webhook registered successfully. */
+                201: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** @constant */
+                            ok: true;
+                            webhook: {
+                                /** Format: uuid */
+                                id: string;
+                                /** Format: uri */
+                                url: string;
+                            };
+                        };
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/users": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List users
+         * @description Returns all employees in the AxTrax database.
+         */
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description List of users. */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** @constant */
+                            ok: true;
+                            users: components["schemas"]["User"][];
+                        };
+                    };
+                };
+            };
+        };
+        put?: never;
+        /**
+         * Create user
+         * @description Create a new employee record. This is a database-only operation — the panel is not notified until a card is assigned to this user.
+         */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": {
+                        first_name: string;
+                        last_name: string;
+                        /**
+                         * @description 1=General, 2=RC Staff, 10000=Visitors.
+                         * @default 1
+                         */
+                        department?: number;
+                        /**
+                         * @description 1=Master, 2=Recurse Center Access Group, 1000000=Unauthorized.
+                         * @default 2
+                         */
+                        access_group?: number;
+                        /** @default  */
+                        pin?: string;
+                        /** @default false */
+                        master_user?: boolean;
+                        /** @default  */
+                        notes?: string;
+                    };
+                };
+            };
+            responses: {
+                /** @description User created. */
+                201: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** @constant */
+                            ok: true;
+                            user: components["schemas"]["User"];
+                        };
+                    };
+                };
+                /** @description Invalid department or access group. */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description Database error. */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/users/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get user
+         * @description Returns a single employee with their assigned cards.
+         */
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    id: number;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description User with cards. */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** @constant */
+                            ok: true;
+                            user: components["schemas"]["User"] & {
+                                cards?: components["schemas"]["Card"][];
+                            };
+                        };
+                    };
+                };
+                /** @description User not found. */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        /**
+         * Delete user
+         * @description Delete an employee. The user must have no cards referencing them. If the user has a panel slot, a DeleteUserData download is queued.
+         */
+        delete: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    id: number;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description User deleted. */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["SuccessResponse"];
+                    };
+                };
+                /** @description User not found. */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description User still has cards referencing them. */
+                409: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+            };
+        };
+        options?: never;
+        head?: never;
+        /**
+         * Update user
+         * @description Update one or more fields on an employee. If access-related fields (access_group, pin, master_user) change and the user has a panel slot, a UserData download is automatically queued.
+         */
+        patch: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    id: number;
+                };
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": {
+                        first_name?: string;
+                        last_name?: string;
+                        department?: number;
+                        access_group?: number;
+                        pin?: string;
+                        master_user?: boolean;
+                        notes?: string;
+                    };
+                };
+            };
+            responses: {
+                /** @description User updated. */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["SuccessResponse"];
+                    };
+                };
+                /** @description Invalid field values or no fields provided. */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description User not found. */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+            };
+        };
+        trace?: never;
+    };
+    "/v1/cards": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List cards
+         * @description Returns all cards in the AxTrax database.
+         */
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description List of cards. */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** @constant */
+                            ok: true;
+                            cards: components["schemas"]["Card"][];
+                        };
+                    };
+                };
+            };
+        };
+        put?: never;
+        /**
+         * Create card
+         * @description Create a new unassigned card record. This is a database-only operation — the panel is not notified until the card is assigned to a user.
+         */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": {
+                        /** @description Facility code (198 for RC Wiegand cards). */
+                        site_code: number;
+                        /** @description Card number as a string. */
+                        card_code: string;
+                    };
+                };
+            };
+            responses: {
+                /** @description Card created. */
+                201: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** @constant */
+                            ok: true;
+                            card: components["schemas"]["Card"];
+                        };
+                    };
+                };
+                /** @description A card with that site_code and card_code already exists. */
+                409: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/cards/lookup/{site_code}/{card_code}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Lookup card by site code and card code
+         * @description Find a card by its facility code and card number.
+         */
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    /** @description Facility code (e.g. 198). */
+                    site_code: number;
+                    /** @description Card number. */
+                    card_code: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Card found. */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** @constant */
+                            ok: true;
+                            card: components["schemas"]["Card"];
+                        };
+                    };
+                };
+                /** @description No card with that site code and card code. */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/cards/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get card
+         * @description Returns a single card by its database ID.
+         */
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    id: number;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Card details. */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** @constant */
+                            ok: true;
+                            card: components["schemas"]["Card"];
+                        };
+                    };
+                };
+                /** @description Card not found. */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        /**
+         * Delete card
+         * @description Delete a card. The card must be unassigned first (IdEmpNum=0). Also removes the card's panel slot if one exists.
+         */
+        delete: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    id: number;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Card deleted. */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["SuccessResponse"];
+                    };
+                };
+                /** @description Card not found. */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description Card is still assigned to an employee. */
+                409: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+            };
+        };
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/cards/{id}/assign": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Assign card to user
+         * @description Assign an unassigned card to an employee. This is the operation that actually pushes credentials to the panel. It allocates panel slots for both the user and card (if needed) and queues the appropriate download commands (UserData priority 140, CodeData priority 145).
+         */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    /** @description Card ID. */
+                    id: number;
+                };
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": {
+                        /** @description The employee to assign this card to. */
+                        employee_id: number;
+                    };
+                };
+            };
+            responses: {
+                /** @description Card assigned and panel downloads queued. */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["SuccessResponse"];
+                    };
+                };
+                /** @description Card or employee not found. */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description Card is already assigned. */
+                409: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/cards/{id}/unassign": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Unassign card from user
+         * @description Unassign a card from its employee. Updates the card to unassigned status and queues a DeleteCardData download (command 242) to clear the card slot on the panel. The card slot row in tblSlotCard is preserved.
+         */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    /** @description Card ID. */
+                    id: number;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Card unassigned and panel download queued. */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["SuccessResponse"];
+                    };
+                };
+                /** @description Card not found. */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description Card is not currently assigned. */
+                409: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/cards/{id}/simulate": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Simulate a card swipe
+         * @description Simulate a card being swiped at a reader. The card must exist and be assigned to an employee. Fires a ManualOutput pulse followed by an EventEmitter transaction that rewrites the resulting panel event into an ACCESS_GRANTED event with the card's credentials. The server sees an event indistinguishable from a real card swipe.
+         */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    /** @description Card ID. */
+                    id: number;
+                };
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": {
+                        /** @description Reader index (0-9). */
+                        reader: number;
+                        /** @description Output relays to pulse as part of the simulation. */
+                        outputs: {
+                            /** @description Output relay index (0-31). */
+                            output_id: number;
+                            /**
+                             * @description Pulse duration in seconds (max 3599).
+                             * @default 1
+                             */
+                            duration?: number;
+                        }[];
+                    };
+                };
+            };
+            responses: {
+                /** @description Card swipe simulated. */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["SuccessResponse"];
+                    };
+                };
+                /** @description Card not found, not assigned, invalid reader, or invalid outputs. */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description Panel rejected the operation (NACK). */
+                502: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/webhooks/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /**
+         * Remove a webhook
+         * @description Unregister a webhook by its ID. Future events will no longer be delivered to it.
+         */
+        delete: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    /** @description The webhook ID returned at registration time. */
+                    id: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Webhook removed. */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["SuccessResponse"];
+                    };
+                };
+                /** @description No webhook with that ID exists. */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** @constant */
+                            ok?: false;
+                            error?: string;
+                        };
+                    };
+                };
+            };
+        };
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/status": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get proxy and component status
+         * @description Returns the current state of all tracked components (proxy lifecycle, coordinator, pipeline handlers, database) as a flat record keyed by component name. Each entry includes the current state, a millisecond timestamp of when it entered that state, and an optional detail object with state-specific information.
+         */
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Current component statuses. */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** @constant */
+                            ok: true;
+                            components: {
+                                [key: string]: components["schemas"]["StatusEntry"];
+                            };
+                        };
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
-export type webhooks = Record<string, never>
+export type webhooks = Record<string, never>;
 export interface components {
-	schemas: {
-		WebhookEvent: {
-			/** @description Milliseconds since Unix epoch when the event was observed. */
-			time: number
-			/**
-			 * @description The event type.
-			 * @enum {string}
-			 */
-			type: "output.enabled" | "output.disabled"
-			data: components["schemas"]["OutputEventData"]
-		}
-		OutputEventData: {
-			/** @description Output relay index (0-indexed). */
-			output_id: number
-			/** @description Whether this output is being held open by the AxTraxNG server, rather than a decision made by the panel. */
-			is_overridden: boolean
-		}
-		/**
-		 * @example {
-		 *       "ok": true
-		 *     }
-		 */
-		SuccessResponse: {
-			/** @constant */
-			ok: true
-		}
-		/**
-		 * @example {
-		 *       "ok": false,
-		 *       "error": {
-		 *         "type": "format_exception",
-		 *         "message": "output_id 33 out of range (0-31)"
-		 *       }
-		 *     }
-		 */
-		FormatExceptionResponse: {
-			/** @constant */
-			ok: false
-			error: {
-				/** @constant */
-				type: "format_exception"
-				/** @description Human-readable description of what went wrong. */
-				message: string
-			}
-		}
-		/**
-		 * @example {
-		 *       "ok": false,
-		 *       "error": {
-		 *         "type": "nack",
-		 *         "associated_logs": [
-		 *           {
-		 *             "destination": [
-		 *               "log",
-		 *               "event"
-		 *             ],
-		 *             "severity": "Error",
-		 *             "message": "01:03:25:450 PrepareNackResponse: You failed to set the ObviousFlag you big dumb idiot"
-		 *           }
-		 *         ]
-		 *       }
-		 *     }
-		 */
-		NackResponse: {
-			/** @constant */
-			ok: false
-			error: {
-				/** @constant */
-				type: "nack"
-				/** @description Log messages the panel sent before the NACK. May be empty if the panel did not send a PrepareNackResponse log. */
-				associated_logs: components["schemas"]["LogPacket"][]
-			}
-		}
-		/**
-		 * @example {
-		 *       "ok": false,
-		 *       "error": {
-		 *         "type": "unexpected_packet",
-		 *         "packet": {
-		 *           "direction": "FromPanel",
-		 *           "source": "Panel (Dual Addressing, Main Controller)",
-		 *           "destination": "Server",
-		 *           "transaction_id": "0x03",
-		 *           "command_id": 107,
-		 *           "command_name": "RequestFirmVer825",
-		 *           "event_flag": "Unset",
-		 *           "payload": "0a1b2c"
-		 *         }
-		 *       }
-		 *     }
-		 */
-		UnexpectedPacketResponse: {
-			/** @constant */
-			ok: false
-			error: {
-				/** @constant */
-				type: "unexpected_packet"
-				packet: components["schemas"]["Frame"]
-			}
-		}
-		LogPacket: {
-			/** @description Where the panel intended this log to go. */
-			destination: ("log" | "event")[]
-			/** @enum {string} */
-			severity:
-				| "Trace"
-				| "Debug"
-				| "Info"
-				| "Warning"
-				| "Error"
-				| "Fatal"
-				| "Disable"
-				| "NotAvailable"
-			/** @description The raw log message text from the panel. */
-			message: string
-		}
-		Frame: {
-			/** @enum {string} */
-			direction: "ToPanel" | "FromPanel"
-			/** @description Source address (e.g. `"Server"`, `"Panel (Dual Addressing, Main Controller)"`). */
-			source: string
-			/** @description Destination address. */
-			destination: string
-			/** @description Transaction ID as hex (e.g. `"0x03"`). */
-			transaction_id: string
-			/** @description Raw command byte. */
-			command_id: number
-			/** @description Human-readable command name, or null if unknown. */
-			command_name: string | null
-			/** @enum {string} */
-			event_flag: "Set" | "Unset"
-			/** @description Hex-encoded payload bytes. */
-			payload: string
-		}
-	}
-	responses: never
-	parameters: never
-	requestBodies: never
-	headers: never
-	pathItems: never
+    schemas: {
+        StatusEntry: {
+            /** @description Current state of the component. */
+            state: string;
+            /** @description Milliseconds since Unix epoch when this state was entered. */
+            since: number;
+            /** @description State-specific detail (absent when there is nothing extra to report). */
+            detail?: Record<string, never>;
+        };
+        WebhookEvent: {
+            /** @description Milliseconds since Unix epoch when the event was observed. */
+            time: number;
+            /**
+             * @description The event type.
+             * @enum {string}
+             */
+            type: "output.enabled" | "output.disabled";
+            data: components["schemas"]["OutputEventData"];
+        };
+        OutputEventData: {
+            /** @description Output relay index (0-indexed). */
+            output_id: number;
+            /** @description Whether this output is being held open by the AxTraxNG server, rather than a decision made by the panel. */
+            is_overridden: boolean;
+        };
+        User: {
+            /** @description Employee number (iEmployeeNum). */
+            id: number;
+            first_name: string;
+            last_name: string;
+            /** @description 1=General, 2=RC Staff, 10000=Visitors. */
+            department: number;
+            /** @description 1=Master, 2=Recurse Center Access Group, 1000000=Unauthorized. */
+            access_group: number;
+            master_user: boolean;
+            notes?: string;
+        };
+        Card: {
+            /** @description Card database ID (IdCardNum). */
+            id: number;
+            /** @description Facility code (e.g. 198). */
+            site_code: number;
+            /** @description Card number as a string. */
+            card_code: string;
+            /** @enum {string} */
+            status: "active" | "unassigned";
+            /** @description Assigned employee ID, or 0 if unassigned. */
+            employee_id: number;
+            /** @description The assigned employee, if any. Present when the card is assigned (employee_id != 0), omitted when unassigned. */
+            employee?: components["schemas"]["User"] | null;
+        };
+        /**
+         * @example {
+         *       "ok": true
+         *     }
+         */
+        SuccessResponse: {
+            /** @constant */
+            ok: true;
+        };
+        /**
+         * @example {
+         *       "ok": false,
+         *       "error": {
+         *         "type": "format_exception",
+         *         "message": "output_id 33 out of range (0-31)"
+         *       }
+         *     }
+         */
+        FormatExceptionResponse: {
+            /** @constant */
+            ok: false;
+            error: {
+                /** @constant */
+                type: "format_exception";
+                /** @description Human-readable description of what went wrong. */
+                message: string;
+            };
+        };
+        /**
+         * @example {
+         *       "ok": false,
+         *       "error": {
+         *         "type": "nack",
+         *         "associated_logs": [
+         *           {
+         *             "destination": [
+         *               "log",
+         *               "event"
+         *             ],
+         *             "severity": "Error",
+         *             "message": "01:03:25:450 PrepareNackResponse: You failed to set the ObviousFlag you big dumb idiot"
+         *           }
+         *         ]
+         *       }
+         *     }
+         */
+        NackResponse: {
+            /** @constant */
+            ok: false;
+            error: {
+                /** @constant */
+                type: "nack";
+                /** @description Log messages the panel sent before the NACK. May be empty if the panel did not send a PrepareNackResponse log. */
+                associated_logs: components["schemas"]["LogPacket"][];
+            };
+        };
+        /**
+         * @example {
+         *       "ok": false,
+         *       "error": {
+         *         "type": "unexpected_packet",
+         *         "packet": {
+         *           "direction": "FromPanel",
+         *           "source": "Panel (Dual Addressing, Main Controller)",
+         *           "destination": "Server",
+         *           "transaction_id": "0x03",
+         *           "command_id": 107,
+         *           "command_name": "RequestFirmVer825",
+         *           "event_flag": "Unset",
+         *           "payload": "0a1b2c"
+         *         }
+         *       }
+         *     }
+         */
+        UnexpectedPacketResponse: {
+            /** @constant */
+            ok: false;
+            error: {
+                /** @constant */
+                type: "unexpected_packet";
+                packet: components["schemas"]["Frame"];
+            };
+        };
+        LogPacket: {
+            /** @description Where the panel intended this log to go. */
+            destination: ("log" | "event")[];
+            /** @enum {string} */
+            severity: "Trace" | "Debug" | "Info" | "Warning" | "Error" | "Fatal" | "Disable" | "NotAvailable";
+            /** @description The raw log message text from the panel. */
+            message: string;
+        };
+        Frame: {
+            /** @enum {string} */
+            direction: "ToPanel" | "FromPanel";
+            /** @description Source address (e.g. `"Server"`, `"Panel (Dual Addressing, Main Controller)"`). */
+            source: string;
+            /** @description Destination address. */
+            destination: string;
+            /** @description Transaction ID as hex (e.g. `"0x03"`). */
+            transaction_id: string;
+            /** @description Raw command byte. */
+            command_id: number;
+            /** @description Human-readable command name, or null if unknown. */
+            command_name: string | null;
+            /** @enum {string} */
+            event_flag: "Set" | "Unset";
+            /** @description Hex-encoded payload bytes. */
+            payload: string;
+        };
+    };
+    responses: never;
+    parameters: never;
+    requestBodies: never;
+    headers: never;
+    pathItems: never;
 }
-export type $defs = Record<string, never>
-export type operations = Record<string, never>
+export type $defs = Record<string, never>;
+export type operations = Record<string, never>;

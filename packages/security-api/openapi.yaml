@@ -273,6 +273,454 @@ paths:
                       id: "b1c2d3e4-5678-4a9b-0cde-f1234567890a"
                       url: "https://my-worker.example.workers.dev/events"
 
+  /v1/users:
+    get:
+      summary: List users
+      description: Returns all employees in the AxTrax database.
+      responses:
+        "200":
+          description: List of users.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [ok, users]
+                properties:
+                  ok:
+                    type: boolean
+                    const: true
+                  users:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/User"
+    post:
+      summary: Create user
+      description: >
+        Create a new employee record. This is a database-only operation — the
+        panel is not notified until a card is assigned to this user.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [first_name, last_name]
+              properties:
+                first_name:
+                  type: string
+                last_name:
+                  type: string
+                department:
+                  type: integer
+                  default: 1
+                  description: "1=General, 2=RC Staff, 10000=Visitors."
+                access_group:
+                  type: integer
+                  default: 2
+                  description: "1=Master, 2=Recurse Center Access Group, 1000000=Unauthorized."
+                pin:
+                  type: string
+                  default: ""
+                master_user:
+                  type: boolean
+                  default: false
+                notes:
+                  type: string
+                  default: ""
+            examples:
+              basic:
+                value:
+                  first_name: "Test"
+                  last_name: "User"
+                  department: 1
+                  access_group: 2
+      responses:
+        "201":
+          description: User created.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [ok, user]
+                properties:
+                  ok:
+                    type: boolean
+                    const: true
+                  user:
+                    $ref: "#/components/schemas/User"
+        "400":
+          description: Invalid department or access group.
+        "500":
+          description: Database error.
+
+  /v1/users/{id}:
+    get:
+      summary: Get user
+      description: Returns a single employee with their assigned cards.
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: User with cards.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [ok, user]
+                properties:
+                  ok:
+                    type: boolean
+                    const: true
+                  user:
+                    allOf:
+                      - $ref: "#/components/schemas/User"
+                      - type: object
+                        properties:
+                          cards:
+                            type: array
+                            items:
+                              $ref: "#/components/schemas/Card"
+        "404":
+          description: User not found.
+    patch:
+      summary: Update user
+      description: >
+        Update one or more fields on an employee. If access-related fields
+        (access_group, pin, master_user) change and the user has a panel
+        slot, a UserData download is automatically queued.
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                first_name:
+                  type: string
+                last_name:
+                  type: string
+                department:
+                  type: integer
+                access_group:
+                  type: integer
+                pin:
+                  type: string
+                master_user:
+                  type: boolean
+                notes:
+                  type: string
+      responses:
+        "200":
+          description: User updated.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SuccessResponse"
+        "400":
+          description: Invalid field values or no fields provided.
+        "404":
+          description: User not found.
+    delete:
+      summary: Delete user
+      description: >
+        Delete an employee. The user must have no cards referencing them.
+        If the user has a panel slot, a DeleteUserData download is queued.
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: User deleted.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SuccessResponse"
+        "404":
+          description: User not found.
+        "409":
+          description: User still has cards referencing them.
+
+  /v1/cards:
+    get:
+      summary: List cards
+      description: Returns all cards in the AxTrax database.
+      responses:
+        "200":
+          description: List of cards.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [ok, cards]
+                properties:
+                  ok:
+                    type: boolean
+                    const: true
+                  cards:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/Card"
+    post:
+      summary: Create card
+      description: >
+        Create a new unassigned card record. This is a database-only operation —
+        the panel is not notified until the card is assigned to a user.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [site_code, card_code]
+              properties:
+                site_code:
+                  type: integer
+                  description: Facility code (198 for RC Wiegand cards).
+                card_code:
+                  type: string
+                  description: Card number as a string.
+            examples:
+              wiegand:
+                value:
+                  site_code: 198
+                  card_code: "1093"
+      responses:
+        "201":
+          description: Card created.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [ok, card]
+                properties:
+                  ok:
+                    type: boolean
+                    const: true
+                  card:
+                    $ref: "#/components/schemas/Card"
+        "409":
+          description: A card with that site_code and card_code already exists.
+
+  /v1/cards/lookup/{site_code}/{card_code}:
+    get:
+      summary: Lookup card by site code and card code
+      description: Find a card by its facility code and card number.
+      parameters:
+        - name: site_code
+          in: path
+          required: true
+          schema:
+            type: integer
+          description: Facility code (e.g. 198).
+        - name: card_code
+          in: path
+          required: true
+          schema:
+            type: string
+          description: Card number.
+      responses:
+        "200":
+          description: Card found.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [ok, card]
+                properties:
+                  ok:
+                    type: boolean
+                    const: true
+                  card:
+                    $ref: "#/components/schemas/Card"
+        "404":
+          description: No card with that site code and card code.
+
+  /v1/cards/{id}:
+    get:
+      summary: Get card
+      description: Returns a single card by its database ID.
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Card details.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [ok, card]
+                properties:
+                  ok:
+                    type: boolean
+                    const: true
+                  card:
+                    $ref: "#/components/schemas/Card"
+        "404":
+          description: Card not found.
+    delete:
+      summary: Delete card
+      description: >
+        Delete a card. The card must be unassigned first (IdEmpNum=0).
+        Also removes the card's panel slot if one exists.
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Card deleted.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SuccessResponse"
+        "404":
+          description: Card not found.
+        "409":
+          description: Card is still assigned to an employee.
+
+  /v1/cards/{id}/assign:
+    post:
+      summary: Assign card to user
+      description: >
+        Assign an unassigned card to an employee. This is the operation that
+        actually pushes credentials to the panel. It allocates panel slots for
+        both the user and card (if needed) and queues the appropriate download
+        commands (UserData priority 140, CodeData priority 145).
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+          description: Card ID.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [employee_id]
+              properties:
+                employee_id:
+                  type: integer
+                  description: The employee to assign this card to.
+      responses:
+        "200":
+          description: Card assigned and panel downloads queued.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SuccessResponse"
+        "404":
+          description: Card or employee not found.
+        "409":
+          description: Card is already assigned.
+
+  /v1/cards/{id}/unassign:
+    post:
+      summary: Unassign card from user
+      description: >
+        Unassign a card from its employee. Updates the card to unassigned status
+        and queues a DeleteCardData download (command 242) to clear the card
+        slot on the panel. The card slot row in tblSlotCard is preserved.
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+          description: Card ID.
+      responses:
+        "200":
+          description: Card unassigned and panel download queued.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SuccessResponse"
+        "404":
+          description: Card not found.
+        "409":
+          description: Card is not currently assigned.
+
+  /v1/cards/{id}/simulate:
+    post:
+      summary: Simulate a card swipe
+      description: >
+        Simulate a card being swiped at a reader. The card must exist and be
+        assigned to an employee. Fires a ManualOutput pulse followed by an
+        EventEmitter transaction that rewrites the resulting panel event into
+        an ACCESS_GRANTED event with the card's credentials. The server sees
+        an event indistinguishable from a real card swipe.
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+          description: Card ID.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [reader, outputs]
+              properties:
+                reader:
+                  type: integer
+                  description: Reader index (0-9).
+                outputs:
+                  type: array
+                  description: Output relays to pulse as part of the simulation.
+                  items:
+                    type: object
+                    required: [output_id]
+                    properties:
+                      output_id:
+                        type: integer
+                        description: Output relay index (0-31).
+                      duration:
+                        type: integer
+                        default: 1
+                        description: Pulse duration in seconds (max 3599).
+            examples:
+              door_0:
+                value:
+                  reader: 0
+                  outputs:
+                    - output_id: 0
+                      duration: 3
+      responses:
+        "200":
+          description: Card swipe simulated.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SuccessResponse"
+        "400":
+          description: Card not found, not assigned, invalid reader, or invalid outputs.
+        "502":
+          description: Panel rejected the operation (NACK).
+
   /v1/webhooks/{id}:
     delete:
       summary: Remove a webhook
@@ -305,8 +753,48 @@ paths:
                   error:
                     type: string
 
+  /v1/status:
+    get:
+      summary: Get proxy and component status
+      description: >
+        Returns the current state of all tracked components (proxy lifecycle,
+        coordinator, pipeline handlers, database) as a flat record keyed by
+        component name. Each entry includes the current state, a millisecond
+        timestamp of when it entered that state, and an optional detail object
+        with state-specific information.
+      responses:
+        "200":
+          description: Current component statuses.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [ok, components]
+                properties:
+                  ok:
+                    type: boolean
+                    const: true
+                  components:
+                    type: object
+                    additionalProperties:
+                      $ref: "#/components/schemas/StatusEntry"
+
 components:
   schemas:
+    StatusEntry:
+      type: object
+      required: [state, since]
+      properties:
+        state:
+          type: string
+          description: Current state of the component.
+        since:
+          type: integer
+          description: Milliseconds since Unix epoch when this state was entered.
+        detail:
+          type: object
+          description: State-specific detail (absent when there is nothing extra to report).
+
     WebhookEvent:
       type: object
       required: [time, type, data]
@@ -341,6 +829,55 @@ components:
           description: >
             Whether this output is being held open by the AxTraxNG server,
             rather than a decision made by the panel.
+
+    User:
+      type: object
+      required: [id, first_name, last_name, department, access_group, master_user]
+      properties:
+        id:
+          type: integer
+          description: Employee number (iEmployeeNum).
+        first_name:
+          type: string
+        last_name:
+          type: string
+        department:
+          type: integer
+          description: "1=General, 2=RC Staff, 10000=Visitors."
+        access_group:
+          type: integer
+          description: "1=Master, 2=Recurse Center Access Group, 1000000=Unauthorized."
+        master_user:
+          type: boolean
+        notes:
+          type: string
+
+    Card:
+      type: object
+      required: [id, site_code, card_code, status, employee_id]
+      properties:
+        id:
+          type: integer
+          description: Card database ID (IdCardNum).
+        site_code:
+          type: integer
+          description: Facility code (e.g. 198).
+        card_code:
+          type: string
+          description: Card number as a string.
+        status:
+          type: string
+          enum: [active, unassigned]
+        employee_id:
+          type: integer
+          description: Assigned employee ID, or 0 if unassigned.
+        employee:
+          description: >
+            The assigned employee, if any. Present when the card is assigned
+            (employee_id != 0), omitted when unassigned.
+          oneOf:
+            - $ref: "#/components/schemas/User"
+            - type: "null"
 
     SuccessResponse:
       type: object
