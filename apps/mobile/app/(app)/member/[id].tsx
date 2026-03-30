@@ -109,7 +109,7 @@ export default function MemberProfileScreen() {
 			<View className="flex-row items-center justify-between">
 				<Pressable
 					className="flex-row items-center gap-1.5"
-					onPress={() => router.back()}
+					onPress={() => router.navigate("/(app)/hub")}
 				>
 					<ChevronLeft size={20} color="#94A3B8" />
 					<Text className="text-sm font-medium text-text-secondary">Hub</Text>
