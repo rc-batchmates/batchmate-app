@@ -1,6 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 import { createFileRoute, Link, redirect } from "@tanstack/react-router"
 import { CheckCircle, ChevronRight, MapPin, User, Users } from "lucide-react"
+import { PageLayout } from "@/components/page-layout"
 import { api } from "@/lib/api"
 import { authClient, useSession } from "@/lib/auth"
 
@@ -78,36 +79,11 @@ function HubPage() {
 	const isCheckedIn = hub?.isCheckedIn ?? false
 
 	return (
-		<div className="mx-auto flex h-full max-w-md flex-col gap-6 px-6 py-8 md:max-w-4xl md:py-12">
-			{/* Header */}
-			<div className="flex items-center justify-between">
-				<div className="flex flex-col gap-1">
-					<span className="text-sm text-text-tertiary">Currently at RC</span>
-					<span className="text-2xl font-semibold text-foreground md:text-3xl">
-						In the Hub
-					</span>
-					<nav className="mt-1 hidden items-center gap-5 md:flex">
-						<Link
-							to="/"
-							className="text-sm font-medium text-text-tertiary no-underline hover:text-foreground"
-						>
-							Home
-						</Link>
-						<span className="text-sm font-semibold text-cyan">Hub</span>
-						<Link
-							to="/directory"
-							className="text-sm font-medium text-text-tertiary no-underline hover:text-foreground"
-						>
-							Directory
-						</Link>
-						<Link
-							to="/profile"
-							className="text-sm font-medium text-text-tertiary no-underline hover:text-foreground"
-						>
-							Profile
-						</Link>
-					</nav>
-				</div>
+		<PageLayout
+			className="gap-6"
+			subtitle="Currently at RC"
+			title="In the Hub"
+			headerRight={
 				<div className="flex items-center gap-4">
 					{visitors && (
 						<div className="flex items-center gap-1.5 rounded-full bg-cyan/10 px-3.5 py-1.5">
@@ -132,8 +108,8 @@ function HubPage() {
 						)}
 					</Link>
 				</div>
-			</div>
-
+			}
+		>
 			{/* Check in */}
 			{hub && !isCheckedIn && (
 				<button
@@ -195,6 +171,6 @@ function HubPage() {
 					))}
 				</div>
 			)}
-		</div>
+		</PageLayout>
 	)
 }

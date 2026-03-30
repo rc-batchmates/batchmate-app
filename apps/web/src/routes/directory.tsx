@@ -17,6 +17,7 @@ import {
 } from "lucide-react"
 import { useEffect, useRef, useState } from "react"
 import { z } from "zod"
+import { PageLayout } from "@/components/page-layout"
 import { api } from "@/lib/api"
 import { authClient, useSession } from "@/lib/auth"
 
@@ -317,38 +318,11 @@ function DirectoryPage() {
 	const hasFilters = batchId != null || role != null || locationId != null
 
 	return (
-		<div className="mx-auto flex min-h-full max-w-md flex-col gap-5 px-6 py-8 md:max-w-4xl md:py-12">
-			{/* Header */}
-			<div className="flex items-center justify-between">
-				<div className="flex flex-col gap-1">
-					<span className="text-sm text-text-tertiary">
-						Search the RC community
-					</span>
-					<span className="text-2xl font-semibold text-foreground md:text-3xl">
-						Directory
-					</span>
-					<nav className="mt-1 hidden items-center gap-5 md:flex">
-						<Link
-							to="/"
-							className="text-sm font-medium text-text-tertiary no-underline hover:text-foreground"
-						>
-							Home
-						</Link>
-						<Link
-							to="/hub"
-							className="text-sm font-medium text-text-tertiary no-underline hover:text-foreground"
-						>
-							Hub
-						</Link>
-						<span className="text-sm font-semibold text-cyan">Directory</span>
-						<Link
-							to="/profile"
-							className="text-sm font-medium text-text-tertiary no-underline hover:text-foreground"
-						>
-							Profile
-						</Link>
-					</nav>
-				</div>
+		<PageLayout
+			className="gap-5"
+			subtitle="Search the RC community"
+			title="Directory"
+			headerRight={
 				<Link
 					to="/profile"
 					className="flex h-11 w-11 items-center justify-center overflow-hidden rounded-full bg-card"
@@ -363,8 +337,8 @@ function DirectoryPage() {
 						<User size={22} color="#22D3EE" />
 					)}
 				</Link>
-			</div>
-
+			}
+		>
 			{/* Search bar */}
 			<div className="flex items-center gap-2 rounded-[10px] border border-border bg-card px-3.5 py-2.5">
 				<Search size={18} color="#64748B" />
@@ -498,6 +472,6 @@ function DirectoryPage() {
 				</div>
 			)}
 			<div ref={loadMoreRef} className="h-1" />
-		</div>
+		</PageLayout>
 	)
 }

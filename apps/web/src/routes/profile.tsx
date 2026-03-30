@@ -1,6 +1,5 @@
 import {
 	createFileRoute,
-	Link,
 	redirect,
 	useNavigate,
 } from "@tanstack/react-router"
@@ -15,6 +14,7 @@ import {
 	Twitter,
 	User,
 } from "lucide-react"
+import { PageLayout } from "@/components/page-layout"
 import { authClient, signOut, useSession } from "@/lib/auth"
 
 export const Route = createFileRoute("/profile")({
@@ -104,36 +104,10 @@ function ProfilePage() {
 	}
 
 	return (
-		<div className="mx-auto flex h-full max-w-md flex-col gap-7 px-6 py-8 md:max-w-4xl md:py-12">
-			{/* Header */}
-			<div className="flex items-center justify-between">
-				<div className="flex flex-col gap-1">
-					<span className="text-sm text-text-tertiary">Your account</span>
-					<span className="text-2xl font-semibold text-foreground md:text-3xl">
-						Profile
-					</span>
-					<nav className="mt-1 hidden items-center gap-5 md:flex">
-						<Link
-							to="/"
-							className="text-sm font-medium text-text-tertiary no-underline hover:text-foreground"
-						>
-							Home
-						</Link>
-						<Link
-							to="/hub"
-							className="text-sm font-medium text-text-tertiary no-underline hover:text-foreground"
-						>
-							Hub
-						</Link>
-						<Link
-							to="/directory"
-							className="text-sm font-medium text-text-tertiary no-underline hover:text-foreground"
-						>
-							Directory
-						</Link>
-						<span className="text-sm font-semibold text-cyan">Profile</span>
-					</nav>
-				</div>
+		<PageLayout
+			subtitle="Your account"
+			title="Profile"
+			headerRight={
 				<a
 					href="https://www.recurse.com/settings/general"
 					target="_blank"
@@ -142,8 +116,8 @@ function ProfilePage() {
 				>
 					Edit
 				</a>
-			</div>
-
+			}
+		>
 			{/* Avatar */}
 			<div className="flex flex-col items-center gap-3">
 				<div className="flex h-24 w-24 items-center justify-center overflow-hidden rounded-full bg-card">
@@ -238,6 +212,7 @@ function ProfilePage() {
 					Sign Out
 				</span>
 			</button>
-		</div>
+
+		</PageLayout>
 	)
 }
