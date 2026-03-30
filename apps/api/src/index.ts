@@ -30,6 +30,18 @@ app.get("/api/v1/openapi.json", async (c) => {
 	const spec = await generator.generate(contract, {
 		info: { title: "batchmate API", version: "0.1.0" },
 		servers: [{ url: "/api/v1" }],
+		security: [{ session: [] }],
+		components: {
+			securitySchemes: {
+				session: {
+					type: "apiKey",
+					in: "cookie",
+					name: "better-auth.session_token",
+					description:
+						"Session cookie set by Better Auth after OAuth login via Recurse Center",
+				},
+			},
+		},
 	})
 	return c.json(spec)
 })
