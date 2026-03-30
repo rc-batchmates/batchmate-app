@@ -63,7 +63,7 @@ function DoorCard({
 	return (
 		<Pressable
 			className="flex-1 justify-between rounded-xl bg-card p-5"
-			style={{ height: 140 }}
+			style={{ height: 140, minWidth: 140 }}
 			onPress={onPress}
 			disabled={isPending}
 		>
@@ -100,7 +100,22 @@ function DoorControls({
 				</Text>
 				<Text className="text-xs text-text-muted">Tap to open</Text>
 			</View>
-			<View className="gap-3">
+			{/* 2x2 on mobile, 1x4 on desktop */}
+			<View className="hidden md:flex md:flex-row md:gap-4">
+				{doors.map((door) => (
+					<DoorCard
+						key={`${door.floor}-${door.entry}`}
+						door={door}
+						onPress={() => onOpenDoor(door.floor, door.entry)}
+						isPending={isPending}
+						isThis={
+							pendingDoor?.floor === door.floor &&
+							pendingDoor?.entry === door.entry
+						}
+					/>
+				))}
+			</View>
+			<View className="gap-3 md:hidden">
 				<View className="flex-row gap-3">
 					{doors.slice(0, 2).map((door) => (
 						<DoorCard

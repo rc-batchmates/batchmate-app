@@ -1,6 +1,12 @@
 import { Calendar, DoorOpen, LogIn, Users } from "lucide-react-native"
 import { useState } from "react"
-import { Image, type ImageSourcePropType, Linking, Pressable, View } from "react-native"
+import {
+	Image,
+	type ImageSourcePropType,
+	Linking,
+	Pressable,
+	View,
+} from "react-native"
 import { Text } from "./text"
 
 export type LoginFormProps = {
@@ -91,7 +97,9 @@ export function LoginForm({ onSubmit, logoSource }: LoginFormProps) {
 				<Text className="font-mono text-[11px] text-text-muted">
 					Built by your fellow
 				</Text>
-				<Pressable onPress={() => Linking.openURL("https://github.com/rc-batchmates")}>
+				<Pressable
+					onPress={() => Linking.openURL("https://github.com/rc-batchmates")}
+				>
 					<Text className="font-mono text-[11px] font-medium text-primary">
 						Batchmates
 					</Text>

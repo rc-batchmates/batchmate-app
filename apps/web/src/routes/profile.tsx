@@ -105,7 +105,7 @@ function ProfilePage() {
 	}
 
 	return (
-		<div className="mx-auto flex h-full max-w-md flex-col gap-7 px-6 py-8">
+		<div className="mx-auto flex h-full max-w-md flex-col gap-7 px-6 py-8 md:max-w-3xl md:py-12">
 			{/* Header */}
 			<div className="flex items-center justify-between">
 				<Link to="/" className="flex items-center gap-1.5">
@@ -149,59 +149,62 @@ function ProfilePage() {
 				</div>
 			</div>
 
-			{/* Contact */}
-			<div className="flex flex-col gap-3">
-				<span className="font-mono text-[11px] font-semibold tracking-widest text-text-tertiary">
-					CONTACT
-				</span>
-				<div className="overflow-hidden rounded-xl bg-card">
-					<InfoRow icon={Mail} label="Email" value={user?.email} />
-					<div className="h-px bg-surface-inset" />
-					<InfoRow icon={Hash} label="Recurse ID" value={user?.rcId} />
+			{/* Contact & Social */}
+			<div className="flex flex-col gap-7 md:flex-row md:gap-5">
+				<div className="flex flex-1 flex-col gap-3">
+					<span className="font-mono text-[11px] font-semibold tracking-widest text-text-tertiary">
+						CONTACT
+					</span>
+					<div className="overflow-hidden rounded-xl bg-card">
+						<InfoRow icon={Mail} label="Email" value={user?.email} />
+						<div className="h-px bg-surface-inset" />
+						<InfoRow icon={Hash} label="Recurse ID" value={user?.rcId} />
+					</div>
 				</div>
-			</div>
 
-			{/* Social */}
-			<div className="flex flex-col gap-3">
-				<span className="font-mono text-[11px] font-semibold tracking-widest text-text-tertiary">
-					SOCIAL
-				</span>
-				<div className="overflow-hidden rounded-xl bg-card">
-					<SocialRow
-						icon={Github}
-						label="GitHub"
-						value={user?.github}
-						href={
-							user?.github ? `https://github.com/${user.github}` : undefined
-						}
-					/>
-					<div className="h-px bg-surface-inset" />
-					<SocialRow
-						icon={Linkedin}
-						label="LinkedIn"
-						value={user?.linkedin}
-						href={
-							user?.linkedin
-								? `https://linkedin.com/in/${user.linkedin}`
-								: undefined
-						}
-					/>
-					<div className="h-px bg-surface-inset" />
-					<SocialRow
-						icon={Twitter}
-						label="Twitter"
-						value={user?.twitter}
-						href={
-							user?.twitter ? `https://twitter.com/${user.twitter}` : undefined
-						}
-					/>
-					<div className="h-px bg-surface-inset" />
-					<SocialRow
-						icon={Globe}
-						label="Website"
-						value={user?.personalSiteUrl}
-						href={user?.personalSiteUrl ?? undefined}
-					/>
+				<div className="flex flex-1 flex-col gap-3">
+					<span className="font-mono text-[11px] font-semibold tracking-widest text-text-tertiary">
+						SOCIAL
+					</span>
+					<div className="overflow-hidden rounded-xl bg-card">
+						<SocialRow
+							icon={Github}
+							label="GitHub"
+							value={user?.github}
+							href={
+								user?.github ? `https://github.com/${user.github}` : undefined
+							}
+						/>
+						<div className="h-px bg-surface-inset" />
+						<SocialRow
+							icon={Linkedin}
+							label="LinkedIn"
+							value={user?.linkedin}
+							href={
+								user?.linkedin
+									? `https://linkedin.com/in/${user.linkedin}`
+									: undefined
+							}
+						/>
+						<div className="h-px bg-surface-inset" />
+						<SocialRow
+							icon={Twitter}
+							label="Twitter"
+							value={user?.twitter}
+							href={
+								user?.twitter
+									? `https://twitter.com/${user.twitter}`
+									: undefined
+							}
+						/>
+						<div className="h-px bg-surface-inset" />
+						<SocialRow
+							icon={Globe}
+							label="Website"
+							value={user?.personalSiteUrl}
+							href={user?.personalSiteUrl ?? undefined}
+						/>
+					</div>
 				</div>
 			</div>
 
@@ -209,7 +212,7 @@ function ProfilePage() {
 			<button
 				type="button"
 				onClick={handleSignOut}
-				className="flex items-center justify-center gap-2 rounded-xl border border-cyan/20 bg-card px-4 py-3 cursor-pointer"
+				className="flex w-full items-center justify-center gap-2 rounded-xl border border-cyan/20 bg-card px-4 py-3 cursor-pointer md:w-48"
 			>
 				<LogOut size={18} color="#94A3B8" />
 				<span className="text-sm font-medium text-text-secondary">

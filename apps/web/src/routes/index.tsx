@@ -36,12 +36,12 @@ function HomePage() {
 	})
 
 	return (
-		<div className="mx-auto flex h-full max-w-md flex-col gap-7 px-6 py-8">
+		<div className="mx-auto flex h-full max-w-md flex-col gap-7 px-6 py-8 md:max-w-4xl md:py-12">
 			{/* Header */}
 			<div className="flex items-center justify-between">
 				<div className="flex flex-col gap-1">
 					<span className="text-sm text-text-tertiary">Welcome back,</span>
-					<span className="text-2xl font-semibold text-foreground">
+					<span className="text-2xl font-semibold text-foreground md:text-3xl">
 						{session?.user?.name?.split(" ")[0] ?? "Recurser"}
 					</span>
 				</div>
