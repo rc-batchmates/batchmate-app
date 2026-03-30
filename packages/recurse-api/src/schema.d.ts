@@ -441,9 +441,9 @@ export interface operations {
 				/** @description Filter to people near this location. */
 				location_id?: number
 				/** @description Filter to people who have a stint of a certain type. */
-				role?: "recurser" | "resident" | "facilitator" | "faculty"
-				/** @description Narrow the search space. "current" = people currently at RC. "overlap" = people who overlapped with the current user at RC. */
-				scope?: "current" | "overlap"
+				role?: "recurser" | "resident" | "faculty"
+				/** @description Narrow the search space. "current" = people currently at RC. "overlap" = people who overlapped with the current user at RC. "ngw" = people who attended the most recent Never Graduate Week. */
+				scope?: "current" | "overlap" | "ngw"
 				/** @description Limit the number of results returned. */
 				limit?: number
 				/** @description Offset the results for pagination. */

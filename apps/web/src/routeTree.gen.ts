@@ -11,6 +11,7 @@
 import { Route as rootRouteImport } from "./routes/__root"
 import { Route as ProfileRouteImport } from "./routes/profile"
 import { Route as HubRouteImport } from "./routes/hub"
+import { Route as DirectoryRouteImport } from "./routes/directory"
 import { Route as AuthRouteRouteImport } from "./routes/_auth/route"
 import { Route as IndexRouteImport } from "./routes/index"
 import { Route as MemberIdRouteImport } from "./routes/member.$id"
@@ -24,6 +25,11 @@ const ProfileRoute = ProfileRouteImport.update({
 const HubRoute = HubRouteImport.update({
   id: "/hub",
   path: "/hub",
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DirectoryRoute = DirectoryRouteImport.update({
+  id: "/directory",
+  path: "/directory",
   getParentRoute: () => rootRouteImport,
 } as any)
 const AuthRouteRoute = AuthRouteRouteImport.update({
@@ -48,6 +54,7 @@ const AuthLoginRoute = AuthLoginRouteImport.update({
 
 export interface FileRoutesByFullPath {
   "/": typeof IndexRoute
+  "/directory": typeof DirectoryRoute
   "/hub": typeof HubRoute
   "/profile": typeof ProfileRoute
   "/login": typeof AuthLoginRoute
@@ -55,6 +62,7 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   "/": typeof IndexRoute
+  "/directory": typeof DirectoryRoute
   "/hub": typeof HubRoute
   "/profile": typeof ProfileRoute
   "/login": typeof AuthLoginRoute
@@ -64,6 +72,7 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   "/": typeof IndexRoute
   "/_auth": typeof AuthRouteRouteWithChildren
+  "/directory": typeof DirectoryRoute
   "/hub": typeof HubRoute
   "/profile": typeof ProfileRoute
   "/_auth/login": typeof AuthLoginRoute
@@ -71,13 +80,14 @@ export interface FileRoutesById {
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: "/" | "/hub" | "/profile" | "/login" | "/member/$id"
+  fullPaths: "/" | "/directory" | "/hub" | "/profile" | "/login" | "/member/$id"
   fileRoutesByTo: FileRoutesByTo
-  to: "/" | "/hub" | "/profile" | "/login" | "/member/$id"
+  to: "/" | "/directory" | "/hub" | "/profile" | "/login" | "/member/$id"
   id:
     | "__root__"
     | "/"
     | "/_auth"
+    | "/directory"
     | "/hub"
     | "/profile"
     | "/_auth/login"
@@ -87,6 +97,7 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AuthRouteRoute: typeof AuthRouteRouteWithChildren
+  DirectoryRoute: typeof DirectoryRoute
   HubRoute: typeof HubRoute
   ProfileRoute: typeof ProfileRoute
   MemberIdRoute: typeof MemberIdRoute
@@ -106,6 +117,13 @@ declare module "@tanstack/react-router" {
       path: "/hub"
       fullPath: "/hub"
       preLoaderRoute: typeof HubRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    "/directory": {
+      id: "/directory"
+      path: "/directory"
+      fullPath: "/directory"
+      preLoaderRoute: typeof DirectoryRouteImport
       parentRoute: typeof rootRouteImport
     }
     "/_auth": {
@@ -154,6 +172,7 @@ const AuthRouteRouteWithChildren = AuthRouteRoute._addFileChildren(
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthRouteRoute: AuthRouteRouteWithChildren,
+  DirectoryRoute: DirectoryRoute,
   HubRoute: HubRoute,
   ProfileRoute: ProfileRoute,
   MemberIdRoute: MemberIdRoute,

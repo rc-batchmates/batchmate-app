@@ -1,5 +1,10 @@
 import { useQuery } from "@tanstack/react-query"
-import { createFileRoute, Link, redirect } from "@tanstack/react-router"
+import {
+	createFileRoute,
+	Link,
+	redirect,
+	useRouter,
+} from "@tanstack/react-router"
 import {
 	ChevronLeft,
 	ExternalLink,
@@ -81,6 +86,7 @@ function SocialRow({
 }
 
 function MemberProfilePage() {
+	const router = useRouter()
 	const { id } = Route.useParams()
 	const {
 		data: member,
@@ -109,13 +115,14 @@ function MemberProfilePage() {
 			{/* Header */}
 			<div className="flex items-center justify-between">
 				<div className="flex flex-col gap-1">
-					<Link
-						to="/hub"
-						className="flex items-center gap-1 text-sm text-text-tertiary no-underline hover:text-foreground"
+					<button
+						type="button"
+						onClick={() => router.history.back()}
+						className="flex cursor-pointer items-center gap-1 text-sm text-text-tertiary hover:text-foreground"
 					>
 						<ChevronLeft size={14} color="#64748B" />
-						Back to Hub
-					</Link>
+						Back
+					</button>
 					<span className="text-2xl font-semibold text-foreground md:text-3xl">
 						{member.name}
 					</span>
@@ -131,6 +138,12 @@ function MemberProfilePage() {
 							className="text-sm font-semibold text-cyan no-underline"
 						>
 							Hub
+						</Link>
+						<Link
+							to="/directory"
+							className="text-sm font-medium text-text-tertiary no-underline hover:text-foreground"
+						>
+							Directory
 						</Link>
 						<Link
 							to="/profile"

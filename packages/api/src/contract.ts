@@ -49,6 +49,40 @@ const MemberProfileSchema = z.object({
 
 export type MemberProfile = z.infer<typeof MemberProfileSchema>
 
+const DirectoryPersonSchema = z.object({
+	id: z.number(),
+	name: z.string(),
+	imageUrl: z.string().nullable(),
+	batch: z.string().nullable(),
+	stintType: z.string().nullable(),
+})
+
+const DirectoryResponseSchema = z.object({
+	people: z.array(DirectoryPersonSchema),
+})
+
+export type DirectoryPerson = z.infer<typeof DirectoryPersonSchema>
+export type DirectoryResponse = z.infer<typeof DirectoryResponseSchema>
+
+const BatchSchema = z.object({
+	id: z.number(),
+	name: z.string(),
+	shortName: z.string().nullable(),
+})
+
+const BatchesResponseSchema = z.array(BatchSchema)
+
+export type Batch = z.infer<typeof BatchSchema>
+
+const LocationSchema = z.object({
+	id: z.number(),
+	name: z.string(),
+})
+
+const LocationsResponseSchema = z.array(LocationSchema)
+
+export type Location = z.infer<typeof LocationSchema>
+
 export const contract = oc.router({
 	health: oc.route({ method: "GET", path: "/health" }).output(
 		z.object({
@@ -79,6 +113,27 @@ export const contract = oc.router({
 		.route({ method: "GET", path: "/members/{id}" })
 		.input(z.object({ id: z.coerce.number() }))
 		.output(MemberProfileSchema),
+	directorySearch: oc
+		.route({ method: "GET", path: "/directory" })
+		.input(
+			z.object({
+				query: z.string().optional(),
+				batchId: z.coerce.number().optional(),
+				locationId: z.coerce.number().optional(),
+				role: z.enum(["recurser", "resident", "faculty"]).optional(),
+				scope: z.enum(["current", "overlap", "ngw"]).optional(),
+				limit: z.coerce.number().optional(),
+				offset: z.coerce.number().optional(),
+			}),
+		)
+		.output(DirectoryResponseSchema),
+	batches: oc
+		.route({ method: "GET", path: "/batches" })
+		.output(BatchesResponseSchema),
+	locations: oc
+		.route({ method: "GET", path: "/locations" })
+		.input(z.object({ query: z.string().optional() }))
+		.output(LocationsResponseSchema),
 })
 
 export type Contract = typeof contract

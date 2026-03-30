@@ -95,6 +95,12 @@ function HubPage() {
 						</Link>
 						<span className="text-sm font-semibold text-cyan">Hub</span>
 						<Link
+							to="/directory"
+							className="text-sm font-medium text-text-tertiary no-underline hover:text-foreground"
+						>
+							Directory
+						</Link>
+						<Link
 							to="/profile"
 							className="text-sm font-medium text-text-tertiary no-underline hover:text-foreground"
 						>

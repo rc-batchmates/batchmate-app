@@ -125,6 +125,12 @@ function ProfilePage() {
 						>
 							Hub
 						</Link>
+						<Link
+							to="/directory"
+							className="text-sm font-medium text-text-tertiary no-underline hover:text-foreground"
+						>
+							Directory
+						</Link>
 						<span className="text-sm font-semibold text-cyan">Profile</span>
 					</nav>
 				</div>

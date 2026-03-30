@@ -1,5 +1,5 @@
 import { Redirect, Tabs } from "expo-router"
-import { House, User, Users } from "lucide-react-native"
+import { House, Search, User, Users } from "lucide-react-native"
 import { View } from "react-native"
 import { useSafeAreaInsets } from "react-native-safe-area-context"
 import { useSession } from "../../src/lib/auth"
@@ -50,6 +50,15 @@ export default function AppLayout() {
 						title: "Hub",
 						tabBarIcon: ({ color, size }) => (
 							<Users size={size} color={color} />
+						),
+					}}
+				/>
+				<Tabs.Screen
+					name="directory"
+					options={{
+						title: "Directory",
+						tabBarIcon: ({ color, size }) => (
+							<Search size={size} color={color} />
 						),
 					}}
 				/>
