@@ -113,30 +113,27 @@ function ZoomLinks() {
 					/>
 				</View>
 
-				{/* Mobile: 2 columns, Desktop: 3 columns */}
-				{/* Row 1 */}
-				<View className="flex-row gap-2 md:gap-2.5">
+				{/* Desktop: 3 columns */}
+				<View className="hidden md:flex md:flex-row md:gap-2.5">
 					<RoomChip label="Midori" slug="midori" />
 					<RoomChip label="Aegis" slug="aegis" />
-					<View className="hidden flex-1 md:flex">
-						<RoomChip label="Edos" slug="edos" />
-					</View>
+					<RoomChip label="Edos" slug="edos" />
 				</View>
-				{/* Row 2 */}
-				<View className="flex-row gap-2 md:gap-2.5">
-					{/* Mobile only: Edos + Couches */}
-					<View className="flex-1 md:hidden">
-						<RoomChip label="Edos" slug="edos" />
-					</View>
+				<View className="hidden md:flex md:flex-row md:gap-2.5">
 					<RoomChip label="Couches" slug="couches" />
-					<View className="hidden flex-1 md:flex">
-						<RoomChip label="Genera" slug="genera" />
-					</View>
-					<View className="hidden flex-1 md:flex">
-						<RoomChip label="Verve" slug="verve" />
-					</View>
+					<RoomChip label="Genera" slug="genera" />
+					<RoomChip label="Verve" slug="verve" />
 				</View>
-				{/* Row 3 — mobile only */}
+
+				{/* Mobile: 2 columns */}
+				<View className="flex-row gap-2 md:hidden">
+					<RoomChip label="Midori" slug="midori" />
+					<RoomChip label="Aegis" slug="aegis" />
+				</View>
+				<View className="flex-row gap-2 md:hidden">
+					<RoomChip label="Edos" slug="edos" />
+					<RoomChip label="Couches" slug="couches" />
+				</View>
 				<View className="flex-row gap-2 md:hidden">
 					<RoomChip label="Genera" slug="genera" />
 					<RoomChip label="Verve" slug="verve" />
