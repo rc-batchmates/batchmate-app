@@ -35,8 +35,7 @@ export function createAuth(db: Database, env: AuthEnv) {
 						clientSecret: env.RC_CLIENT_SECRET,
 						scopes: [],
 						mapProfileToUser(profile) {
-							const currentStint =
-								profile.stints?.[profile.stints.length - 1]
+							const currentStint = profile.stints?.[profile.stints.length - 1]
 							const batchName = currentStint?.batch?.name ?? null
 							return {
 								name: profile.name,

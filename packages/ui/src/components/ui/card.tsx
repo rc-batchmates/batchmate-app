@@ -10,10 +10,7 @@ function Card({
 }: React.ComponentPropsWithoutRef<typeof View>) {
 	return (
 		<View
-			className={cn(
-				"rounded-xl bg-card gap-6 py-6",
-				className,
-			)}
+			className={cn("rounded-xl bg-card gap-6 py-6", className)}
 			{...props}
 		/>
 	)

@@ -1,5 +1,5 @@
+import { ArrowUpDown, Footprints } from "lucide-react-native"
 import { Pressable, View } from "react-native"
-import { Footprints, ArrowUpDown } from "lucide-react-native"
 import { Text } from "./text"
 
 type Floor = "4" | "5"

@@ -1,15 +1,20 @@
-import { createFileRoute, redirect, Link, useNavigate } from "@tanstack/react-router"
+import {
+	createFileRoute,
+	Link,
+	redirect,
+	useNavigate,
+} from "@tanstack/react-router"
 import {
 	ChevronLeft,
-	User,
-	Mail,
-	Hash,
-	Github,
-	Linkedin,
-	Twitter,
-	Globe,
 	ExternalLink,
+	Github,
+	Globe,
+	Hash,
+	Linkedin,
 	LogOut,
+	Mail,
+	Twitter,
+	User,
 } from "lucide-react"
 import { authClient, signOut, useSession } from "@/lib/auth"
 
@@ -27,7 +32,11 @@ function InfoRow({
 	icon: Icon,
 	label,
 	value,
-}: { icon: typeof Mail; label: string; value?: string | null }) {
+}: {
+	icon: typeof Mail
+	label: string
+	value?: string | null
+}) {
 	return (
 		<div className="flex items-center gap-3 px-4 py-3.5">
 			<Icon size={18} color="#64748B" />
@@ -163,9 +172,7 @@ function ProfilePage() {
 						label="GitHub"
 						value={user?.github}
 						href={
-							user?.github
-								? `https://github.com/${user.github}`
-								: undefined
+							user?.github ? `https://github.com/${user.github}` : undefined
 						}
 					/>
 					<div className="h-px bg-surface-inset" />
@@ -185,9 +192,7 @@ function ProfilePage() {
 						label="Twitter"
 						value={user?.twitter}
 						href={
-							user?.twitter
-								? `https://twitter.com/${user.twitter}`
-								: undefined
+							user?.twitter ? `https://twitter.com/${user.twitter}` : undefined
 						}
 					/>
 					<div className="h-px bg-surface-inset" />

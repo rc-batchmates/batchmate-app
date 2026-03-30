@@ -1,5 +1,5 @@
-import { View } from "react-native"
 import { Redirect, Slot } from "expo-router"
+import { View } from "react-native"
 import { useSafeAreaInsets } from "react-native-safe-area-context"
 import { useSession } from "../../src/lib/auth"
 

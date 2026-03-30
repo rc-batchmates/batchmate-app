@@ -1,25 +1,29 @@
 import { Text } from "@batchmate/ui"
 import { useRouter } from "expo-router"
-import { Image, Linking, Pressable, ScrollView, View } from "react-native"
 import {
 	ChevronLeft,
-	User,
-	Mail,
-	Hash,
-	Github,
-	Linkedin,
-	Twitter,
-	Globe,
 	ExternalLink,
+	Github,
+	Globe,
+	Hash,
+	Linkedin,
 	LogOut,
+	Mail,
+	Twitter,
+	User,
 } from "lucide-react-native"
+import { Image, Linking, Pressable, ScrollView, View } from "react-native"
 import { signOut, useSession } from "../../src/lib/auth"
 
 function InfoRow({
 	icon: Icon,
 	label,
 	value,
-}: { icon: typeof Mail; label: string; value?: string | null }) {
+}: {
+	icon: typeof Mail
+	label: string
+	value?: string | null
+}) {
 	return (
 		<View className="flex-row items-center gap-3 px-4 py-3.5">
 			<Icon size={18} color="#64748B" />
@@ -109,10 +113,7 @@ export default function ProfileScreen() {
 			<View className="items-center gap-3">
 				<View className="h-24 w-24 items-center justify-center overflow-hidden rounded-full bg-card">
 					{user?.image ? (
-						<Image
-							source={{ uri: user.image }}
-							className="h-full w-full"
-						/>
+						<Image source={{ uri: user.image }} className="h-full w-full" />
 					) : (
 						<User size={44} color="#22D3EE" />
 					)}
@@ -149,9 +150,7 @@ export default function ProfileScreen() {
 						label="GitHub"
 						value={user?.github}
 						href={
-							user?.github
-								? `https://github.com/${user.github}`
-								: undefined
+							user?.github ? `https://github.com/${user.github}` : undefined
 						}
 					/>
 					<View className="h-px bg-surface-inset" />
@@ -171,9 +170,7 @@ export default function ProfileScreen() {
 						label="Twitter"
 						value={user?.twitter}
 						href={
-							user?.twitter
-								? `https://twitter.com/${user.twitter}`
-								: undefined
+							user?.twitter ? `https://twitter.com/${user.twitter}` : undefined
 						}
 					/>
 					<View className="h-px bg-surface-inset" />

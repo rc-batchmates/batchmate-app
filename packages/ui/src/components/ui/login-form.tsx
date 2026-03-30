@@ -1,6 +1,6 @@
+import { Calendar, DoorOpen, LogIn, Users } from "lucide-react-native"
 import { useState } from "react"
 import { Image, type ImageSourcePropType, Pressable, View } from "react-native"
-import { LogIn, DoorOpen, Calendar, Users } from "lucide-react-native"
 import { Text } from "./text"
 
 export type LoginFormProps = {
@@ -11,7 +11,10 @@ export type LoginFormProps = {
 function FeatureRow({
 	icon: Icon,
 	label,
-}: { icon: typeof DoorOpen; label: string }) {
+}: {
+	icon: typeof DoorOpen
+	label: string
+}) {
 	return (
 		<View className="flex-row items-center gap-2.5">
 			<Icon size={16} color="#22D3EE" />
@@ -62,9 +65,7 @@ export function LoginForm({ onSubmit, logoSource }: LoginFormProps) {
 			{/* Sign In Button */}
 			<View className="w-full gap-4">
 				{error ? (
-					<Text className="text-center text-sm text-destructive">
-						{error}
-					</Text>
+					<Text className="text-center text-sm text-destructive">{error}</Text>
 				) : null}
 				<Pressable
 					className="h-14 w-full flex-row items-center justify-center gap-2.5 rounded-xl bg-primary"
