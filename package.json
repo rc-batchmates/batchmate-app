@@ -9,7 +9,8 @@
 		"db:migrate": "pnpm --filter @batchmate/db db:migrate",
 		"check": "biome check .",
 		"check:fix": "biome check . --write",
-		"ship": "turbo build && wrangler deploy"
+		"ship": "turbo build && wrangler deploy",
+		"tail": "pnpm wrangler tail --format pretty"
 	},
 	"devDependencies": {
 		"@biomejs/biome": "^2.4.4",
