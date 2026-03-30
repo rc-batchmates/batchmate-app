@@ -15,6 +15,13 @@
       "when": 1774762057786,
       "tag": "0001_calm_victor_mancha",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "6",
+      "when": 1774849379433,
+      "tag": "0002_thin_living_mummy",
+      "breakpoints": true
     }
   ]
 }

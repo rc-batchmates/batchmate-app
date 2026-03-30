@@ -4,6 +4,10 @@ main = "apps/api/src/index.ts"
 compatibility_date = "2025-04-01"
 compatibility_flags = ["nodejs_compat"]
 
+[vars]
+VIRTUAL_CARD_SITE_CODE = "999"
+VIRTUAL_CARD_PREFIX = "99900000000"
+
 [dev]
 ip = "0.0.0.0"
 port = 8787

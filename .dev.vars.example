@@ -2,3 +2,9 @@ BETTER_AUTH_SECRET="" # generate with: pnpm --filter @batchmate/auth exec better
 RC_CLIENT_ID=""
 RC_CLIENT_SECRET=""
 BASE_URL="http://localhost:8787"
+
+# pick randomish numbers above (not including) 256
+# leave a bunch of zeros after your prefix, so rc ids (when added)
+# won't collide
+VIRTUAL_CARD_SITE_CODE = "998"
+VIRTUAL_CARD_PREFIX = "99800000000"
