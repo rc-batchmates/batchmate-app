@@ -68,6 +68,10 @@ app.use("/api/v1/*", async (c, next) => {
 		context: {
 			db,
 			securityComputer: c.env.SECURITY_COMPUTER,
+			rcOAuth: {
+				clientId: c.env.RC_CLIENT_ID,
+				clientSecret: c.env.RC_CLIENT_SECRET,
+			},
 			user: session?.user ?? null,
 			session: session?.session ?? null,
 		},

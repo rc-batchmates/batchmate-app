@@ -1,0 +1,701 @@
+openapi: 3.1.0
+info:
+  title: Recurse Center API
+  version: v1
+  description: >
+    Subset of the Recurse Center API used by Batchmate for hub attendance
+    and member profile lookups. Based on the official API docs at
+    https://github.com/recursecenter/wiki/wiki/Recurse-Center-API
+
+servers:
+  - url: https://www.recurse.com/api/v1
+
+security:
+  - bearerAuth: []
+
+paths:
+  /hub_visits:
+    get:
+      operationId: getHubVisits
+      summary: List hub visits
+      description: >
+        Show all visits. Ordered by date ascending. Returns an array.
+        Defaults start_date to today in America/New_York if not specified.
+      parameters:
+        - name: date
+          in: query
+          required: false
+          schema:
+            type: string
+            format: date
+          description: Only show visits on this date.
+        - name: start_date
+          in: query
+          required: false
+          schema:
+            type: string
+            format: date
+          description: Inclusive start date. Defaults to today in America/New_York.
+        - name: end_date
+          in: query
+          required: false
+          schema:
+            type: string
+            format: date
+          description: Inclusive end date.
+        - name: person_id
+          in: query
+          required: false
+          schema:
+            type: integer
+          description: Filter to a specific person.
+        - name: page
+          in: query
+          required: false
+          schema:
+            type: integer
+            default: 1
+          description: Page number for pagination.
+        - name: per_page
+          in: query
+          required: false
+          schema:
+            type: integer
+            default: 100
+            maximum: 200
+          description: Number of results per page. Max 200.
+      responses:
+        "200":
+          description: List of hub visits.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/HubVisit"
+        "401":
+          description: Missing or invalid access token.
+
+  /hub_visits/{person_id}/{date}:
+    get:
+      operationId: getHubVisit
+      summary: Get a hub visit
+      description: Returns a single visit, or 404 if the person does not have a visit for that day.
+      parameters:
+        - name: person_id
+          in: path
+          required: true
+          schema:
+            type: integer
+        - name: date
+          in: path
+          required: true
+          schema:
+            type: string
+            format: date
+      responses:
+        "200":
+          description: The hub visit.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HubVisit"
+        "404":
+          description: No visit found for this person on this date.
+
+    patch:
+      operationId: updateHubVisit
+      summary: Create or update a hub visit
+      description: >
+        Creates (or updates) a visit on this date. Notes are appended,
+        app data is merged. Returns the updated object.
+      parameters:
+        - name: person_id
+          in: path
+          required: true
+          schema:
+            type: integer
+        - name: date
+          in: path
+          required: true
+          schema:
+            type: string
+            format: date
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                notes:
+                  type: string
+                  description: >
+                    If there are existing notes, new notes are appended
+                    with two newlines preceding.
+                app_data:
+                  type: string
+                  description: >
+                    A JSON string stored with the visit. For a new visit it is
+                    set directly; for an existing visit it is merged with
+                    existing app data.
+      responses:
+        "200":
+          description: The created or updated hub visit.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HubVisit"
+
+    delete:
+      operationId: deleteHubVisit
+      summary: Delete a hub visit
+      description: >
+        Deletes the visit for the given person and date. Noop if the visit
+        doesn't exist. Always returns 200 as long as person_id exists and
+        date is not malformed. No content.
+      parameters:
+        - name: person_id
+          in: path
+          required: true
+          schema:
+            type: integer
+        - name: date
+          in: path
+          required: true
+          schema:
+            type: string
+            format: date
+      responses:
+        "200":
+          description: Visit deleted (or did not exist).
+
+  /profiles:
+    get:
+      operationId: searchProfiles
+      summary: Search profiles
+      description: >
+        The endpoint used by the RC Directory. Used to search and filter
+        members of the RC community.
+      parameters:
+        - name: query
+          in: query
+          required: false
+          schema:
+            type: string
+          description: >
+            Search by name, skills, profile questions. An empty query returns
+            results in descending order by profile creation date.
+        - name: batch_id
+          in: query
+          required: false
+          schema:
+            type: integer
+          description: Filter to people who have a stint for this batch ID.
+        - name: location_id
+          in: query
+          required: false
+          schema:
+            type: integer
+          description: Filter to people near this location.
+        - name: role
+          in: query
+          required: false
+          schema:
+            type: string
+            enum: [recurser, resident, facilitator, faculty]
+          description: Filter to people who have a stint of a certain type.
+        - name: scope
+          in: query
+          required: false
+          schema:
+            type: string
+            enum: [current, overlap]
+          description: >
+            Narrow the search space. "current" = people currently at RC.
+            "overlap" = people who overlapped with the current user at RC.
+        - name: limit
+          in: query
+          required: false
+          schema:
+            type: integer
+            default: 20
+            maximum: 50
+          description: Limit the number of results returned.
+        - name: offset
+          in: query
+          required: false
+          schema:
+            type: integer
+            default: 0
+          description: Offset the results for pagination.
+      responses:
+        "200":
+          description: List of matching profiles.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Profile"
+        "401":
+          description: Missing or invalid access token.
+
+  /profiles/me:
+    get:
+      operationId: getMyProfile
+      summary: Get the current user's profile
+      description: Returns the profile of the authenticated user.
+      responses:
+        "200":
+          description: The current user's profile.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Profile"
+        "401":
+          description: Missing or invalid access token.
+
+  /profiles/{person_id_or_email}:
+    get:
+      operationId: getProfile
+      summary: Get a profile
+      description: >
+        Fetch a profile by person ID or email address. If using an email,
+        it must be URL encoded.
+      parameters:
+        - name: person_id_or_email
+          in: path
+          required: true
+          schema:
+            type: string
+          description: The person's RC ID (integer) or email address (URL encoded).
+      responses:
+        "200":
+          description: The member's profile.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Profile"
+        "401":
+          description: Missing or invalid access token.
+        "404":
+          description: No member found with that ID or email.
+
+  /batches:
+    get:
+      operationId: listBatches
+      summary: List all batches
+      description: >
+        Returns an array of all batches up to and including the current batch,
+        with the most recent batch first. Future batches are not included.
+      responses:
+        "200":
+          description: List of batches.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Batch"
+        "401":
+          description: Missing or invalid access token.
+
+  /batches/{batch_id}:
+    get:
+      operationId: getBatch
+      summary: Get a batch
+      description: Gets info about a specific batch.
+      parameters:
+        - name: batch_id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: The batch.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Batch"
+        "401":
+          description: Missing or invalid access token.
+        "404":
+          description: No batch found with that ID.
+
+  /locations:
+    get:
+      operationId: searchLocations
+      summary: Search locations
+      description: Search location by name and ascii_name.
+      parameters:
+        - name: query
+          in: query
+          required: false
+          schema:
+            type: string
+          description: Search location by name and ascii_name.
+        - name: limit
+          in: query
+          required: false
+          schema:
+            type: integer
+            default: 10
+            maximum: 50
+          description: Number of results to return.
+      responses:
+        "200":
+          description: List of matching locations.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Location"
+        "401":
+          description: Missing or invalid access token.
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      description: >
+        Recurse Center access token. Can be an OAuth2 access token or a
+        personal access token.
+
+  schemas:
+    Location:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        ascii_name:
+          type: string
+        short_name:
+          type:
+            - string
+            - "null"
+        type:
+          type: string
+
+    Batch:
+      type: object
+      required: [id, name, start_date, end_date]
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+          description: Full batch name (e.g. "Summer 1, 2023").
+        short_name:
+          type: string
+          description: Abbreviated batch name (e.g. "S1'23").
+        alt_name:
+          type: string
+          description: Alternative batch name.
+        start_date:
+          type: string
+          format: date
+        end_date:
+          type: string
+          format: date
+
+    StintBatch:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        short_name:
+          type: string
+        alt_name:
+          type: string
+
+    Stint:
+      type: object
+      required: [id, start_date, type]
+      properties:
+        id:
+          type: integer
+        type:
+          type: string
+          enum: [retreat, residency, research_fellowship, employment, facilitatorship]
+        title:
+          type:
+            - string
+            - "null"
+        for_half_batch:
+          type: boolean
+        in_progress:
+          type: boolean
+        start_date:
+          type: string
+          format: date
+        end_date:
+          type:
+            - string
+            - "null"
+          format: date
+        batch:
+          $ref: "#/components/schemas/StintBatch"
+
+    Company:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+
+    HubVisitPerson:
+      type: object
+      required: [id, name]
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+
+    HubVisit:
+      type: object
+      required: [person, date]
+      properties:
+        person:
+          $ref: "#/components/schemas/HubVisitPerson"
+        date:
+          type: string
+          format: date
+        app_data:
+          type: object
+          additionalProperties: true
+        notes:
+          type: string
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+        created_by_app:
+          type:
+            - string
+            - "null"
+        updated_by_app:
+          type:
+            - string
+            - "null"
+
+    Profile:
+      type: object
+      required: [id, first_name, last_name]
+      properties:
+        id:
+          type: integer
+        first_name:
+          type: string
+        last_name:
+          type: string
+        name:
+          type: string
+        name_hl:
+          type: string
+        email:
+          type:
+            - string
+            - "null"
+        github:
+          type:
+            - string
+            - "null"
+        employer_role:
+          type:
+            - string
+            - "null"
+        twitter:
+          type:
+            - string
+            - "null"
+        linkedin:
+          type:
+            - string
+            - "null"
+        personal_site_url:
+          type:
+            - string
+            - "null"
+        pronouns:
+          type:
+            - string
+            - "null"
+        unformatted_phone_number:
+          type:
+            - string
+            - "null"
+        zoom_url:
+          type:
+            - string
+            - "null"
+        zulip_id:
+          type:
+            - integer
+            - "null"
+        image_path:
+          type:
+            - string
+            - "null"
+        phone_number:
+          type:
+            - string
+            - "null"
+        slug:
+          type:
+            - string
+            - "null"
+        joy_of_computing_username:
+          type:
+            - string
+            - "null"
+        bio_rendered:
+          type:
+            - string
+            - "null"
+        bio_match:
+          type:
+            - boolean
+            - "null"
+        bio_hl:
+          type:
+            - string
+            - "null"
+        bio_truncated:
+          type:
+            - string
+            - "null"
+        before_rc_rendered:
+          type:
+            - string
+            - "null"
+        before_rc_match:
+          type:
+            - boolean
+            - "null"
+        before_rc_hl:
+          type:
+            - string
+            - "null"
+        before_rc_truncated:
+          type:
+            - string
+            - "null"
+        during_rc_rendered:
+          type:
+            - string
+            - "null"
+        during_rc_match:
+          type:
+            - boolean
+            - "null"
+        during_rc_hl:
+          type:
+            - string
+            - "null"
+        during_rc_truncated:
+          type:
+            - string
+            - "null"
+        interests_rendered:
+          type:
+            - string
+            - "null"
+        interests_match:
+          type:
+            - boolean
+            - "null"
+        interests_hl:
+          type:
+            - string
+            - "null"
+        interests_truncated:
+          type:
+            - string
+            - "null"
+        employer_info_rendered:
+          type:
+            - string
+            - "null"
+        employer_info_match:
+          type:
+            - boolean
+            - "null"
+        employer_info_hl:
+          type:
+            - string
+            - "null"
+        employer_info_truncated:
+          type:
+            - string
+            - "null"
+        github_rendered:
+          type:
+            - string
+            - "null"
+        github_match:
+          type:
+            - boolean
+            - "null"
+        github_hl:
+          type:
+            - string
+            - "null"
+        github_truncated:
+          type:
+            - string
+            - "null"
+        phone_number_rendered:
+          type:
+            - string
+            - "null"
+        phone_number_match:
+          type:
+            - boolean
+            - "null"
+        phone_number_hl:
+          type:
+            - string
+            - "null"
+        phone_number_truncated:
+          type:
+            - string
+            - "null"
+        email_rendered:
+          type:
+            - string
+            - "null"
+        email_match:
+          type:
+            - boolean
+            - "null"
+        email_hl:
+          type:
+            - string
+            - "null"
+        email_truncated:
+          type:
+            - string
+            - "null"
+        current_location:
+          oneOf:
+            - $ref: "#/components/schemas/Location"
+            - type: "null"
+        stints:
+          type: array
+          items:
+            $ref: "#/components/schemas/Stint"
+        company:
+          oneOf:
+            - $ref: "#/components/schemas/Company"
+            - type: "null"

@@ -1,30 +1,27 @@
+import { useQuery } from "@tanstack/react-query"
+import { createFileRoute, Link, redirect } from "@tanstack/react-router"
 import {
-	createFileRoute,
-	Link,
-	redirect,
-	useNavigate,
-} from "@tanstack/react-router"
-import {
+	ChevronLeft,
 	ExternalLink,
 	Github,
 	Globe,
 	Hash,
 	Linkedin,
-	LogOut,
 	Mail,
 	Twitter,
 	User,
 } from "lucide-react"
-import { authClient, signOut, useSession } from "@/lib/auth"
+import { api } from "@/lib/api"
+import { authClient } from "@/lib/auth"
 
-export const Route = createFileRoute("/profile")({
+export const Route = createFileRoute("/member/$id")({
 	beforeLoad: async () => {
 		const { data: session } = await authClient.getSession()
 		if (!session) {
 			throw redirect({ to: "/login" })
 		}
 	},
-	component: ProfilePage,
+	component: MemberProfilePage,
 })
 
 function InfoRow({
@@ -83,24 +80,28 @@ function SocialRow({
 	return content
 }
 
-function ProfilePage() {
-	const navigate = useNavigate()
-	const { data: session } = useSession()
-	const user = session?.user as
-		| (Record<string, string | null | undefined> & {
-				name?: string
-				email?: string
-				rcId?: string
-				github?: string
-				twitter?: string
-				linkedin?: string
-				personalSiteUrl?: string
-		  })
-		| undefined
+function MemberProfilePage() {
+	const { id } = Route.useParams()
+	const {
+		data: member,
+		isLoading,
+		error,
+	} = useQuery(api.memberProfile.queryOptions({ input: { id: Number(id) } }))
 
-	async function handleSignOut() {
-		await signOut()
-		navigate({ to: "/login" })
+	if (isLoading) {
+		return (
+			<div className="flex h-full items-center justify-center">
+				<span className="text-sm text-text-tertiary">Loading...</span>
+			</div>
+		)
+	}
+
+	if (error || !member) {
+		return (
+			<div className="flex h-full items-center justify-center">
+				<span className="text-sm text-destructive">Member not found</span>
+			</div>
+		)
 	}
 
 	return (
@@ -108,9 +109,15 @@ function ProfilePage() {
 			{/* Header */}
 			<div className="flex items-center justify-between">
 				<div className="flex flex-col gap-1">
-					<span className="text-sm text-text-tertiary">Your account</span>
+					<Link
+						to="/hub"
+						className="flex items-center gap-1 text-sm text-text-tertiary no-underline hover:text-foreground"
+					>
+						<ChevronLeft size={14} color="#64748B" />
+						Back to Hub
+					</Link>
 					<span className="text-2xl font-semibold text-foreground md:text-3xl">
-						Profile
+						{member.name}
 					</span>
 					<nav className="mt-1 hidden items-center gap-5 md:flex">
 						<Link
@@ -121,29 +128,26 @@ function ProfilePage() {
 						</Link>
 						<Link
 							to="/hub"
-							className="text-sm font-medium text-text-tertiary no-underline hover:text-foreground"
+							className="text-sm font-semibold text-cyan no-underline"
 						>
 							Hub
 						</Link>
-						<span className="text-sm font-semibold text-cyan">Profile</span>
+						<Link
+							to="/profile"
+							className="text-sm font-medium text-text-tertiary no-underline hover:text-foreground"
+						>
+							Profile
+						</Link>
 					</nav>
 				</div>
-				<a
-					href="https://www.recurse.com/settings/general"
-					target="_blank"
-					rel="noopener noreferrer"
-					className="text-sm font-medium text-cyan no-underline"
-				>
-					Edit
-				</a>
 			</div>
 
 			{/* Avatar */}
 			<div className="flex flex-col items-center gap-3">
 				<div className="flex h-24 w-24 items-center justify-center overflow-hidden rounded-full bg-card">
-					{user?.image ? (
+					{member.imageUrl ? (
 						<img
-							src={user.image}
+							src={member.imageUrl}
 							alt=""
 							className="h-full w-full object-cover"
 						/>
@@ -152,15 +156,32 @@ function ProfilePage() {
 					)}
 				</div>
 				<span className="text-[22px] font-semibold text-foreground">
-					{user?.name}
+					{member.name}
 				</span>
+				{member.pronouns && (
+					<span className="text-sm text-text-tertiary">{member.pronouns}</span>
+				)}
 				<div className="flex items-center gap-1.5">
 					<div className="h-2 w-2 rounded-full bg-cyan" />
 					<span className="font-mono text-[13px] font-medium text-cyan">
-						{user?.batch ?? "Recurser"}
+						{member.batch ?? "Recurser"}
 					</span>
 				</div>
 			</div>
+
+			{/* Bio */}
+			{(member.bio || member.duringRc) && (
+				<div className="flex flex-col gap-3">
+					<span className="font-mono text-[11px] font-semibold tracking-widest text-text-tertiary">
+						ABOUT
+					</span>
+					<div className="overflow-hidden rounded-xl bg-card px-4 py-3.5">
+						<p className="text-sm leading-relaxed text-text-secondary">
+							{member.duringRc || member.bio}
+						</p>
+					</div>
+				</div>
+			)}
 
 			{/* Contact & Social */}
 			<div className="flex flex-col gap-7 md:flex-row md:gap-5">
@@ -169,9 +190,9 @@ function ProfilePage() {
 						CONTACT
 					</span>
 					<div className="overflow-hidden rounded-xl bg-card">
-						<InfoRow icon={Mail} label="Email" value={user?.email} />
+						<InfoRow icon={Mail} label="Email" value={member.email} />
 						<div className="h-px bg-surface-inset" />
-						<InfoRow icon={Hash} label="Recurse ID" value={user?.rcId} />
+						<InfoRow icon={Hash} label="Recurse ID" value={String(member.id)} />
 					</div>
 				</div>
 
@@ -183,19 +204,21 @@ function ProfilePage() {
 						<SocialRow
 							icon={Github}
 							label="GitHub"
-							value={user?.github}
+							value={member.github}
 							href={
-								user?.github ? `https://github.com/${user.github}` : undefined
+								member.github
+									? `https://github.com/${member.github}`
+									: undefined
 							}
 						/>
 						<div className="h-px bg-surface-inset" />
 						<SocialRow
 							icon={Linkedin}
 							label="LinkedIn"
-							value={user?.linkedin}
+							value={member.linkedin}
 							href={
-								user?.linkedin
-									? `https://linkedin.com/in/${user.linkedin}`
+								member.linkedin
+									? `https://linkedin.com/in/${member.linkedin}`
 									: undefined
 							}
 						/>
@@ -203,10 +226,10 @@ function ProfilePage() {
 						<SocialRow
 							icon={Twitter}
 							label="Twitter"
-							value={user?.twitter}
+							value={member.twitter}
 							href={
-								user?.twitter
-									? `https://twitter.com/${user.twitter}`
+								member.twitter
+									? `https://twitter.com/${member.twitter}`
 									: undefined
 							}
 						/>
@@ -214,24 +237,12 @@ function ProfilePage() {
 						<SocialRow
 							icon={Globe}
 							label="Website"
-							value={user?.personalSiteUrl}
-							href={user?.personalSiteUrl ?? undefined}
+							value={member.personalSiteUrl}
+							href={member.personalSiteUrl ?? undefined}
 						/>
 					</div>
 				</div>
 			</div>
-
-			{/* Sign Out */}
-			<button
-				type="button"
-				onClick={handleSignOut}
-				className="flex w-full items-center justify-center gap-2 rounded-xl border border-cyan/20 bg-card px-4 py-3 cursor-pointer md:w-48"
-			>
-				<LogOut size={18} color="#94A3B8" />
-				<span className="text-sm font-medium text-text-secondary">
-					Sign Out
-				</span>
-			</button>
 		</div>
 	)
 }

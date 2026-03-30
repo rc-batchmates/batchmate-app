@@ -10,13 +10,20 @@
 
 import { Route as rootRouteImport } from "./routes/__root"
 import { Route as ProfileRouteImport } from "./routes/profile"
+import { Route as HubRouteImport } from "./routes/hub"
 import { Route as AuthRouteRouteImport } from "./routes/_auth/route"
 import { Route as IndexRouteImport } from "./routes/index"
+import { Route as MemberIdRouteImport } from "./routes/member.$id"
 import { Route as AuthLoginRouteImport } from "./routes/_auth/login"
 
 const ProfileRoute = ProfileRouteImport.update({
   id: "/profile",
   path: "/profile",
+  getParentRoute: () => rootRouteImport,
+} as any)
+const HubRoute = HubRouteImport.update({
+  id: "/hub",
+  path: "/hub",
   getParentRoute: () => rootRouteImport,
 } as any)
 const AuthRouteRoute = AuthRouteRouteImport.update({
@@ -28,6 +35,11 @@ const IndexRoute = IndexRouteImport.update({
   path: "/",
   getParentRoute: () => rootRouteImport,
 } as any)
+const MemberIdRoute = MemberIdRouteImport.update({
+  id: "/member/$id",
+  path: "/member/$id",
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AuthLoginRoute = AuthLoginRouteImport.update({
   id: "/login",
   path: "/login",
@@ -36,33 +48,48 @@ const AuthLoginRoute = AuthLoginRouteImport.update({
 
 export interface FileRoutesByFullPath {
   "/": typeof IndexRoute
+  "/hub": typeof HubRoute
   "/profile": typeof ProfileRoute
   "/login": typeof AuthLoginRoute
+  "/member/$id": typeof MemberIdRoute
 }
 export interface FileRoutesByTo {
   "/": typeof IndexRoute
+  "/hub": typeof HubRoute
   "/profile": typeof ProfileRoute
   "/login": typeof AuthLoginRoute
+  "/member/$id": typeof MemberIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   "/": typeof IndexRoute
   "/_auth": typeof AuthRouteRouteWithChildren
+  "/hub": typeof HubRoute
   "/profile": typeof ProfileRoute
   "/_auth/login": typeof AuthLoginRoute
+  "/member/$id": typeof MemberIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: "/" | "/profile" | "/login"
+  fullPaths: "/" | "/hub" | "/profile" | "/login" | "/member/$id"
   fileRoutesByTo: FileRoutesByTo
-  to: "/" | "/profile" | "/login"
-  id: "__root__" | "/" | "/_auth" | "/profile" | "/_auth/login"
+  to: "/" | "/hub" | "/profile" | "/login" | "/member/$id"
+  id:
+    | "__root__"
+    | "/"
+    | "/_auth"
+    | "/hub"
+    | "/profile"
+    | "/_auth/login"
+    | "/member/$id"
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AuthRouteRoute: typeof AuthRouteRouteWithChildren
+  HubRoute: typeof HubRoute
   ProfileRoute: typeof ProfileRoute
+  MemberIdRoute: typeof MemberIdRoute
 }
 
 declare module "@tanstack/react-router" {
@@ -72,6 +99,13 @@ declare module "@tanstack/react-router" {
       path: "/profile"
       fullPath: "/profile"
       preLoaderRoute: typeof ProfileRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    "/hub": {
+      id: "/hub"
+      path: "/hub"
+      fullPath: "/hub"
+      preLoaderRoute: typeof HubRouteImport
       parentRoute: typeof rootRouteImport
     }
     "/_auth": {
@@ -86,6 +120,13 @@ declare module "@tanstack/react-router" {
       path: "/"
       fullPath: "/"
       preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    "/member/$id": {
+      id: "/member/$id"
+      path: "/member/$id"
+      fullPath: "/member/$id"
+      preLoaderRoute: typeof MemberIdRouteImport
       parentRoute: typeof rootRouteImport
     }
     "/_auth/login": {
@@ -113,7 +154,9 @@ const AuthRouteRouteWithChildren = AuthRouteRoute._addFileChildren(
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthRouteRoute: AuthRouteRouteWithChildren,
+  HubRoute: HubRoute,
   ProfileRoute: ProfileRoute,
+  MemberIdRoute: MemberIdRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

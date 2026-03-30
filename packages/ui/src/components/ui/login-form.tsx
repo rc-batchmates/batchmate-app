@@ -1,11 +1,6 @@
 import { Calendar, DoorOpen, LogIn, Users } from "lucide-react-native"
 import { useState } from "react"
-import {
-	Image,
-	type ImageSourcePropType,
-	Pressable,
-	View,
-} from "react-native"
+import { Image, type ImageSourcePropType, Pressable, View } from "react-native"
 import { ExternalLink } from "./external-link"
 import { Text } from "./text"
 
@@ -88,8 +83,14 @@ export function LoginForm({ onSubmit, logoSource }: LoginFormProps) {
 			{/* Features */}
 			<View className="items-center gap-4">
 				<FeatureRow icon={DoorOpen} label="Building door access" />
-				<FeatureRow icon={Calendar} label="Hub & schedule management (coming soon)" />
-				<FeatureRow icon={Users} label="Recurse Center community (coming soon)" />
+				<FeatureRow
+					icon={Calendar}
+					label="Hub & schedule management (coming soon)"
+				/>
+				<FeatureRow
+					icon={Users}
+					label="Recurse Center community (coming soon)"
+				/>
 			</View>
 
 			{/* Footer */}

@@ -44,6 +44,21 @@ function HomePage() {
 					<span className="text-2xl font-semibold text-foreground md:text-3xl">
 						{session?.user?.name?.split(" ")[0] ?? "Recurser"}
 					</span>
+					<nav className="mt-1 hidden items-center gap-5 md:flex">
+						<span className="text-sm font-semibold text-cyan">Home</span>
+						<Link
+							to="/hub"
+							className="text-sm font-medium text-text-tertiary no-underline hover:text-foreground"
+						>
+							Hub
+						</Link>
+						<Link
+							to="/profile"
+							className="text-sm font-medium text-text-tertiary no-underline hover:text-foreground"
+						>
+							Profile
+						</Link>
+					</nav>
 				</div>
 				<Link
 					to="/profile"

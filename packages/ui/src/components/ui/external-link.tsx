@@ -1,4 +1,4 @@
-import { type ReactNode } from "react"
+import type { ReactNode } from "react"
 import { Linking, Platform, Pressable } from "react-native"
 
 export function ExternalLink({

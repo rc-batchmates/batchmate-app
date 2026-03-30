@@ -10,6 +10,7 @@
 	},
 	"dependencies": {
 		"@batchmate/db": "workspace:*",
+		"@batchmate/recurse-api": "workspace:*",
 		"@batchmate/security-api": "workspace:*",
 		"@orpc/contract": "^1.0.0",
 		"@orpc/server": "^1.0.0",
