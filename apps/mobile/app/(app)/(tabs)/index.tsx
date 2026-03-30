@@ -4,8 +4,8 @@ import { useRouter } from "expo-router"
 import { User } from "lucide-react-native"
 import { useState } from "react"
 import { Image, Pressable, ScrollView, View } from "react-native"
-import { api } from "../../src/lib/api"
-import { useSession } from "../../src/lib/auth"
+import { api } from "../../../src/lib/api"
+import { useSession } from "../../../src/lib/auth"
 
 export default function HomeScreen() {
 	const router = useRouter()

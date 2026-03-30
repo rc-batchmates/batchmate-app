@@ -3,7 +3,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 import { useRouter } from "expo-router"
 import { CheckCircle, ChevronRight, MapPin, Users } from "lucide-react-native"
 import { Image, Pressable, ScrollView, View } from "react-native"
-import { api } from "../../src/lib/api"
+import { api } from "../../../src/lib/api"
 
 function PersonCard({
 	name,

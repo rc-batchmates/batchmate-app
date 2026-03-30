@@ -1,9 +1,5 @@
 import { useQuery } from "@tanstack/react-query"
-import {
-	createFileRoute,
-	redirect,
-	useRouter,
-} from "@tanstack/react-router"
+import { createFileRoute, redirect, useRouter } from "@tanstack/react-router"
 import {
 	ChevronLeft,
 	ExternalLink,
@@ -225,7 +221,6 @@ function MemberProfilePage() {
 					</div>
 				</div>
 			</div>
-
 		</PageLayout>
 	)
 }

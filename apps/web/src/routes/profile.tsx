@@ -1,8 +1,4 @@
-import {
-	createFileRoute,
-	redirect,
-	useNavigate,
-} from "@tanstack/react-router"
+import { createFileRoute, redirect, useNavigate } from "@tanstack/react-router"
 import {
 	ExternalLink,
 	Github,
@@ -212,7 +208,6 @@ function ProfilePage() {
 					Sign Out
 				</span>
 			</button>
-
 		</PageLayout>
 	)
 }

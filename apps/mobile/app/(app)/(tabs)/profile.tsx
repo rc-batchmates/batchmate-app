@@ -12,7 +12,7 @@ import {
 	User,
 } from "lucide-react-native"
 import { Image, Pressable, ScrollView, View } from "react-native"
-import { signOut, useSession } from "../../src/lib/auth"
+import { signOut, useSession } from "../../../src/lib/auth"
 
 function InfoRow({
 	icon: Icon,

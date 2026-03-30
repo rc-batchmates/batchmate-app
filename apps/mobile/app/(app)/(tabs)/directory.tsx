@@ -18,7 +18,7 @@ import {
 	TextInput,
 	View,
 } from "react-native"
-import { api } from "../../src/lib/api"
+import { api } from "../../../src/lib/api"
 
 const PAGE_SIZE = 50
 const SEARCH_DEBOUNCE_MS = 300

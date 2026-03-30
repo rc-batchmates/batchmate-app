@@ -13,7 +13,13 @@ export interface BaseContext {
 	db: Database
 	securityComputer: Fetcher
 	rcOAuth: { clientId: string; clientSecret: string } | null
-	user: { id: string; name: string; email: string, accessControlUserId: string, accessControlVirtualCardId: string } | null
+	user: {
+		id: string
+		name: string
+		email: string
+		accessControlUserId: string
+		accessControlVirtualCardId: string
+	} | null
 	session: { id: string } | null
 }
 
