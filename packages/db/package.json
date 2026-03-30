@@ -10,7 +10,8 @@
 	},
 	"scripts": {
 		"db:generate": "drizzle-kit generate",
-		"db:migrate": "wrangler d1 migrations apply batchmate --local"
+		"db:migrate": "wrangler d1 migrations apply batchmate --local",
+		"db:migrate:remote": "wrangler d1 migrations apply batchmate --remote"
 	},
 	"dependencies": {
 		"better-auth": "^1.4.19",
