@@ -9,11 +9,9 @@ export const Route = createFileRoute("/_auth/login")({
 
 function LoginPage() {
 	return (
-		<AuthLayout
-			tagline={"The next generation of recurse tooling."}
-			taglineSub="Access the hub, manage your schedule & configure your rc thing — all in one place."
-		>
+		<AuthLayout>
 			<LoginForm
+				logoSource="/rc_octopus_cyan.png"
 				onSubmit={async () => {
 					await signIn.social({ provider: "recurse", callbackURL: "/" })
 				}}

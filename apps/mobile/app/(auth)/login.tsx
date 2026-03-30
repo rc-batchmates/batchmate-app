@@ -13,10 +13,11 @@ export default function LoginScreen() {
 		>
 			<ScrollView
 				className="flex-1"
-				contentContainerClassName="flex-1 justify-center px-6 py-12"
+				contentContainerClassName="flex-1 justify-center"
 				keyboardShouldPersistTaps="handled"
 			>
 				<LoginForm
+					logoSource={require("../../assets/rc_octopus_cyan.png")}
 					onSubmit={async () => {
 						await signIn.social({
 							provider: "recurse",

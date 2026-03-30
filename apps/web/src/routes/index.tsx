@@ -1,17 +1,10 @@
-import {
-	Button,
-	Card,
-	CardContent,
-	CardHeader,
-	CardTitle,
-	DoorControls,
-	Text,
-} from "@batchmate/ui"
+import { DoorControls } from "@batchmate/ui"
 import { useMutation, useQuery } from "@tanstack/react-query"
-import { createFileRoute, redirect, useNavigate } from "@tanstack/react-router"
+import { createFileRoute, Link, redirect } from "@tanstack/react-router"
+import { User } from "lucide-react"
 import { useState } from "react"
 import { api } from "@/lib/api"
-import { authClient, signOut, useSession } from "@/lib/auth"
+import { authClient, useSession } from "@/lib/auth"
 
 export const Route = createFileRoute("/")({
 	beforeLoad: async () => {
@@ -24,7 +17,6 @@ export const Route = createFileRoute("/")({
 })
 
 function HomePage() {
-	const navigate = useNavigate()
 	const { data: session } = useSession()
 	const {
 		data: health,
@@ -43,62 +35,57 @@ function HomePage() {
 		onSettled: () => setPendingDoor(null),
 	})
 
-	async function handleSignOut() {
-		await signOut()
-		navigate({ to: "/login" })
-	}
-
 	return (
-		<div className="mx-auto max-w-2xl p-8">
-			<div className="flex items-center justify-between mb-8">
-				<h1 className="text-3xl font-bold">batchmate.app</h1>
-				<Button variant="outline" onPress={handleSignOut}>
-					<Text>Sign out</Text>
-				</Button>
-			</div>
-
-			<div className="mb-6">
-				<DoorControls
-					onOpenDoor={(floor, entry) => openDoor.mutate({ floor, entry })}
-					isPending={openDoor.isPending}
-					pendingDoor={pendingDoor}
-				/>
-			</div>
-
-			{session?.user && (
-				<Card className="mb-6">
-					<CardHeader>
-						<CardTitle>
-							<Text>User</Text>
-						</CardTitle>
-					</CardHeader>
-					<CardContent>
-						<p>
-							<span className="font-medium">Name:</span> {session.user.name}
-						</p>
-						<p>
-							<span className="font-medium">Email:</span> {session.user.email}
-						</p>
-					</CardContent>
-				</Card>
-			)}
-
-			<Card>
-				<CardHeader>
-					<CardTitle>
-						<Text>API Health</Text>
-					</CardTitle>
-				</CardHeader>
-				<CardContent>
-					{isLoading && <p className="text-muted-foreground">Loading...</p>}
-					{error && <p className="text-destructive">Error: {error.message}</p>}
-					{health && (
-						<pre className="text-sm bg-muted p-4 rounded-md overflow-auto">
-							{JSON.stringify(health, null, 2)}
-						</pre>
+		<div className="mx-auto flex h-full max-w-md flex-col gap-7 px-6 py-8">
+			{/* Header */}
+			<div className="flex items-center justify-between">
+				<div className="flex flex-col gap-1">
+					<span className="text-sm text-text-tertiary">Welcome back,</span>
+					<span className="text-2xl font-semibold text-foreground">
+						{session?.user?.name?.split(" ")[0] ?? "Recurser"}
+					</span>
+				</div>
+				<Link
+					to="/profile"
+					className="flex h-11 w-11 items-center justify-center overflow-hidden rounded-full bg-card"
+				>
+					{session?.user?.image ? (
+						<img
+							src={session.user.image}
+							alt=""
+							className="h-full w-full object-cover"
+						/>
+					) : (
+						<User size={22} color="#22D3EE" />
 					)}
-				</CardContent>
-			</Card>
+				</Link>
+			</div>
+
+			{/* API Status */}
+			<div className="flex items-center gap-2.5 rounded-lg bg-card px-4 py-3">
+				<div
+					className={`h-2 w-2 rounded-full ${error ? "bg-destructive" : "bg-cyan"}`}
+				/>
+				<span className="font-mono text-xs font-medium text-cyan">
+					{isLoading
+						? "Connecting..."
+						: error
+							? "Disconnected"
+							: "API Connected"}
+				</span>
+				{health?.timestamp && (
+					<span className="font-mono text-[11px] text-text-muted">
+						{health.timestamp}
+					</span>
+				)}
+			</div>
+
+			{/* Door Controls */}
+			<DoorControls
+				onOpenDoor={(floor, entry) => openDoor.mutate({ floor, entry })}
+				isPending={openDoor.isPending}
+				pendingDoor={pendingDoor}
+			/>
 		</div>
 	)
 }

@@ -1,18 +1,11 @@
-import {
-	Button,
-	Card,
-	CardContent,
-	CardHeader,
-	CardTitle,
-	DoorControls,
-	Text,
-} from "@batchmate/ui"
+import { DoorControls, Text } from "@batchmate/ui"
 import { useMutation, useQuery } from "@tanstack/react-query"
 import { useRouter } from "expo-router"
 import { useState } from "react"
-import { ScrollView, View } from "react-native"
+import { Image, Pressable, ScrollView, View } from "react-native"
+import { User } from "lucide-react-native"
 import { api } from "../../src/lib/api"
-import { signOut, useSession } from "../../src/lib/auth"
+import { useSession } from "../../src/lib/auth"
 
 export default function HomeScreen() {
 	const router = useRouter()
@@ -30,58 +23,59 @@ export default function HomeScreen() {
 		onSettled: () => setPendingDoor(null),
 	})
 
-	async function handleSignOut() {
-		await signOut()
-		router.replace("/(auth)/login")
-	}
-
 	return (
 		<ScrollView
 			className="flex-1 bg-background"
-			contentContainerClassName="items-center px-6 py-12 gap-8"
+			contentContainerClassName="px-6 py-4 gap-7"
 		>
-			<View className="w-full flex-row items-center justify-between">
-				<Text className="text-2xl font-bold">Batchmate</Text>
-				<Button variant="outline" onPress={handleSignOut}>
-					<Text>Sign out</Text>
-				</Button>
+			{/* Header */}
+			<View className="flex-row items-center justify-between">
+				<View className="gap-1">
+					<Text className="text-sm text-text-tertiary">Welcome back,</Text>
+					<Text className="text-2xl font-semibold">
+						{session?.user?.name?.split(" ")[0] ?? "Recurser"}
+					</Text>
+				</View>
+				<Pressable
+					className="h-11 w-11 items-center justify-center overflow-hidden rounded-full bg-card"
+					onPress={() => router.push("/(app)/profile")}
+				>
+					{session?.user?.image ? (
+						<Image
+							source={{ uri: session.user.image }}
+							className="h-full w-full"
+						/>
+					) : (
+						<User size={22} color="#22D3EE" />
+					)}
+				</Pressable>
 			</View>
 
+			{/* API Status */}
+			<View className="flex-row items-center gap-2.5 rounded-lg bg-card px-4 py-3">
+				<View
+					className={`h-2 w-2 rounded-full ${health.isError ? "bg-destructive" : "bg-cyan"}`}
+				/>
+				<Text className="font-mono text-xs font-medium text-primary">
+					{health.isLoading
+						? "Connecting..."
+						: health.isError
+							? "Disconnected"
+							: "API Connected"}
+				</Text>
+				{health.data?.timestamp && (
+					<Text className="font-mono text-[11px] text-text-muted">
+						{health.data.timestamp}
+					</Text>
+				)}
+			</View>
+
+			{/* Door Controls */}
 			<DoorControls
 				onOpenDoor={(floor, entry) => openDoor.mutate({ floor, entry })}
 				isPending={openDoor.isPending}
 				pendingDoor={pendingDoor}
 			/>
-
-			<View className="items-center gap-2">
-				<Text className="text-sm text-muted-foreground">
-					{health.isLoading
-						? "Connecting..."
-						: health.isError
-							? `Error: ${health.error.message}`
-							: `API: ${health.data?.status ?? "unknown"}`}
-				</Text>
-			</View>
-
-			{session?.user ? (
-				<Card className="w-full">
-					<CardHeader>
-						<CardTitle>
-							<Text>User</Text>
-						</CardTitle>
-					</CardHeader>
-					<CardContent className="gap-1">
-						<Text className="text-sm">
-							<Text className="font-medium">Name: </Text>
-							{session.user.name}
-						</Text>
-						<Text className="text-sm">
-							<Text className="font-medium">Email: </Text>
-							{session.user.email}
-						</Text>
-					</CardContent>
-				</Card>
-			) : null}
 		</ScrollView>
 	)
 }

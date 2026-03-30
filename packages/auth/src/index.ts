@@ -27,6 +27,7 @@ export function createAuth(db: Database, env: AuthEnv) {
 				config: [
 					{
 						providerId: "recurse",
+						overrideUserInfo: true,
 						authorizationUrl: `${RC_BASE}/oauth/authorize`,
 						tokenUrl: `${RC_BASE}/oauth/token`,
 						userInfoUrl: `${RC_BASE}/api/v1/profiles/me`,
@@ -34,6 +35,9 @@ export function createAuth(db: Database, env: AuthEnv) {
 						clientSecret: env.RC_CLIENT_SECRET,
 						scopes: [],
 						mapProfileToUser(profile) {
+							const currentStint =
+								profile.stints?.[profile.stints.length - 1]
+							const batchName = currentStint?.batch?.name ?? null
 							return {
 								name: profile.name,
 								email: profile.email,
@@ -43,6 +47,7 @@ export function createAuth(db: Database, env: AuthEnv) {
 								twitter: profile.twitter ?? null,
 								linkedin: profile.linkedin ?? null,
 								personalSiteUrl: profile.personal_site_url ?? null,
+								batch: batchName,
 							}
 						},
 					},
@@ -68,6 +73,7 @@ export function createAuth(db: Database, env: AuthEnv) {
 				twitter: { type: "string", required: false },
 				linkedin: { type: "string", required: false },
 				personalSiteUrl: { type: "string", required: false },
+				batch: { type: "string", required: false },
 			},
 		},
 	})

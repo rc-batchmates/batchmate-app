@@ -14,6 +14,7 @@ export const user = sqliteTable("user", {
 	twitter: text("twitter"),
 	linkedin: text("linkedin"),
 	personalSiteUrl: text("personal_site_url"),
+	batch: text("batch"),
 	createdAt: integer("created_at", { mode: "timestamp_ms" })
 		.default(sql`(cast(unixepoch('subsecond') * 1000 as integer))`)
 		.notNull(),

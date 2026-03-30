@@ -11,7 +11,7 @@ function Card({
 	return (
 		<View
 			className={cn(
-				"rounded-xl border border-border bg-card gap-6 py-6 shadow-sm",
+				"rounded-xl bg-card gap-6 py-6",
 				className,
 			)}
 			{...props}
