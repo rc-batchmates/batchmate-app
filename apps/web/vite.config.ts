@@ -5,7 +5,6 @@ import tailwindcss from "@tailwindcss/vite"
 import tanstackRouter from "@tanstack/router-plugin/vite"
 import react from "@vitejs/plugin-react"
 import { defineConfig, transformWithEsbuild } from "vite"
-import { VitePWA } from "vite-plugin-pwa"
 
 const require = createRequire(import.meta.url)
 
@@ -88,36 +87,6 @@ export default defineConfig({
 			},
 		}),
 		tailwindcss(),
-		VitePWA({
-			registerType: "autoUpdate",
-			includeAssets: ["favicon.png", "apple-touch-icon.png"],
-			manifest: {
-				name: "batchmate",
-				short_name: "batchmate",
-				description: "batchmate",
-				theme_color: "#0a0f1c",
-				background_color: "#0a0f1c",
-				display: "standalone",
-				icons: [
-					{
-						src: "pwa-192x192.png",
-						sizes: "192x192",
-						type: "image/png",
-					},
-					{
-						src: "pwa-512x512.png",
-						sizes: "512x512",
-						type: "image/png",
-					},
-					{
-						src: "pwa-512x512.png",
-						sizes: "512x512",
-						type: "image/png",
-						purpose: "maskable",
-					},
-				],
-			},
-		}),
 	],
 	resolve: {
 		alias: {
