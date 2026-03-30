@@ -66,9 +66,22 @@ export const hubVisits = server.hubVisits.handler(async ({ context }) => {
 		}),
 	)
 
+	// Deduplicate by person, keeping the latest check-in
+	const latestByPerson = new Map<number, (typeof data)[0]>()
+	for (const visit of data) {
+		const existing = latestByPerson.get(visit.person.id)
+		if (
+			!existing ||
+			(visit.created_at &&
+				(!existing.created_at || visit.created_at > existing.created_at))
+		) {
+			latestByPerson.set(visit.person.id, visit)
+		}
+	}
+
 	return {
 		isCheckedIn,
-		visitors: data.map((visit) => {
+		visitors: Array.from(latestByPerson.values()).map((visit) => {
 			const profile = profiles.get(visit.person.id)
 			return {
 				personId: visit.person.id,
