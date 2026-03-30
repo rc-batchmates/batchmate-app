@@ -65,7 +65,7 @@ function SocialRow({
 			<Icon size={18} color="#64748B" />
 			<div className="flex flex-1 flex-col gap-0.5">
 				<span className="text-xs text-text-tertiary">{label}</span>
-				<span className="font-mono text-sm font-medium text-cyan">
+				<span className="break-all font-mono text-sm font-medium text-cyan">
 					{value || "—"}
 				</span>
 			</div>
