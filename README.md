@@ -25,6 +25,7 @@ packages/
   api-client/    # oRPC client with TanStack Query integration
   auth/          # Better Auth configuration
   db/            # Drizzle ORM schema and database client
+  recurse-api/   # Recurse Center API client
   security-api/  # Security computer API client (door access)
   ui/            # Shared cross-platform UI components
 ```
@@ -56,6 +57,8 @@ cp .dev.vars.example .dev.vars
 | `RC_CLIENT_ID` | Recurse Center OAuth client ID |
 | `RC_CLIENT_SECRET` | Recurse Center OAuth client secret |
 | `BASE_URL` | API base URL (default: `http://localhost:8787`) |
+| `VIRTUAL_CARD_SITE_CODE` | Site code for virtual card access (pick a random number above 256) |
+| `VIRTUAL_CARD_PREFIX` | Prefix for virtual card IDs (pad with zeros to avoid RC ID collisions) |
 
 ### 3. Set up the database
 
@@ -92,7 +95,9 @@ pnpm --filter @batchmate/mobile android     # Android emulator
 | `pnpm check:fix` | Auto-fix lint issues |
 | `pnpm db:generate` | Generate Drizzle migrations |
 | `pnpm db:migrate` | Apply D1 migrations |
+| `pnpm db:studio` | Open Drizzle Studio |
 | `pnpm ship` | Build and deploy to Cloudflare |
+| `pnpm tail` | Tail Cloudflare Worker logs |
 
 ## Deployment
 
