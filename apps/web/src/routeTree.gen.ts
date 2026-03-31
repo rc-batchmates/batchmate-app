@@ -9,22 +9,40 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from "./routes/__root"
+import { Route as SupportRouteImport } from "./routes/support"
 import { Route as ProfileRouteImport } from "./routes/profile"
+import { Route as PrivacyRouteImport } from "./routes/privacy"
 import { Route as HubRouteImport } from "./routes/hub"
+import { Route as GdprRouteImport } from "./routes/gdpr"
 import { Route as DirectoryRouteImport } from "./routes/directory"
 import { Route as AuthRouteRouteImport } from "./routes/_auth/route"
 import { Route as IndexRouteImport } from "./routes/index"
 import { Route as MemberIdRouteImport } from "./routes/member.$id"
 import { Route as AuthLoginRouteImport } from "./routes/_auth/login"
 
+const SupportRoute = SupportRouteImport.update({
+  id: "/support",
+  path: "/support",
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ProfileRoute = ProfileRouteImport.update({
   id: "/profile",
   path: "/profile",
   getParentRoute: () => rootRouteImport,
 } as any)
+const PrivacyRoute = PrivacyRouteImport.update({
+  id: "/privacy",
+  path: "/privacy",
+  getParentRoute: () => rootRouteImport,
+} as any)
 const HubRoute = HubRouteImport.update({
   id: "/hub",
   path: "/hub",
+  getParentRoute: () => rootRouteImport,
+} as any)
+const GdprRoute = GdprRouteImport.update({
+  id: "/gdpr",
+  path: "/gdpr",
   getParentRoute: () => rootRouteImport,
 } as any)
 const DirectoryRoute = DirectoryRouteImport.update({
@@ -55,16 +73,22 @@ const AuthLoginRoute = AuthLoginRouteImport.update({
 export interface FileRoutesByFullPath {
   "/": typeof IndexRoute
   "/directory": typeof DirectoryRoute
+  "/gdpr": typeof GdprRoute
   "/hub": typeof HubRoute
+  "/privacy": typeof PrivacyRoute
   "/profile": typeof ProfileRoute
+  "/support": typeof SupportRoute
   "/login": typeof AuthLoginRoute
   "/member/$id": typeof MemberIdRoute
 }
 export interface FileRoutesByTo {
   "/": typeof IndexRoute
   "/directory": typeof DirectoryRoute
+  "/gdpr": typeof GdprRoute
   "/hub": typeof HubRoute
+  "/privacy": typeof PrivacyRoute
   "/profile": typeof ProfileRoute
+  "/support": typeof SupportRoute
   "/login": typeof AuthLoginRoute
   "/member/$id": typeof MemberIdRoute
 }
@@ -73,23 +97,47 @@ export interface FileRoutesById {
   "/": typeof IndexRoute
   "/_auth": typeof AuthRouteRouteWithChildren
   "/directory": typeof DirectoryRoute
+  "/gdpr": typeof GdprRoute
   "/hub": typeof HubRoute
+  "/privacy": typeof PrivacyRoute
   "/profile": typeof ProfileRoute
+  "/support": typeof SupportRoute
   "/_auth/login": typeof AuthLoginRoute
   "/member/$id": typeof MemberIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: "/" | "/directory" | "/hub" | "/profile" | "/login" | "/member/$id"
+  fullPaths:
+    | "/"
+    | "/directory"
+    | "/gdpr"
+    | "/hub"
+    | "/privacy"
+    | "/profile"
+    | "/support"
+    | "/login"
+    | "/member/$id"
   fileRoutesByTo: FileRoutesByTo
-  to: "/" | "/directory" | "/hub" | "/profile" | "/login" | "/member/$id"
+  to:
+    | "/"
+    | "/directory"
+    | "/gdpr"
+    | "/hub"
+    | "/privacy"
+    | "/profile"
+    | "/support"
+    | "/login"
+    | "/member/$id"
   id:
     | "__root__"
     | "/"
     | "/_auth"
     | "/directory"
+    | "/gdpr"
     | "/hub"
+    | "/privacy"
     | "/profile"
+    | "/support"
     | "/_auth/login"
     | "/member/$id"
   fileRoutesById: FileRoutesById
@@ -98,13 +146,23 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AuthRouteRoute: typeof AuthRouteRouteWithChildren
   DirectoryRoute: typeof DirectoryRoute
+  GdprRoute: typeof GdprRoute
   HubRoute: typeof HubRoute
+  PrivacyRoute: typeof PrivacyRoute
   ProfileRoute: typeof ProfileRoute
+  SupportRoute: typeof SupportRoute
   MemberIdRoute: typeof MemberIdRoute
 }
 
 declare module "@tanstack/react-router" {
   interface FileRoutesByPath {
+    "/support": {
+      id: "/support"
+      path: "/support"
+      fullPath: "/support"
+      preLoaderRoute: typeof SupportRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     "/profile": {
       id: "/profile"
       path: "/profile"
@@ -112,11 +170,25 @@ declare module "@tanstack/react-router" {
       preLoaderRoute: typeof ProfileRouteImport
       parentRoute: typeof rootRouteImport
     }
+    "/privacy": {
+      id: "/privacy"
+      path: "/privacy"
+      fullPath: "/privacy"
+      preLoaderRoute: typeof PrivacyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     "/hub": {
       id: "/hub"
       path: "/hub"
       fullPath: "/hub"
       preLoaderRoute: typeof HubRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    "/gdpr": {
+      id: "/gdpr"
+      path: "/gdpr"
+      fullPath: "/gdpr"
+      preLoaderRoute: typeof GdprRouteImport
       parentRoute: typeof rootRouteImport
     }
     "/directory": {
@@ -173,8 +245,11 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthRouteRoute: AuthRouteRouteWithChildren,
   DirectoryRoute: DirectoryRoute,
+  GdprRoute: GdprRoute,
   HubRoute: HubRoute,
+  PrivacyRoute: PrivacyRoute,
   ProfileRoute: ProfileRoute,
+  SupportRoute: SupportRoute,
   MemberIdRoute: MemberIdRoute,
 }
 export const routeTree = rootRouteImport
