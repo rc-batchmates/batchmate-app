@@ -15,6 +15,7 @@ import { Route as PrivacyRouteImport } from "./routes/privacy"
 import { Route as HubRouteImport } from "./routes/hub"
 import { Route as GdprRouteImport } from "./routes/gdpr"
 import { Route as DirectoryRouteImport } from "./routes/directory"
+import { Route as SplatRouteImport } from "./routes/$"
 import { Route as AuthRouteRouteImport } from "./routes/_auth/route"
 import { Route as IndexRouteImport } from "./routes/index"
 import { Route as MemberIdRouteImport } from "./routes/member.$id"
@@ -50,6 +51,11 @@ const DirectoryRoute = DirectoryRouteImport.update({
   path: "/directory",
   getParentRoute: () => rootRouteImport,
 } as any)
+const SplatRoute = SplatRouteImport.update({
+  id: "/$",
+  path: "/$",
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AuthRouteRoute = AuthRouteRouteImport.update({
   id: "/_auth",
   getParentRoute: () => rootRouteImport,
@@ -72,6 +78,7 @@ const AuthLoginRoute = AuthLoginRouteImport.update({
 
 export interface FileRoutesByFullPath {
   "/": typeof IndexRoute
+  "/$": typeof SplatRoute
   "/directory": typeof DirectoryRoute
   "/gdpr": typeof GdprRoute
   "/hub": typeof HubRoute
@@ -83,6 +90,7 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   "/": typeof IndexRoute
+  "/$": typeof SplatRoute
   "/directory": typeof DirectoryRoute
   "/gdpr": typeof GdprRoute
   "/hub": typeof HubRoute
@@ -96,6 +104,7 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   "/": typeof IndexRoute
   "/_auth": typeof AuthRouteRouteWithChildren
+  "/$": typeof SplatRoute
   "/directory": typeof DirectoryRoute
   "/gdpr": typeof GdprRoute
   "/hub": typeof HubRoute
@@ -109,6 +118,7 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | "/"
+    | "/$"
     | "/directory"
     | "/gdpr"
     | "/hub"
@@ -120,6 +130,7 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | "/"
+    | "/$"
     | "/directory"
     | "/gdpr"
     | "/hub"
@@ -132,6 +143,7 @@ export interface FileRouteTypes {
     | "__root__"
     | "/"
     | "/_auth"
+    | "/$"
     | "/directory"
     | "/gdpr"
     | "/hub"
@@ -145,6 +157,7 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AuthRouteRoute: typeof AuthRouteRouteWithChildren
+  SplatRoute: typeof SplatRoute
   DirectoryRoute: typeof DirectoryRoute
   GdprRoute: typeof GdprRoute
   HubRoute: typeof HubRoute
@@ -198,6 +211,13 @@ declare module "@tanstack/react-router" {
       preLoaderRoute: typeof DirectoryRouteImport
       parentRoute: typeof rootRouteImport
     }
+    "/$": {
+      id: "/$"
+      path: "/$"
+      fullPath: "/$"
+      preLoaderRoute: typeof SplatRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     "/_auth": {
       id: "/_auth"
       path: ""
@@ -244,6 +264,7 @@ const AuthRouteRouteWithChildren = AuthRouteRoute._addFileChildren(
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthRouteRoute: AuthRouteRouteWithChildren,
+  SplatRoute: SplatRoute,
   DirectoryRoute: DirectoryRoute,
   GdprRoute: GdprRoute,
   HubRoute: HubRoute,
