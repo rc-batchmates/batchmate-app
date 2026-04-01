@@ -1,5 +1,5 @@
-import type { ComponentType } from "react"
 import { ExternalLink as ExternalLinkIcon } from "lucide-react-native"
+import type { ComponentType } from "react"
 import { View } from "react-native"
 import { ExternalLink } from "./external-link"
 import { Text } from "./text"
@@ -28,11 +28,11 @@ export function SocialRow({
 		</>
 	)
 
-	if (href && value) {
+	if (href) {
 		return (
 			<ExternalLink
 				href={href}
-				className="flex-row items-center gap-3 px-4 py-3.5"
+				className="flex flex-row items-center gap-3 px-4 py-3.5"
 			>
 				{content}
 			</ExternalLink>
@@ -40,6 +40,8 @@ export function SocialRow({
 	}
 
 	return (
-		<View className="flex-row items-center gap-3 px-4 py-3.5">{content}</View>
+		<View className="flex flex-row items-center gap-3 px-4 py-3.5">
+			{content}
+		</View>
 	)
 }
