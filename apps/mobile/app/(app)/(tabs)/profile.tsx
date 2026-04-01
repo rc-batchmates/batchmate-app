@@ -1,7 +1,6 @@
-import { ExternalLink, Text } from "@batchmate/ui"
+import { ExternalLink, InfoRow, SocialRow, Text } from "@batchmate/ui"
 import { useRouter } from "expo-router"
 import {
-	ExternalLink as ExternalLinkIcon,
 	Github,
 	Globe,
 	Hash,
@@ -13,66 +12,6 @@ import {
 } from "lucide-react-native"
 import { Image, Pressable, ScrollView, View } from "react-native"
 import { signOut, useSession } from "../../../src/lib/auth"
-
-function InfoRow({
-	icon: Icon,
-	label,
-	value,
-}: {
-	icon: typeof Mail
-	label: string
-	value?: string | null
-}) {
-	return (
-		<View className="flex-row items-center gap-3 px-4 py-3.5">
-			<Icon size={18} color="#64748B" />
-			<View className="flex-1 gap-0.5">
-				<Text className="text-xs text-text-tertiary">{label}</Text>
-				<Text className="font-mono text-sm font-medium">{value || "—"}</Text>
-			</View>
-		</View>
-	)
-}
-
-function SocialRow({
-	icon: Icon,
-	label,
-	value,
-	href,
-}: {
-	icon: typeof Github
-	label: string
-	value?: string | null
-	href?: string
-}) {
-	const content = (
-		<>
-			<Icon size={18} color="#64748B" />
-			<View className="flex-1 gap-0.5">
-				<Text className="text-xs text-text-tertiary">{label}</Text>
-				<Text className="font-mono text-sm font-medium text-primary">
-					{value || "—"}
-				</Text>
-			</View>
-			{value && <ExternalLinkIcon size={16} color="#475569" />}
-		</>
-	)
-
-	if (href && value) {
-		return (
-			<ExternalLink
-				href={href}
-				className="flex-row items-center gap-3 px-4 py-3.5"
-			>
-				{content}
-			</ExternalLink>
-		)
-	}
-
-	return (
-		<View className="flex-row items-center gap-3 px-4 py-3.5">{content}</View>
-	)
-}
 
 export default function ProfileScreen() {
 	const router = useRouter()

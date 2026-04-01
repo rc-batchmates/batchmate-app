@@ -1,6 +1,5 @@
 import { createFileRoute, redirect, useNavigate } from "@tanstack/react-router"
 import {
-	ExternalLink,
 	Github,
 	Globe,
 	Hash,
@@ -10,6 +9,7 @@ import {
 	Twitter,
 	User,
 } from "lucide-react"
+import { InfoRow, SocialRow } from "@batchmate/ui"
 import { PageLayout } from "@/components/page-layout"
 import { authClient, signOut, useSession } from "@/lib/auth"
 
@@ -22,62 +22,6 @@ export const Route = createFileRoute("/profile")({
 	},
 	component: ProfilePage,
 })
-
-function InfoRow({
-	icon: Icon,
-	label,
-	value,
-}: {
-	icon: typeof Mail
-	label: string
-	value?: string | null
-}) {
-	return (
-		<div className="flex items-center gap-3 px-4 py-3.5">
-			<Icon size={18} color="#64748B" />
-			<div className="flex flex-1 flex-col gap-0.5">
-				<span className="text-xs text-text-tertiary">{label}</span>
-				<span className="font-mono text-sm font-medium text-foreground">
-					{value || "—"}
-				</span>
-			</div>
-		</div>
-	)
-}
-
-function SocialRow({
-	icon: Icon,
-	label,
-	value,
-	href,
-}: {
-	icon: typeof Github
-	label: string
-	value?: string | null
-	href?: string
-}) {
-	const content = (
-		<div className="flex items-center gap-3 px-4 py-3.5">
-			<Icon size={18} color="#64748B" />
-			<div className="flex flex-1 flex-col gap-0.5">
-				<span className="text-xs text-text-tertiary">{label}</span>
-				<span className="break-all font-mono text-sm font-medium text-cyan">
-					{value || "—"}
-				</span>
-			</div>
-			{value && <ExternalLink size={16} color="#475569" />}
-		</div>
-	)
-
-	if (href && value) {
-		return (
-			<a href={href} target="_blank" rel="noopener noreferrer">
-				{content}
-			</a>
-		)
-	}
-	return content
-}
 
 function ProfilePage() {
 	const navigate = useNavigate()
