@@ -7,6 +7,7 @@ import { Text } from "./text"
 export type LoginFormProps = {
 	onSubmit: () => Promise<void>
 	logoSource?: ImageSourcePropType | string
+	onLogoPress?: () => void
 }
 
 function FeatureRow({
@@ -24,7 +25,11 @@ function FeatureRow({
 	)
 }
 
-export function LoginForm({ onSubmit, logoSource }: LoginFormProps) {
+export function LoginForm({
+	onSubmit,
+	logoSource,
+	onLogoPress,
+}: LoginFormProps) {
 	const [error, setError] = useState("")
 	const [loading, setLoading] = useState(false)
 
@@ -44,7 +49,11 @@ export function LoginForm({ onSubmit, logoSource }: LoginFormProps) {
 		<View className="flex-1 items-center justify-center gap-8 px-6">
 			{/* Logo */}
 			<View className="items-center gap-4">
-				<View className="h-20 w-20 items-center justify-center overflow-hidden rounded-[20px] bg-card">
+				<Pressable
+					className="h-20 w-20 items-center justify-center overflow-hidden rounded-[20px] bg-card"
+					onPress={onLogoPress}
+					disabled={!onLogoPress}
+				>
 					{logoSource ? (
 						<Image
 							source={
@@ -56,7 +65,7 @@ export function LoginForm({ onSubmit, logoSource }: LoginFormProps) {
 							resizeMode="contain"
 						/>
 					) : null}
-				</View>
+				</Pressable>
 				<Text className="font-mono text-[32px] font-bold">batchmate</Text>
 				<Text className="text-center font-mono text-sm text-text-tertiary">
 					The next generation of recurse tooling
