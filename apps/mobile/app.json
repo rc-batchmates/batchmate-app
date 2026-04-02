@@ -19,8 +19,8 @@
     "android": {
       "package": "app.batchmate.app",
       "adaptiveIcon": {
-        "foregroundImage": "./assets/icon.png",
-        "backgroundColor": "#ffffff"
+        "foregroundImage": "./assets/adaptive-icon.png",
+        "backgroundColor": "#0F172A"
       }
     },
     "plugins": [
