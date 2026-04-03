@@ -19,11 +19,7 @@ export const Route = createFileRoute("/")({
 
 function HomePage() {
 	const { data: session } = useSession()
-	const {
-		data: health,
-		isLoading,
-		error,
-	} = useQuery(api.health.queryOptions({}))
+	const { error } = useQuery(api.health.queryOptions({}))
 
 	const [pendingDoor, setPendingDoor] = useState<{
 		floor: "4" | "5"
@@ -57,24 +53,15 @@ function HomePage() {
 				</Link>
 			}
 		>
-			{/* API Status */}
-			<div className="flex items-center gap-2.5 rounded-lg bg-card px-4 py-3">
-				<div
-					className={`h-2 w-2 rounded-full ${error ? "bg-destructive" : "bg-cyan"}`}
-				/>
-				<span className="font-mono text-xs font-medium text-cyan">
-					{isLoading
-						? "Connecting..."
-						: error
-							? "Disconnected"
-							: "API Connected"}
-				</span>
-				{health?.timestamp && (
-					<span className="font-mono text-[11px] text-text-muted">
-						{health.timestamp}
+			{/* API Status — only show when there's an error */}
+			{error && (
+				<div className="flex items-center gap-2.5 rounded-lg bg-card px-4 py-3">
+					<div className="h-2 w-2 rounded-full bg-destructive" />
+					<span className="font-mono text-xs font-medium text-destructive">
+						Disconnected
 					</span>
-				)}
-			</div>
+				</div>
+			)}
 
 			{/* Door Controls */}
 			<DoorControls

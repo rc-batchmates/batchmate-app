@@ -51,24 +51,15 @@ export default function HomeScreen() {
 				</Pressable>
 			</View>
 
-			{/* API Status */}
-			<View className="flex-row items-center gap-2.5 rounded-lg bg-card px-4 py-3">
-				<View
-					className={`h-2 w-2 rounded-full ${health.isError ? "bg-destructive" : "bg-cyan"}`}
-				/>
-				<Text className="font-mono text-xs font-medium text-primary">
-					{health.isLoading
-						? "Connecting..."
-						: health.isError
-							? "Disconnected"
-							: "API Connected"}
-				</Text>
-				{health.data?.timestamp && (
-					<Text className="font-mono text-[11px] text-text-muted">
-						{health.data.timestamp}
+			{/* API Status — only show when there's an error */}
+			{health.isError && (
+				<View className="flex-row items-center gap-2.5 rounded-lg bg-card px-4 py-3">
+					<View className="h-2 w-2 rounded-full bg-destructive" />
+					<Text className="font-mono text-xs font-medium text-destructive">
+						Disconnected
 					</Text>
-				)}
-			</View>
+				</View>
+			)}
 
 			{/* Door Controls */}
 			<DoorControls

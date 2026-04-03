@@ -30,16 +30,7 @@ export default function DemoHomeScreen() {
 				</View>
 			</View>
 
-			{/* API Status */}
-			<View className="flex-row items-center gap-2.5 rounded-lg bg-card px-4 py-3">
-				<View className="h-2 w-2 rounded-full bg-cyan" />
-				<Text className="font-mono text-xs font-medium text-primary">
-					API Connected
-				</Text>
-				<Text className="font-mono text-[11px] text-text-muted">
-					{new Date().toISOString()}
-				</Text>
-			</View>
+			{/* API Status — hidden in demo since it's always "connected" */}
 
 			{/* Door Controls */}
 			<DoorControls
