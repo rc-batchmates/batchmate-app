@@ -49,7 +49,7 @@ export default function DemoProfileScreen() {
 					CONTACT
 				</Text>
 				<View className="overflow-hidden rounded-xl bg-card">
-					<InfoRow icon={Mail} label="Email" value="demo@example.com" />
+					<InfoRow icon={Mail} label="Email" value="demo@example.com" mailto />
 					<View className="h-px bg-surface-inset" />
 					<InfoRow icon={Hash} label="Recurse ID" value="00000" />
 				</View>

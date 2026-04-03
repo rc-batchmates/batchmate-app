@@ -142,7 +142,7 @@ export default function DemoMemberProfileScreen() {
 					CONTACT
 				</Text>
 				<View className="overflow-hidden rounded-xl bg-card">
-					<InfoRow icon={Mail} label="Email" value={member.email} />
+					<InfoRow icon={Mail} label="Email" value={member.email} mailto />
 					<View className="h-px bg-surface-inset" />
 					<InfoRow icon={Hash} label="Recurse ID" value={id} />
 				</View>

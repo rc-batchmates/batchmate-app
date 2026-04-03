@@ -112,7 +112,7 @@ function MemberProfilePage() {
 						CONTACT
 					</span>
 					<div className="overflow-hidden rounded-xl bg-card">
-						<InfoRow icon={Mail} label="Email" value={member.email} />
+						<InfoRow icon={Mail} label="Email" value={member.email} mailto />
 						<div className="h-px bg-surface-inset" />
 						<InfoRow icon={Hash} label="Recurse ID" value={String(member.id)} />
 					</div>

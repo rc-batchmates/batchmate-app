@@ -12,7 +12,8 @@
     "ios": {
       "bundleIdentifier": "app.batchmate.app",
       "infoPlist": {
-        "ITSAppUsesNonExemptEncryption": false
+        "ITSAppUsesNonExemptEncryption": false,
+        "LSApplicationQueriesSchemes": ["mailto"]
       },
       "appleTeamId": "KNBPD99JQM"
     },

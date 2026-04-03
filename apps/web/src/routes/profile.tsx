@@ -89,7 +89,7 @@ function ProfilePage() {
 						CONTACT
 					</span>
 					<div className="overflow-hidden rounded-xl bg-card">
-						<InfoRow icon={Mail} label="Email" value={user?.email} />
+						<InfoRow icon={Mail} label="Email" value={user?.email} mailto />
 						<div className="h-px bg-surface-inset" />
 						<InfoRow icon={Hash} label="Recurse ID" value={user?.rcId} />
 					</div>

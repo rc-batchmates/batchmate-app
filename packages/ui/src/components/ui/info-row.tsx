@@ -1,20 +1,22 @@
 import type { ComponentType } from "react"
 import { useState } from "react"
-import { Platform, Pressable, View } from "react-native"
+import { Linking, Platform, Pressable, View } from "react-native"
 import { Text } from "./text"
 
 export function InfoRow({
 	icon: Icon,
 	label,
 	value,
+	mailto,
 }: {
 	icon: ComponentType<{ size: number; color: string }>
 	label: string
 	value?: string | null
+	mailto?: boolean
 }) {
 	const [copied, setCopied] = useState(false)
 
-	async function handleCopy() {
+	async function copyValue() {
 		if (!value) return
 		if (Platform.OS === "web") {
 			navigator.clipboard.writeText(value)
@@ -26,9 +28,26 @@ export function InfoRow({
 		setTimeout(() => setCopied(false), 1500)
 	}
 
+	async function handlePress() {
+		if (!value) return
+		if (mailto) {
+			const url = `mailto:${value}`
+			if (Platform.OS === "web") {
+				window.open(url, "_self")
+				return
+			}
+			const supported = await Linking.canOpenURL(url)
+			if (supported) {
+				await Linking.openURL(url)
+				return
+			}
+		}
+		await copyValue()
+	}
+
 	return (
 		<Pressable
-			onPress={handleCopy}
+			onPress={handlePress}
 			disabled={!value}
 			className="flex-row items-center gap-3 px-4 py-3.5"
 		>
@@ -39,7 +58,7 @@ export function InfoRow({
 			</View>
 			{value && (
 				<Text className="text-xs text-text-tertiary">
-					{copied ? "Copied!" : "Copy"}
+					{copied ? "Copied!" : mailto ? "Send" : "Copy"}
 				</Text>
 			)}
 		</Pressable>
