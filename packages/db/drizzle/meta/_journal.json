@@ -22,6 +22,13 @@
       "when": 1774849379433,
       "tag": "0002_thin_living_mummy",
       "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "6",
+      "when": 1779284969321,
+      "tag": "0003_stale_prowler",
+      "breakpoints": true
     }
   ]
 }

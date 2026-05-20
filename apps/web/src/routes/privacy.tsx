@@ -62,7 +62,7 @@ function PrivacyPolicy() {
 	return (
 		<PageLayout
 			title="Privacy Policy"
-			subtitle="Last updated: March 31, 2026"
+			subtitle="Last updated: May 8, 2026"
 		>
 			<div className="flex flex-col gap-8">
 				<Section>
@@ -930,6 +930,177 @@ function PrivacyPolicy() {
 					<P>
 						We do not offer financial incentives or price or service differences
 						in exchange for the retention or sale of Your Personal Information.
+					</P>
+				</Section>
+
+				<Section>
+					<SectionTitle>
+						Your Canadian Privacy Rights (PIPEDA)
+					</SectionTitle>
+					<P>
+						If You are a resident of Canada, the federal Personal Information
+						Protection and Electronic Documents Act (&quot;PIPEDA&quot;) and
+						applicable provincial privacy laws may apply to Our processing of
+						Your Personal Information. We adhere to the ten fair information
+						principles set out in Schedule 1 of PIPEDA: accountability,
+						identifying purposes, consent, limiting collection, limiting use
+						disclosure and retention, accuracy, safeguards, openness, individual
+						access, and challenging compliance.
+					</P>
+
+					<SubTitle>Privacy Officer</SubTitle>
+					<P>
+						We have designated a Privacy Officer who is accountable for Our
+						compliance with PIPEDA and applicable Canadian privacy laws. You may
+						contact Our Privacy Officer with any questions, concerns, or
+						requests regarding Your Personal Information:
+					</P>
+					<UL>
+						<li>
+							Privacy Officer, Left Shift Logical, LLC, 418 Broadway STE N,
+							Albany, NY, 12207, USA
+						</li>
+						<li>
+							Email:{" "}
+							<A href="mailto:support@leftshift.com">support@leftshift.com</A>
+						</li>
+					</UL>
+
+					<SubTitle>Your Rights Under PIPEDA</SubTitle>
+					<P>As a Canadian resident, You have the right to:</P>
+					<UL>
+						<li>
+							<strong className="text-foreground">Access:</strong> Request
+							access to the Personal Information We hold about You and
+							information about how it has been used and to whom it has been
+							disclosed.
+						</li>
+						<li>
+							<strong className="text-foreground">Correction:</strong> Request
+							correction of inaccurate or incomplete Personal Information.
+						</li>
+						<li>
+							<strong className="text-foreground">
+								Withdraw consent:
+							</strong>{" "}
+							Withdraw Your consent to Our collection, use, or disclosure of
+							Your Personal Information at any time, subject to legal or
+							contractual restrictions and reasonable notice. Withdrawing
+							consent may affect Our ability to provide certain features of
+							the Service.
+						</li>
+						<li>
+							<strong className="text-foreground">
+								Challenge compliance:
+							</strong>{" "}
+							Challenge Our compliance with PIPEDA by contacting Our Privacy
+							Officer. If You are not satisfied with Our response, You may
+							file a complaint with the Office of the Privacy Commissioner of
+							Canada at{" "}
+							<A href="https://www.priv.gc.ca">www.priv.gc.ca</A>.
+						</li>
+					</UL>
+
+					<SubTitle>Cross-Border Transfers</SubTitle>
+					<P>
+						Your Personal Information is processed and stored on servers
+						located outside of Canada, including in the United States, by Our
+						service providers (such as Cloudflare). While Your Personal
+						Information is in another jurisdiction, it may be accessible to law
+						enforcement and national security authorities of that jurisdiction
+						in accordance with the laws of that jurisdiction. We use
+						contractual and other measures to provide a comparable level of
+						protection while Your information is being processed by Our service
+						providers.
+					</P>
+				</Section>
+
+				<Section>
+					<SectionTitle>
+						Your Quebec Privacy Rights (Law 25)
+					</SectionTitle>
+					<P>
+						If You are a resident of Quebec, the Act respecting the protection
+						of personal information in the private sector (as amended by Law
+						25) provides You with additional rights regarding Your Personal
+						Information.
+					</P>
+
+					<SubTitle>Person in Charge of Personal Information</SubTitle>
+					<P>
+						The person in charge of the protection of Personal Information at
+						Our Company is Our Privacy Officer, who can be reached at{" "}
+						<A href="mailto:support@leftshift.com">support@leftshift.com</A>.
+					</P>
+
+					<SubTitle>Your Rights Under Law 25</SubTitle>
+					<UL>
+						<li>
+							<strong className="text-foreground">Right to be informed:</strong>{" "}
+							You have the right to be informed of the collection, purposes,
+							means of collection, categories of persons with access, and the
+							right to access and rectification at the time of collection.
+						</li>
+						<li>
+							<strong className="text-foreground">Right of access:</strong>{" "}
+							You have the right to access the Personal Information We hold
+							about You.
+						</li>
+						<li>
+							<strong className="text-foreground">Right to rectification:</strong>{" "}
+							You have the right to have inaccurate, incomplete, or equivocal
+							Personal Information corrected.
+						</li>
+						<li>
+							<strong className="text-foreground">
+								Right to data portability:
+							</strong>{" "}
+							You have the right to obtain the computerized Personal
+							Information We hold about You in a structured, commonly used
+							technological format, and to have it transferred to another
+							person or body authorized by law to collect such information.
+						</li>
+						<li>
+							<strong className="text-foreground">
+								Right to withdraw consent and to de-indexing:
+							</strong>{" "}
+							You have the right to withdraw Your consent to the use of Your
+							Personal Information and, in certain circumstances, to require
+							Us to cease disseminating it or to de-index hyperlinks providing
+							access to it.
+						</li>
+						<li>
+							<strong className="text-foreground">
+								Right to lodge a complaint:
+							</strong>{" "}
+							You may file a complaint with the Commission d&apos;accès à
+							l&apos;information du Québec at{" "}
+							<A href="https://www.cai.gouv.qc.ca">www.cai.gouv.qc.ca</A> if
+							You believe Your rights have been violated.
+						</li>
+					</UL>
+
+					<SubTitle>Automated Decision-Making</SubTitle>
+					<P>
+						We do not use Your Personal Information to render decisions based
+						exclusively on automated processing. If this changes, We will
+						inform You at or before the time the decision is made and provide
+						You with the opportunity to submit observations.
+					</P>
+
+					<SubTitle>Communication of Personal Information Outside Quebec</SubTitle>
+					<P>
+						Your Personal Information may be communicated to and stored by
+						service providers located outside of Quebec, including in the
+						United States. Before communicating Personal Information outside
+						Quebec, We conduct a privacy impact assessment to confirm that the
+						information will receive adequate protection, considering the
+						sensitivity of the information, the purposes for which it will be
+						used, the protection measures applied to it, and the legal
+						framework applicable in the jurisdiction where it will be
+						communicated. By using the Service, You acknowledge that Your
+						Personal Information may be communicated outside Quebec for the
+						purposes described in this Privacy Policy.
 					</P>
 				</Section>
 

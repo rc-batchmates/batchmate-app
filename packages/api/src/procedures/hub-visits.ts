@@ -1,7 +1,10 @@
 import { account } from "@batchmate/db/auth-schema"
+import { recurseProfile } from "@batchmate/db/schema"
 import { ORPCError } from "@orpc/server"
-import { and, eq } from "drizzle-orm"
+import { and, eq, inArray, sql } from "drizzle-orm"
 import { server } from "../context"
+
+const PROFILE_CACHE_TTL_MS = 7 * 24 * 60 * 60 * 1000
 
 export const hubVisits = server.hubVisits.handler(async ({ context }) => {
 	if (!context.user) {
@@ -14,7 +17,6 @@ export const hubVisits = server.hubVisits.handler(async ({ context }) => {
 		})
 	}
 
-	// Get the user's RC ID to check if they're checked in
 	const rcAccount = await context.db
 		.select({ accountId: account.accountId })
 		.from(account)
@@ -40,33 +42,76 @@ export const hubVisits = server.hubVisits.handler(async ({ context }) => {
 		? data.some((visit) => visit.person.id === rcId)
 		: false
 
-	// Hub visits only return person {id, name}. Fetch profiles in parallel
-	// to get images and batch info. This is N+1 but unavoidable — the RC API
-	// has no batch endpoint for hub visitors and scope=current returns people
-	// in batch, not in the hub. Consider caching profiles if this gets slow.
 	const uniqueIds = [...new Set(data.map((v) => v.person.id))]
 	const profiles = new Map<
 		number,
 		{ imageUrl: string | null; batch: string | null }
 	>()
 
-	await Promise.allSettled(
-		uniqueIds.map(async (id) => {
-			const { data: profile } = await context.recurseApi!.GET(
-				"/profiles/{person_id_or_email}",
-				{ params: { path: { person_id_or_email: String(id) } } },
+	if (uniqueIds.length > 0) {
+		const cached = await context.db
+			.select()
+			.from(recurseProfile)
+			.where(inArray(recurseProfile.personId, uniqueIds))
+			.all()
+
+		const freshCutoff = Date.now() - PROFILE_CACHE_TTL_MS
+		const staleIds = new Set(uniqueIds)
+		for (const row of cached) {
+			if (row.cachedAt.getTime() >= freshCutoff) {
+				profiles.set(row.personId, {
+					imageUrl: row.imageUrl,
+					batch: row.batch,
+				})
+				staleIds.delete(row.personId)
+			}
+		}
+
+		if (staleIds.size > 0) {
+			const fetched = await Promise.allSettled(
+				[...staleIds].map(async (id) => {
+					const { data: profile } = await context.recurseApi!.GET(
+						"/profiles/{person_id_or_email}",
+						{ params: { path: { person_id_or_email: String(id) } } },
+					)
+					if (!profile) return null
+					const lastStint = profile.stints?.[profile.stints.length - 1]
+					return {
+						personId: id,
+						imageUrl: profile.image_path ?? null,
+						batch: lastStint?.batch?.name ?? null,
+					}
+				}),
 			)
-			if (profile) {
-				const lastStint = profile.stints?.[profile.stints.length - 1]
-				profiles.set(id, {
-					imageUrl: profile.image_path ?? null,
-					batch: lastStint?.batch?.name ?? null,
+
+			const rows = fetched
+				.map((r) => (r.status === "fulfilled" ? r.value : null))
+				.filter((r): r is NonNullable<typeof r> => r !== null)
+
+			for (const row of rows) {
+				profiles.set(row.personId, {
+					imageUrl: row.imageUrl,
+					batch: row.batch,
 				})
 			}
-		}),
-	)
 
-	// Deduplicate by person, keeping the latest check-in
+			if (rows.length > 0) {
+				const now = new Date()
+				await context.db
+					.insert(recurseProfile)
+					.values(rows.map((r) => ({ ...r, cachedAt: now })))
+					.onConflictDoUpdate({
+						target: recurseProfile.personId,
+						set: {
+							imageUrl: sql`excluded.image_url`,
+							batch: sql`excluded.batch`,
+							cachedAt: sql`excluded.cached_at`,
+						},
+					})
+			}
+		}
+	}
+
 	const latestByPerson = new Map<number, (typeof data)[0]>()
 	for (const visit of data) {
 		const existing = latestByPerson.get(visit.person.id)
