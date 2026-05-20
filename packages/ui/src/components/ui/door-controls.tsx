@@ -202,14 +202,14 @@ function ElevatorCard({
 
 	return (
 		<Pressable
-			className="w-full justify-between gap-4 overflow-hidden rounded-xl border border-primary/30 bg-primary/10 p-5 select-none"
-			style={{ minHeight: 160, ...webHoldStyle }}
+			className="flex-1 justify-between gap-4 overflow-hidden rounded-xl border border-primary/30 bg-primary/10 p-5 select-none"
+			style={{ ...webHoldStyle }}
 			onPressIn={onPressIn}
 			onPressOut={onPressOut}
 			disabled={isPending}
 			{...webHoldGuards}
 		>
-			<View className="flex-row items-center gap-4">
+			<View className="gap-3">
 				<View className="h-12 w-12 items-center justify-center rounded-[12px] bg-surface-inset">
 					<ElevatorIcon size={24} color="#22D3EE" />
 				</View>
@@ -323,25 +323,8 @@ function DoorControls({
 					DOOR CONTROLS
 				</Text>
 			</View>
-			<View className="gap-3">
-				<ElevatorCard
-					onCommit={() => onOpenDoor(elevatorAction)}
-					isPending={isPending}
-					isThis={isSameAction(elevatorAction, pendingAction)}
-					isUnlocked={isSameAction(elevatorAction, justUnlockedAction)}
-					unlockDurationMs={unlockDurationMs}
-					holdDurationMs={holdDurationMs}
-				/>
-				<View className="flex-row gap-3">
-					<StairsCard
-						floor="4"
-						onCommit={() => onOpenDoor(stairs4Action)}
-						isPending={isPending}
-						isThis={isSameAction(stairs4Action, pendingAction)}
-						isUnlocked={isSameAction(stairs4Action, justUnlockedAction)}
-						unlockDurationMs={unlockDurationMs}
-						holdDurationMs={holdDurationMs}
-					/>
+			<View className="flex-row gap-3">
+				<View className="flex-1 gap-3">
 					<StairsCard
 						floor="5"
 						onCommit={() => onOpenDoor(stairs5Action)}
@@ -351,7 +334,24 @@ function DoorControls({
 						unlockDurationMs={unlockDurationMs}
 						holdDurationMs={holdDurationMs}
 					/>
+					<StairsCard
+						floor="4"
+						onCommit={() => onOpenDoor(stairs4Action)}
+						isPending={isPending}
+						isThis={isSameAction(stairs4Action, pendingAction)}
+						isUnlocked={isSameAction(stairs4Action, justUnlockedAction)}
+						unlockDurationMs={unlockDurationMs}
+						holdDurationMs={holdDurationMs}
+					/>
 				</View>
+				<ElevatorCard
+					onCommit={() => onOpenDoor(elevatorAction)}
+					isPending={isPending}
+					isThis={isSameAction(elevatorAction, pendingAction)}
+					isUnlocked={isSameAction(elevatorAction, justUnlockedAction)}
+					unlockDurationMs={unlockDurationMs}
+					holdDurationMs={holdDurationMs}
+				/>
 			</View>
 		</View>
 	)
