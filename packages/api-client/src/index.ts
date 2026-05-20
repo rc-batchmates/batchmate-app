@@ -1,5 +1,5 @@
 export const DEV_API_URL = "http://localhost:8787"
-export const PROD_API_URL = "https://recurse.rocks"
+export const PROD_API_URL = "https://batchmate.app"
 
 import { contract } from "@batchmate/api/contract"
 import type { Router } from "@batchmate/api/router"

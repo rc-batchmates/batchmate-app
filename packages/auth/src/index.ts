@@ -26,7 +26,7 @@ export function createAuth(db: Database, env: AuthEnv) {
 
 	return betterAuth({
 		...authOptions,
-		baseURL: env.BASE_URL ?? "https://recurse.rocks",
+		baseURL: env.BASE_URL ?? "https://batchmate.app",
 		plugins: [
 			expo(),
 			genericOAuth({
@@ -62,6 +62,9 @@ export function createAuth(db: Database, env: AuthEnv) {
 			}),
 		],
 		trustedOrigins: [
+			"https://batchmate.app",
+			"http://batchmate.app",
+			// Legacy host — remove in Phase 3 once recurse.rocks is retired.
 			"http://recurse.rocks",
 			"https://recurse.rocks",
 			"http://localhost:5173",

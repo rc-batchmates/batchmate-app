@@ -13,6 +13,13 @@ ip = "0.0.0.0"
 port = 8787
 
 [[routes]]
+pattern = "batchmate.app"
+custom_domain = true
+
+# Legacy host. Browser requests are 302'd to batchmate.app in the worker;
+# /api/v1/* keeps serving directly so old mobile builds keep working until
+# they're updated. Remove this route in Phase 3 once legacy traffic is gone.
+[[routes]]
 pattern = "recurse.rocks"
 custom_domain = true
 

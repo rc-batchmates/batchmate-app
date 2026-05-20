@@ -147,7 +147,7 @@ function PrivacyPolicy() {
 						<li>
 							<strong className="text-foreground">Website</strong> refers to
 							batchmate, accessible from{" "}
-							<A href="https://recurse.rocks">https://recurse.rocks</A>.
+							<A href="https://batchmate.app">https://batchmate.app</A>.
 						</li>
 						<li>
 							<strong className="text-foreground">You</strong> means the
