@@ -148,7 +148,14 @@ app.use("/api/v1/*", async (c, next) => {
 app.get("*", async (c) => {
 	const response = await c.env.ASSETS.fetch(c.req.raw)
 	if (response.ok) return response
-	return c.env.ASSETS.fetch(new URL("/", c.req.url))
+	// SPA fallback: only serve index.html for navigation requests. Returning
+	// it for a missing static asset (e.g. a stale-cached `/assets/*.js` hash
+	// from before a deploy) makes the browser parse HTML as a JS module and
+	// fail strict MIME checking.
+	if ((c.req.header("accept") ?? "").includes("text/html")) {
+		return c.env.ASSETS.fetch(new URL("/", c.req.url))
+	}
+	return response
 })
 
 export default app
