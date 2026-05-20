@@ -160,6 +160,9 @@ importers:
         specifier: ^0.5.1
         version: 0.5.2(@babel/core@7.29.0)(react-native@0.81.5(@babel/core@7.29.0)(@types/react@19.1.17)(react@19.1.0))(react@19.1.0)
     devDependencies:
+      '@expo/env':
+        specifier: ^2.1.2
+        version: 2.1.2
       '@tailwindcss/postcss':
         specifier: ^4.2.2
         version: 4.2.2
@@ -1751,6 +1754,10 @@ packages:
 
   '@expo/env@2.0.11':
     resolution: {integrity: sha512-xV+ps6YCW7XIPVUwFVCRN2nox09dnRwy8uIjwHWTODu0zFw4kp4omnVkl0OOjuu2XOe7tdgAHxikrkJt9xB/7Q==}
+
+  '@expo/env@2.1.2':
+    resolution: {integrity: sha512-RJtGFfj/ygO/6zcVbV3cckHf4THcEkv5IZft1GjCB3dfT6axvzvIwXE9EiQqQYmGHcQ+ZrvC8xZcIhiHba0pYg==}
+    engines: {node: '>=20.12.0'}
 
   '@expo/fingerprint@0.15.4':
     resolution: {integrity: sha512-eYlxcrGdR2/j2M6pEDXo9zU9KXXF1vhP+V+Tl+lyY+bU8lnzrN6c637mz6Ye3em2ANy8hhUR03Raf8VsT9Ogng==}
@@ -8148,6 +8155,14 @@ snapshots:
       debug: 4.4.3(supports-color@10.2.2)
       dotenv: 16.4.7
       dotenv-expand: 11.0.7
+      getenv: 2.0.0
+    transitivePeerDependencies:
+      - supports-color
+
+  '@expo/env@2.1.2':
+    dependencies:
+      chalk: 4.1.2
+      debug: 4.4.3(supports-color@10.2.2)
       getenv: 2.0.0
     transitivePeerDependencies:
       - supports-color
