@@ -12,3 +12,12 @@ export const recurseProfile = sqliteTable("recurse_profile", {
 		.default(sql`(cast(unixepoch('subsecond') * 1000 as integer))`)
 		.notNull(),
 })
+
+export const zoomRoom = sqliteTable("zoom_room", {
+	slug: text("slug").primaryKey(),
+	label: text("label").notNull(),
+	directUrl: text("direct_url").notNull(),
+	updatedAt: integer("updated_at", { mode: "timestamp_ms" })
+		.default(sql`(cast(unixepoch('subsecond') * 1000 as integer))`)
+		.notNull(),
+})

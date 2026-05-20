@@ -9,6 +9,7 @@
 		"db:migrate": "pnpm --filter @batchmate/db db:migrate",
 		"db:migrate:remote": "pnpm --filter @batchmate/db db:migrate:remote",
 		"db:studio": "pnpm --filter @batchmate/db db:studio",
+		"scrape:zoom": "pnpm --filter @batchmate/db scrape:zoom",
 		"check": "biome check .",
 		"check:fix": "biome check . --write",
 		"ship": "turbo build && wrangler deploy",

@@ -90,6 +90,16 @@ const LocationsResponseSchema = z.array(LocationSchema)
 
 export type Location = z.infer<typeof LocationSchema>
 
+const ZoomRoomSchema = z.object({
+	slug: z.string(),
+	label: z.string(),
+	directUrl: z.string(),
+})
+
+const ZoomRoomsResponseSchema = z.array(ZoomRoomSchema)
+
+export type ZoomRoom = z.infer<typeof ZoomRoomSchema>
+
 export const contract = oc.router({
 	health: oc.route({ method: "GET", path: "/health" }).output(
 		z.object({
@@ -136,6 +146,9 @@ export const contract = oc.router({
 		.route({ method: "GET", path: "/locations" })
 		.input(z.object({ query: z.string().optional() }))
 		.output(LocationsResponseSchema),
+	zoomRooms: oc
+		.route({ method: "GET", path: "/zoom-rooms" })
+		.output(ZoomRoomsResponseSchema),
 })
 
 export type Contract = typeof contract

@@ -11,9 +11,14 @@ export default function HomeScreen() {
 	const router = useRouter()
 	const { data: session } = useSession()
 	const health = useQuery(api.health.queryOptions({}))
+	const { data: zoomRooms } = useQuery(api.zoomRooms.queryOptions({}))
 
 	const [pendingAction, setPendingAction] = useState<DoorAction | null>(null)
 	const [justUnlocked, setJustUnlocked] = useState<DoorAction | null>(null)
+
+	const zoomDirectUrls = zoomRooms
+		? Object.fromEntries(zoomRooms.map((r) => [r.slug, r.directUrl]))
+		: undefined
 
 	const openDoor = useMutation({
 		...api.doorsOpen.mutationOptions({}),
@@ -72,7 +77,7 @@ export default function HomeScreen() {
 			/>
 
 			{/* Zoom Rooms */}
-			<ZoomLinks />
+			<ZoomLinks directUrls={zoomDirectUrls} />
 		</ScrollView>
 	)
 }

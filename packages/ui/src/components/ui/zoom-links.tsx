@@ -9,13 +9,15 @@ function RoomChip({
 	slug,
 	icon: Icon = Video,
 	fullWidth,
+	directUrl,
 }: {
 	label: string
 	slug: string
 	icon?: typeof Video
 	fullWidth?: boolean
+	directUrl?: string
 }) {
-	const href = `https://www.recurse.com/zoom/${slug}`
+	const href = directUrl ?? `https://www.recurse.com/zoom/${slug}`
 
 	const content = (
 		<>
@@ -53,8 +55,8 @@ function RoomChip({
 	)
 }
 
-function PairingButton({ n }: { n: number }) {
-	const href = `https://www.recurse.com/zoom/pairing_station_${n}`
+function PairingButton({ n, directUrl }: { n: number; directUrl?: string }) {
+	const href = directUrl ?? `https://www.recurse.com/zoom/pairing_station_${n}`
 
 	const content = (
 		<Text className="font-mono text-sm font-semibold text-foreground">{n}</Text>
@@ -85,7 +87,8 @@ function PairingButton({ n }: { n: number }) {
 	)
 }
 
-function ZoomLinks() {
+function ZoomLinks({ directUrls }: { directUrls?: Record<string, string> }) {
+	const url = (slug: string) => directUrls?.[slug]
 	return (
 		<View className="w-full gap-4">
 			{/* Header */}
@@ -105,33 +108,34 @@ function ZoomLinks() {
 						slug="presentation_space"
 						icon={Monitor}
 						fullWidth
+						directUrl={url("presentation_space")}
 					/>
 				</View>
 
 				{/* Desktop: 3 columns */}
 				<View className="hidden md:flex md:flex-row md:gap-2.5">
-					<RoomChip label="Midori" slug="midori" />
-					<RoomChip label="Aegis" slug="aegis" />
-					<RoomChip label="Edos" slug="edos" />
+					<RoomChip label="Midori" slug="midori" directUrl={url("midori")} />
+					<RoomChip label="Aegis" slug="aegis" directUrl={url("aegis")} />
+					<RoomChip label="Edos" slug="edos" directUrl={url("edos")} />
 				</View>
 				<View className="hidden md:flex md:flex-row md:gap-2.5">
-					<RoomChip label="Couches" slug="couches" />
-					<RoomChip label="Genera" slug="genera" />
-					<RoomChip label="Verve" slug="verve" />
+					<RoomChip label="Couches" slug="couches" directUrl={url("couches")} />
+					<RoomChip label="Genera" slug="genera" directUrl={url("genera")} />
+					<RoomChip label="Verve" slug="verve" directUrl={url("verve")} />
 				</View>
 
 				{/* Mobile: 2 columns */}
 				<View className="flex-row gap-2 md:hidden">
-					<RoomChip label="Midori" slug="midori" />
-					<RoomChip label="Aegis" slug="aegis" />
+					<RoomChip label="Midori" slug="midori" directUrl={url("midori")} />
+					<RoomChip label="Aegis" slug="aegis" directUrl={url("aegis")} />
 				</View>
 				<View className="flex-row gap-2 md:hidden">
-					<RoomChip label="Edos" slug="edos" />
-					<RoomChip label="Couches" slug="couches" />
+					<RoomChip label="Edos" slug="edos" directUrl={url("edos")} />
+					<RoomChip label="Couches" slug="couches" directUrl={url("couches")} />
 				</View>
 				<View className="flex-row gap-2 md:hidden">
-					<RoomChip label="Genera" slug="genera" />
-					<RoomChip label="Verve" slug="verve" />
+					<RoomChip label="Genera" slug="genera" directUrl={url("genera")} />
+					<RoomChip label="Verve" slug="verve" directUrl={url("verve")} />
 				</View>
 			</View>
 
@@ -142,7 +146,11 @@ function ZoomLinks() {
 				</Text>
 				<View className="flex-row gap-2 md:gap-2.5">
 					{pairingStations.map((n) => (
-						<PairingButton key={n} n={n} />
+						<PairingButton
+							key={n}
+							n={n}
+							directUrl={url(`pairing_station_${n}`)}
+						/>
 					))}
 				</View>
 			</View>

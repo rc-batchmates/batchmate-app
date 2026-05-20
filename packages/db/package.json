@@ -12,7 +12,8 @@
 		"db:generate": "drizzle-kit generate",
 		"db:migrate": "wrangler d1 migrations apply batchmate --local",
 		"db:migrate:remote": "wrangler d1 migrations apply batchmate --remote",
-		"db:studio": "drizzle-kit studio"
+		"db:studio": "drizzle-kit studio",
+		"scrape:zoom": "node scripts/scrape-zoom.ts"
 	},
 	"dependencies": {
 		"better-auth": "^1.4.19",

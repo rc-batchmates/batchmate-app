@@ -23,6 +23,9 @@ dist-ssr
 .env.local
 .dev.vars
 
+# Scrape outputs
+packages/db/tmp/
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json

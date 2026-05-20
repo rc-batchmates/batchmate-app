@@ -7,6 +7,7 @@ import { hubCheckin } from "./procedures/hub-checkin"
 import { hubVisits } from "./procedures/hub-visits"
 import { locations } from "./procedures/locations"
 import { memberProfile } from "./procedures/member-profile"
+import { zoomRooms } from "./procedures/zoom-rooms"
 
 export const router = server.router({
 	health,
@@ -17,6 +18,7 @@ export const router = server.router({
 	directorySearch,
 	batches,
 	locations,
+	zoomRooms,
 })
 
 export type Router = typeof router
