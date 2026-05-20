@@ -11,6 +11,7 @@ export {
 	CardTitle,
 } from "./components/ui/card"
 export {
+	type DoorAction,
 	DoorControls,
 	type DoorControlsProps,
 } from "./components/ui/door-controls"

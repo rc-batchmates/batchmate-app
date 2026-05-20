@@ -1,11 +1,17 @@
 import { oc } from "@orpc/contract"
 import * as z from "zod"
 
-export const FloorSchema = z.enum(["4", "5"])
+export const FloorSchema = z.enum(["4", "5", "all"])
 export type Floor = z.infer<typeof FloorSchema>
 
 export const EntrySchema = z.enum(["elevator", "stairs"])
 export type Entry = z.infer<typeof EntrySchema>
+
+export const DoorOpenInputSchema = z.object({
+	floor: FloorSchema,
+	entry: EntrySchema,
+})
+export type DoorOpenInput = z.infer<typeof DoorOpenInputSchema>
 
 const HubVisitorSchema = z.object({
 	personId: z.number(),
@@ -93,12 +99,7 @@ export const contract = oc.router({
 	),
 	doorsOpen: oc
 		.route({ method: "POST", path: "/doors/open" })
-		.input(
-			z.object({
-				floor: FloorSchema,
-				entry: EntrySchema,
-			}),
-		)
+		.input(DoorOpenInputSchema)
 		.output(
 			z.object({
 				success: z.boolean(),

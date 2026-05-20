@@ -1,4 +1,4 @@
-import { DoorControls, Text, ZoomLinks } from "@batchmate/ui"
+import { type DoorAction, DoorControls, Text, ZoomLinks } from "@batchmate/ui"
 import { useMutation, useQuery } from "@tanstack/react-query"
 import { useRouter } from "expo-router"
 import { User } from "lucide-react-native"
@@ -12,15 +12,13 @@ export default function HomeScreen() {
 	const { data: session } = useSession()
 	const health = useQuery(api.health.queryOptions({}))
 
-	const [pendingDoor, setPendingDoor] = useState<{
-		floor: "4" | "5"
-		entry: "elevator" | "stairs"
-	} | null>(null)
+	const [pendingAction, setPendingAction] = useState<DoorAction | null>(null)
+	const [justUnlocked, setJustUnlocked] = useState<DoorAction | null>(null)
 
 	const openDoor = useMutation({
 		...api.doorsOpen.mutationOptions({}),
-		onMutate: (input) => setPendingDoor(input),
-		onSettled: () => setPendingDoor(null),
+		onSuccess: (_, input) => setJustUnlocked(input as DoorAction),
+		onSettled: () => setPendingAction(null),
 	})
 
 	return (
@@ -63,9 +61,14 @@ export default function HomeScreen() {
 
 			{/* Door Controls */}
 			<DoorControls
-				onOpenDoor={(floor, entry) => openDoor.mutate({ floor, entry })}
+				onOpenDoor={(action) => {
+					setPendingAction(action)
+					openDoor.mutate(action)
+				}}
 				isPending={openDoor.isPending}
-				pendingDoor={pendingDoor}
+				pendingAction={pendingAction}
+				justUnlockedAction={justUnlocked}
+				onUnlockEnd={() => setJustUnlocked(null)}
 			/>
 
 			{/* Zoom Rooms */}

@@ -14,6 +14,7 @@
 		"class-variance-authority": "^0.7.1",
 		"clsx": "^2.1.1",
 		"expo-clipboard": "~8.0.8",
+		"expo-haptics": "~15.0.8",
 		"lucide-react": "^0.575.0",
 		"lucide-react-native": "^0.575.0",
 		"react-native": ">=0.74.0",

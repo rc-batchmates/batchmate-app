@@ -1,17 +1,18 @@
-import { DoorControls, Text, ZoomLinks } from "@batchmate/ui"
+import { type DoorAction, DoorControls, Text, ZoomLinks } from "@batchmate/ui"
 import { User } from "lucide-react-native"
 import { useState } from "react"
 import { ScrollView, View } from "react-native"
 
 export default function DemoHomeScreen() {
-	const [pendingDoor, setPendingDoor] = useState<{
-		floor: "4" | "5"
-		entry: "elevator" | "stairs"
-	} | null>(null)
+	const [pendingAction, setPendingAction] = useState<DoorAction | null>(null)
+	const [justUnlocked, setJustUnlocked] = useState<DoorAction | null>(null)
 
-	function handleOpenDoor(floor: "4" | "5", entry: "elevator" | "stairs") {
-		setPendingDoor({ floor, entry })
-		setTimeout(() => setPendingDoor(null), 800)
+	function handleOpenDoor(action: DoorAction) {
+		setPendingAction(action)
+		setTimeout(() => {
+			setPendingAction(null)
+			setJustUnlocked(action)
+		}, 800)
 	}
 
 	return (
@@ -35,8 +36,10 @@ export default function DemoHomeScreen() {
 			{/* Door Controls */}
 			<DoorControls
 				onOpenDoor={handleOpenDoor}
-				isPending={pendingDoor !== null}
-				pendingDoor={pendingDoor}
+				isPending={pendingAction !== null}
+				pendingAction={pendingAction}
+				justUnlockedAction={justUnlocked}
+				onUnlockEnd={() => setJustUnlocked(null)}
 			/>
 
 			{/* Zoom Rooms */}

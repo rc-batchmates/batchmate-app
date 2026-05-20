@@ -96,8 +96,14 @@ export default defineConfig({
 				__dirname,
 				"./src/stubs/expo-clipboard.ts",
 			),
+			"expo-haptics": path.resolve(__dirname, "./src/stubs/expo-haptics.ts"),
 			"@": path.resolve(__dirname, "./src"),
 		},
+	},
+	define: {
+		// react-native-web's vendored Animated module references `global` (Node/RN ambient).
+		// Shim to `globalThis` so it resolves in the browser.
+		global: "globalThis",
 	},
 	optimizeDeps: {
 		exclude: ["react-native-web", "react-native-css"],

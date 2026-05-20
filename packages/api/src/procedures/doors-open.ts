@@ -1,8 +1,8 @@
 import { ORPCError } from "@orpc/server"
 import { server } from "../context"
-import type { Entry, Floor } from "../contract"
+import type { Entry } from "../contract"
 
-const outputId: Record<Floor, Record<Entry, number>> = {
+const outputId: Record<"4" | "5", Record<Entry, number>> = {
 	"4": { stairs: 0, elevator: 2 },
 	"5": { stairs: 1, elevator: 3 },
 }
@@ -15,6 +15,11 @@ export const doorsOpen = server.doorsOpen.handler(
 
 		const RECURSE_CENTER_VIRTUAL_READER_ID = 5
 
+		const outputIds =
+			input.floor === "all"
+				? [outputId["4"][input.entry], outputId["5"][input.entry]]
+				: [outputId[input.floor][input.entry]]
+
 		const { error } = await context.securityApi.POST(
 			"/v1/cards/{id}/simulate",
 			{
@@ -25,12 +30,10 @@ export const doorsOpen = server.doorsOpen.handler(
 				},
 				body: {
 					reader: RECURSE_CENTER_VIRTUAL_READER_ID,
-					outputs: [
-						{
-							output_id: outputId[input.floor][input.entry],
-							duration: 5,
-						},
-					],
+					outputs: outputIds.map((output_id) => ({
+						output_id,
+						duration: 5,
+					})),
 				},
 			},
 		)

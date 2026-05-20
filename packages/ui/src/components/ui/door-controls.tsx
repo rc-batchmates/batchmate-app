@@ -1,88 +1,297 @@
-import { ArrowUpDown, Footprints } from "lucide-react-native"
-import { Pressable, View } from "react-native"
+import * as Haptics from "expo-haptics"
+import { createLucideIcon, DoorOpen, Info } from "lucide-react-native"
+import { useCallback, useEffect, useRef, useState } from "react"
+import { Animated, Platform, Pressable, View } from "react-native"
 import { Text } from "./text"
 
+const StairsIcon = createLucideIcon("Stairs", [
+	["path", { d: "M3 21h6v-6h6v-6h6V3" }],
+])
+
+const ElevatorIcon = createLucideIcon("Elevator", [
+	["rect", { x: "5", y: "3", width: "14", height: "18", rx: "1" }],
+	["path", { d: "M9 9l3-3 3 3" }],
+	["path", { d: "M9 15l3 3 3-3" }],
+])
+
 type Floor = "4" | "5"
-type Entry = "elevator" | "stairs"
+
+export type DoorAction =
+	| { entry: "stairs"; floor: Floor }
+	| { entry: "elevator"; floor: "all" }
 
 export interface DoorControlsProps {
-	onOpenDoor: (floor: Floor, entry: Entry) => void
+	onOpenDoor: (action: DoorAction) => void
 	isPending?: boolean
-	pendingDoor?: { floor: Floor; entry: Entry } | null
+	pendingAction?: DoorAction | null
+	justUnlockedAction?: DoorAction | null
+	unlockDurationMs?: number
+	holdDurationMs?: number
+	onUnlockEnd?: () => void
 }
 
-const doors: {
-	floor: Floor
-	entry: Entry
-	title: string
-	subtitle: string
-	icon: typeof Footprints
-}[] = [
-	{
-		floor: "4",
-		entry: "stairs",
-		title: "4th Floor",
-		subtitle: "Stairs",
-		icon: Footprints,
-	},
-	{
-		floor: "4",
-		entry: "elevator",
-		title: "4th Floor",
-		subtitle: "Elevator",
-		icon: ArrowUpDown,
-	},
-	{
-		floor: "5",
-		entry: "stairs",
-		title: "5th Floor",
-		subtitle: "Stairs",
-		icon: Footprints,
-	},
-	{
-		floor: "5",
-		entry: "elevator",
-		title: "5th Floor",
-		subtitle: "Elevator",
-		icon: ArrowUpDown,
-	},
-]
+function isSameAction(a: DoorAction, b: DoorAction | null | undefined) {
+	return !!b && a.entry === b.entry && a.floor === b.floor
+}
 
-function DoorCard({
-	door,
-	onPress,
+const webHoldGuards =
+	Platform.OS === "web"
+		? ({
+				onContextMenu: (e: { preventDefault: () => void }) =>
+					e.preventDefault(),
+				draggable: false,
+			} as Record<string, unknown>)
+		: {}
+
+const webHoldStyle =
+	Platform.OS === "web"
+		? ({
+				WebkitTouchCallout: "none",
+				WebkitTapHighlightColor: "transparent",
+			} as Record<string, unknown>)
+		: undefined
+
+function hapticLight() {
+	if (Platform.OS === "web") {
+		try {
+			navigator.vibrate?.(15)
+		} catch {}
+	} else {
+		Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light).catch(() => {})
+	}
+}
+
+function hapticSuccess() {
+	if (Platform.OS === "web") {
+		try {
+			navigator.vibrate?.([15, 30, 30])
+		} catch {}
+	} else {
+		Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success).catch(
+			() => {},
+		)
+	}
+}
+
+type Phase = "idle" | "holding" | "unlocked"
+
+function ProgressBar({
+	phase,
+	holdDurationMs,
+	unlockDurationMs,
+}: {
+	phase: Phase
+	holdDurationMs: number
+	unlockDurationMs: number
+}) {
+	const widthAnim = useRef(new Animated.Value(0)).current
+
+	useEffect(() => {
+		widthAnim.stopAnimation()
+		if (phase === "holding") {
+			widthAnim.setValue(0)
+			Animated.timing(widthAnim, {
+				toValue: 1,
+				duration: holdDurationMs,
+				useNativeDriver: false,
+			}).start()
+		} else if (phase === "unlocked") {
+			widthAnim.setValue(1)
+			Animated.timing(widthAnim, {
+				toValue: 0,
+				duration: unlockDurationMs,
+				useNativeDriver: false,
+			}).start()
+		} else {
+			Animated.timing(widthAnim, {
+				toValue: 0,
+				duration: 150,
+				useNativeDriver: false,
+			}).start()
+		}
+	}, [phase, holdDurationMs, unlockDurationMs, widthAnim])
+
+	const width = widthAnim.interpolate({
+		inputRange: [0, 1],
+		outputRange: ["0%", "100%"],
+	})
+
+	return (
+		<View
+			pointerEvents="none"
+			className="absolute right-0 bottom-0 left-0 h-1 overflow-hidden rounded-b-xl bg-surface-inset"
+		>
+			<Animated.View style={{ width, height: "100%" }} className="bg-primary" />
+		</View>
+	)
+}
+
+function useHoldGesture({
+	holdDurationMs,
+	disabled,
+	onCommit,
+}: {
+	holdDurationMs: number
+	disabled: boolean
+	onCommit: () => void
+}) {
+	const [isHolding, setIsHolding] = useState(false)
+	const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+
+	const cancel = useCallback(() => {
+		if (timerRef.current) {
+			clearTimeout(timerRef.current)
+			timerRef.current = null
+		}
+		setIsHolding(false)
+	}, [])
+
+	const onPressIn = useCallback(() => {
+		if (disabled) return
+		hapticLight()
+		setIsHolding(true)
+		timerRef.current = setTimeout(() => {
+			timerRef.current = null
+			setIsHolding(false)
+			hapticSuccess()
+			onCommit()
+		}, holdDurationMs)
+	}, [disabled, holdDurationMs, onCommit])
+
+	useEffect(
+		() => () => {
+			if (timerRef.current) clearTimeout(timerRef.current)
+		},
+		[],
+	)
+
+	return { isHolding, onPressIn, onPressOut: cancel }
+}
+
+function ElevatorCard({
+	onCommit,
 	isPending,
 	isThis,
+	isUnlocked,
+	unlockDurationMs,
+	holdDurationMs,
 }: {
-	door: (typeof doors)[number]
-	onPress: () => void
+	onCommit: () => void
 	isPending?: boolean
 	isThis: boolean
+	isUnlocked: boolean
+	unlockDurationMs: number
+	holdDurationMs: number
 }) {
-	const Icon = door.icon
+	const { isHolding, onPressIn, onPressOut } = useHoldGesture({
+		holdDurationMs,
+		disabled: !!isPending,
+		onCommit,
+	})
+
+	const label =
+		isThis && isPending
+			? "Opening..."
+			: isHolding
+				? "Hold..."
+				: isUnlocked
+					? "Unlocked"
+					: "Elevator"
+
+	const phase: Phase = isHolding ? "holding" : isUnlocked ? "unlocked" : "idle"
+
 	return (
 		<Pressable
-			className="flex-1 justify-between rounded-xl bg-card p-5"
-			style={{ height: 140, minWidth: 140 }}
-			onPress={onPress}
+			className="w-full justify-between gap-4 overflow-hidden rounded-xl border border-primary/30 bg-primary/10 p-5 select-none"
+			style={{ minHeight: 160, ...webHoldStyle }}
+			onPressIn={onPressIn}
+			onPressOut={onPressOut}
 			disabled={isPending}
+			{...webHoldGuards}
 		>
-			<View className="flex-row items-center justify-between">
-				<View className="h-10 w-10 items-center justify-center rounded-[10px] bg-surface-inset">
-					<Icon size={20} color="#22D3EE" />
+			<View className="flex-row items-center gap-4">
+				<View className="h-12 w-12 items-center justify-center rounded-[12px] bg-surface-inset">
+					<ElevatorIcon size={24} color="#22D3EE" />
 				</View>
-				<Text className="font-mono text-xl font-bold text-primary">
-					{door.floor}F
+				<View className="gap-0.5">
+					<Text className="text-base font-semibold">{label}</Text>
+					<Text className="text-xs text-text-tertiary">
+						Hold to unlock both floors
+					</Text>
+				</View>
+			</View>
+			<View className="flex-row items-start gap-2 rounded-lg bg-surface-inset/60 px-3 py-2">
+				<View className="pt-px">
+					<Info size={14} color="#94a3b8" />
+				</View>
+				<Text className="flex-1 text-xs text-text-secondary">
+					After unlocking, press your floor button inside the elevator
 				</Text>
 			</View>
-			<View className="gap-0.5">
-				<Text className="text-[15px] font-semibold">
-					{isThis && isPending ? "Opening..." : door.title}
-				</Text>
-				<Text className="font-mono text-xs text-text-tertiary">
-					{door.subtitle}
-				</Text>
+			<ProgressBar
+				phase={phase}
+				holdDurationMs={holdDurationMs}
+				unlockDurationMs={unlockDurationMs}
+			/>
+		</Pressable>
+	)
+}
+
+function StairsCard({
+	floor,
+	onCommit,
+	isPending,
+	isThis,
+	isUnlocked,
+	unlockDurationMs,
+	holdDurationMs,
+}: {
+	floor: Floor
+	onCommit: () => void
+	isPending?: boolean
+	isThis: boolean
+	isUnlocked: boolean
+	unlockDurationMs: number
+	holdDurationMs: number
+}) {
+	const { isHolding, onPressIn, onPressOut } = useHoldGesture({
+		holdDurationMs,
+		disabled: !!isPending,
+		onCommit,
+	})
+
+	const label =
+		isThis && isPending
+			? "Opening..."
+			: isHolding
+				? "Hold..."
+				: isUnlocked
+					? "Unlocked"
+					: "Stairs"
+
+	const phase: Phase = isHolding ? "holding" : isUnlocked ? "unlocked" : "idle"
+
+	return (
+		<Pressable
+			className="flex-1 justify-between overflow-hidden rounded-xl bg-card p-5 select-none"
+			style={{ height: 120, minWidth: 120, ...webHoldStyle }}
+			onPressIn={onPressIn}
+			onPressOut={onPressOut}
+			disabled={isPending}
+			{...webHoldGuards}
+		>
+			<View className="flex-row items-start justify-between">
+				<View className="h-10 w-10 items-center justify-center rounded-[10px] bg-surface-inset">
+					<StairsIcon size={20} color="#22D3EE" />
+				</View>
+				<Text className="text-3xl font-bold leading-none">{floor}</Text>
 			</View>
+			<Text className="text-sm font-semibold">{label}</Text>
+			<ProgressBar
+				phase={phase}
+				holdDurationMs={holdDurationMs}
+				unlockDurationMs={unlockDurationMs}
+			/>
 		</Pressable>
 	)
 }
@@ -90,59 +299,58 @@ function DoorCard({
 function DoorControls({
 	onOpenDoor,
 	isPending,
-	pendingDoor,
+	pendingAction,
+	justUnlockedAction,
+	unlockDurationMs = 5000,
+	holdDurationMs = 700,
+	onUnlockEnd,
 }: DoorControlsProps) {
+	const elevatorAction: DoorAction = { entry: "elevator", floor: "all" }
+	const stairs4Action: DoorAction = { entry: "stairs", floor: "4" }
+	const stairs5Action: DoorAction = { entry: "stairs", floor: "5" }
+
+	useEffect(() => {
+		if (!justUnlockedAction) return
+		const t = setTimeout(() => onUnlockEnd?.(), unlockDurationMs)
+		return () => clearTimeout(t)
+	}, [justUnlockedAction, unlockDurationMs, onUnlockEnd])
+
 	return (
 		<View className="w-full gap-4">
-			<View className="flex-row items-center justify-between">
+			<View className="flex-row items-center gap-1.5">
+				<DoorOpen size={14} color="#22D3EE" />
 				<Text className="font-mono text-[11px] font-semibold tracking-widest text-text-tertiary">
 					DOOR CONTROLS
 				</Text>
-				<Text className="text-xs text-text-muted">Tap to open</Text>
 			</View>
-			{/* 2x2 on mobile, 1x4 on desktop */}
-			<View className="hidden md:flex md:flex-row md:gap-4">
-				{doors.map((door) => (
-					<DoorCard
-						key={`${door.floor}-${door.entry}`}
-						door={door}
-						onPress={() => onOpenDoor(door.floor, door.entry)}
+			<View className="gap-3">
+				<ElevatorCard
+					onCommit={() => onOpenDoor(elevatorAction)}
+					isPending={isPending}
+					isThis={isSameAction(elevatorAction, pendingAction)}
+					isUnlocked={isSameAction(elevatorAction, justUnlockedAction)}
+					unlockDurationMs={unlockDurationMs}
+					holdDurationMs={holdDurationMs}
+				/>
+				<View className="flex-row gap-3">
+					<StairsCard
+						floor="4"
+						onCommit={() => onOpenDoor(stairs4Action)}
 						isPending={isPending}
-						isThis={
-							pendingDoor?.floor === door.floor &&
-							pendingDoor?.entry === door.entry
-						}
+						isThis={isSameAction(stairs4Action, pendingAction)}
+						isUnlocked={isSameAction(stairs4Action, justUnlockedAction)}
+						unlockDurationMs={unlockDurationMs}
+						holdDurationMs={holdDurationMs}
 					/>
-				))}
-			</View>
-			<View className="gap-3 md:hidden">
-				<View className="flex-row gap-3">
-					{doors.slice(0, 2).map((door) => (
-						<DoorCard
-							key={`${door.floor}-${door.entry}`}
-							door={door}
-							onPress={() => onOpenDoor(door.floor, door.entry)}
-							isPending={isPending}
-							isThis={
-								pendingDoor?.floor === door.floor &&
-								pendingDoor?.entry === door.entry
-							}
-						/>
-					))}
-				</View>
-				<View className="flex-row gap-3">
-					{doors.slice(2, 4).map((door) => (
-						<DoorCard
-							key={`${door.floor}-${door.entry}`}
-							door={door}
-							onPress={() => onOpenDoor(door.floor, door.entry)}
-							isPending={isPending}
-							isThis={
-								pendingDoor?.floor === door.floor &&
-								pendingDoor?.entry === door.entry
-							}
-						/>
-					))}
+					<StairsCard
+						floor="5"
+						onCommit={() => onOpenDoor(stairs5Action)}
+						isPending={isPending}
+						isThis={isSameAction(stairs5Action, pendingAction)}
+						isUnlocked={isSameAction(stairs5Action, justUnlockedAction)}
+						unlockDurationMs={unlockDurationMs}
+						holdDurationMs={holdDurationMs}
+					/>
 				</View>
 			</View>
 		</View>
