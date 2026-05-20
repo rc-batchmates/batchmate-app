@@ -44,8 +44,10 @@ const app = new Hono<Env>()
 
 // Legacy host redirect. Browser hits to recurse.rocks land on batchmate.app
 // for everything except /api/v1/* — old mobile builds still talk to the API
-// on recurse.rocks until they update. 302 (not 301) during the dual-host
-// phase so we can disable this quickly if needed; promote to 301 in Phase 3.
+// on recurse.rocks until they update. Always 302, never 301: we plan to
+// reuse recurse.rocks for a different product later. The `?from=recurse.rocks`
+// marker lets the client banner detect the redirect even when the browser
+// doesn't forward a Referer (direct-typed URL, bookmark, etc.).
 app.use(async (c, next) => {
 	const url = new URL(c.req.url)
 	if (
@@ -53,6 +55,7 @@ app.use(async (c, next) => {
 		!url.pathname.startsWith("/api/v1/")
 	) {
 		url.hostname = "batchmate.app"
+		url.searchParams.set("from", "recurse.rocks")
 		return c.redirect(url.toString(), 302)
 	}
 	await next()

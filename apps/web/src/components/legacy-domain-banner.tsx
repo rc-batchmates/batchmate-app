@@ -9,12 +9,23 @@ export function LegacyDomainBanner() {
 	useEffect(() => {
 		if (typeof window === "undefined") return
 		if (localStorage.getItem(DISMISS_KEY) === "1") return
+
+		const url = new URL(window.location.href)
+		const fromLegacyParam = url.searchParams.get("from") === "recurse.rocks"
 		const ref = document.referrer
-		if (
+		const fromLegacyReferer =
 			ref.startsWith("https://recurse.rocks") ||
 			ref.startsWith("http://recurse.rocks")
-		) {
-			setVisible(true)
+
+		if (!fromLegacyParam && !fromLegacyReferer) return
+
+		setVisible(true)
+
+		// Strip the marker so the URL the user sees / shares is clean.
+		if (fromLegacyParam) {
+			url.searchParams.delete("from")
+			const cleaned = `${url.pathname}${url.search}${url.hash}`
+			window.history.replaceState(null, "", cleaned)
 		}
 	}, [])
 
