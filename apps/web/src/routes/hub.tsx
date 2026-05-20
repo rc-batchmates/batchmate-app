@@ -81,12 +81,16 @@ function HubPage() {
 		error,
 	} = useQuery(api.hubVisits.queryOptions({}))
 
+	const hubQueryKey = api.hubVisits.queryOptions({}).queryKey
 	const checkin = useMutation({
 		...api.hubCheckin.mutationOptions({}),
 		onSuccess: () => {
-			queryClient.invalidateQueries({
-				queryKey: api.hubVisits.queryOptions({}).queryKey,
-			})
+			queryClient.setQueryData(
+				hubQueryKey,
+				(old: typeof hub | undefined) =>
+					old ? { ...old, isCheckedIn: true } : old,
+			)
+			queryClient.invalidateQueries({ queryKey: hubQueryKey })
 		},
 	})
 
