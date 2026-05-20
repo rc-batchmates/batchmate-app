@@ -1,47 +1,65 @@
 import { Text } from "@batchmate/ui"
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 import { useRouter } from "expo-router"
-import { CheckCircle, ChevronRight, MapPin, Users } from "lucide-react-native"
-import { Image, Pressable, ScrollView, View } from "react-native"
+import {
+	ArrowUpDown,
+	CheckCircle,
+	MapPin,
+	Moon,
+	Users,
+} from "lucide-react-native"
+import { useMemo, useState } from "react"
+import { Alert, Pressable, ScrollView, View } from "react-native"
+import { DropdownList } from "../../../src/components/dropdown-list"
+import { FilterChip } from "../../../src/components/filter-chip"
+import { PersonCard } from "../../../src/components/person-card"
+import { ScopeChip } from "../../../src/components/scope-chip"
 import { api } from "../../../src/lib/api"
 
-function PersonCard({
-	name,
-	imageUrl,
-	batch,
-	onPress,
-}: {
-	name: string
-	imageUrl: string | null
-	batch: string | null
-	onPress: () => void
-}) {
-	const initials = name
-		.split(" ")
-		.map((n) => n[0])
-		.join("")
-		.slice(0, 2)
-		.toUpperCase()
+type SortKey = "firstName" | "lastName" | "checkInTime"
 
+const SORT_OPTIONS: { id: number; name: string; key: SortKey }[] = [
+	{ id: 1, name: "First name", key: "firstName" },
+	{ id: 2, name: "Last name", key: "lastName" },
+	{ id: 3, name: "Check-in time", key: "checkInTime" },
+]
+
+function hourInNYT(iso: string): number | null {
+	if (!iso) return null
+	const d = new Date(iso)
+	if (Number.isNaN(d.getTime())) return null
+	return Number(
+		new Intl.DateTimeFormat("en-US", {
+			timeZone: "America/New_York",
+			hour: "numeric",
+			hour12: false,
+		}).format(d),
+	)
+}
+
+function firstName(name: string) {
+	return name.split(" ")[0] ?? ""
+}
+
+function lastName(name: string) {
+	const parts = name.split(" ")
+	return parts[parts.length - 1] ?? ""
+}
+
+function OvernightBadge() {
 	return (
 		<Pressable
-			className="flex-row items-center gap-3 rounded-xl bg-card px-4 py-3.5"
-			onPress={onPress}
+			onPress={() =>
+				Alert.alert(
+					"Overnight check-in",
+					"Some folks check in again after midnight, so they may not actually be in the hub yet.",
+				)
+			}
+			className="flex-row items-center gap-1 rounded-full bg-indigo-500/10 px-2 py-0.5"
+			hitSlop={6}
 		>
-			<View className="h-10 w-10 items-center justify-center overflow-hidden rounded-full bg-surface-inset">
-				{imageUrl ? (
-					<Image source={{ uri: imageUrl }} className="h-full w-full" />
-				) : (
-					<Text className="text-sm font-semibold text-primary">{initials}</Text>
-				)}
-			</View>
-			<View className="flex-1 gap-0.5">
-				<Text className="text-[15px] font-medium">{name}</Text>
-				<Text className="text-xs text-text-tertiary">
-					{batch ?? "Recurser"}
-				</Text>
-			</View>
-			<ChevronRight size={20} color="#475569" />
+			<Moon size={11} color="#A5B4FC" />
+			<Text className="text-[11px] font-medium text-indigo-300">Overnight</Text>
 		</Pressable>
 	)
 }
@@ -67,12 +85,55 @@ export default function HubScreen() {
 	const visitors = hub?.visitors
 	const isCheckedIn = hub?.isCheckedIn ?? false
 
+	const [sortKey, setSortKey] = useState<SortKey>("firstName")
+	const [showOvernight, setShowOvernight] = useState(false)
+	const [sortOpen, setSortOpen] = useState(false)
+
+	const { mainList, overnightCount, overnightIds } = useMemo(() => {
+		if (!visitors) {
+			return {
+				mainList: [],
+				overnightCount: 0,
+				overnightIds: new Set<number>(),
+			}
+		}
+		const overnightSet = new Set<number>()
+		const overnight: typeof visitors = []
+		const rest: typeof visitors = []
+		for (const v of visitors) {
+			const h = hourInNYT(v.checkedInAt)
+			if (h !== null && h < 7) {
+				overnight.push(v)
+				overnightSet.add(v.personId)
+			} else {
+				rest.push(v)
+			}
+		}
+		const pool = showOvernight ? [...rest, ...overnight] : rest
+		const sorted = [...pool].sort((a, b) => {
+			if (sortKey === "checkInTime") {
+				return (b.checkedInAt ?? "").localeCompare(a.checkedInAt ?? "")
+			}
+			const fn = sortKey === "lastName" ? lastName : firstName
+			return fn(a.name).localeCompare(fn(b.name), undefined, {
+				sensitivity: "base",
+			})
+		})
+		return {
+			mainList: sorted,
+			overnightCount: overnight.length,
+			overnightIds: overnightSet,
+		}
+	}, [visitors, sortKey, showOvernight])
+
+	const currentSortLabel =
+		SORT_OPTIONS.find((s) => s.key === sortKey)?.name ?? "Sort"
+
 	return (
 		<ScrollView
 			className="flex-1 bg-background"
 			contentContainerClassName="px-6 py-4 gap-6"
 		>
-			{/* Header */}
 			<View className="flex-row items-center justify-between">
 				<View className="gap-1">
 					<Text className="text-sm text-text-tertiary">Currently at RC</Text>
@@ -82,13 +143,12 @@ export default function HubScreen() {
 					<View className="flex-row items-center gap-1.5 rounded-full bg-cyan/10 px-3.5 py-1.5">
 						<View className="h-2 w-2 rounded-full bg-cyan" />
 						<Text className="text-[13px] font-medium text-primary">
-							{visitors.length} {visitors.length === 1 ? "person" : "people"}
+							{mainList.length} {mainList.length === 1 ? "person" : "people"}
 						</Text>
 					</View>
 				)}
 			</View>
 
-			{/* Check in */}
 			{hub && !isCheckedIn && (
 				<Pressable
 					className="h-12 flex-row items-center justify-center gap-2 rounded-xl bg-cyan"
@@ -111,14 +171,12 @@ export default function HubScreen() {
 				</View>
 			)}
 
-			{/* Loading */}
 			{isLoading && (
 				<View className="flex-1 items-center justify-center py-20">
 					<Text className="text-sm text-text-tertiary">Loading...</Text>
 				</View>
 			)}
 
-			{/* Error */}
 			{error && (
 				<View className="flex-1 items-center justify-center py-20">
 					<Text className="text-sm text-destructive">
@@ -127,7 +185,6 @@ export default function HubScreen() {
 				</View>
 			)}
 
-			{/* Empty state */}
 			{visitors && visitors.length === 0 && (
 				<View className="flex-1 items-center justify-center gap-3 py-20">
 					<Users size={48} color="#475569" />
@@ -137,18 +194,62 @@ export default function HubScreen() {
 				</View>
 			)}
 
-			{/* People list */}
 			{visitors && visitors.length > 0 && (
-				<View className="gap-2.5">
-					{visitors.map((visit) => (
-						<PersonCard
-							key={visit.personId}
-							name={visit.name}
-							imageUrl={visit.imageUrl}
-							batch={visit.batch}
-							onPress={() => router.push(`/(app)/member/${visit.personId}`)}
+				<View className="gap-3">
+					<View className="flex-row flex-wrap items-center gap-2">
+						<FilterChip
+							icon={ArrowUpDown}
+							label={currentSortLabel}
+							active={false}
+							onPress={() => setSortOpen((o) => !o)}
 						/>
-					))}
+						{overnightCount > 0 && (
+							<ScopeChip
+								label={
+									showOvernight
+										? `Hide ${overnightCount} overnight`
+										: `Show ${overnightCount} overnight`
+								}
+								active={showOvernight}
+								onPress={() => setShowOvernight((s) => !s)}
+							/>
+						)}
+					</View>
+					{sortOpen && (
+						<DropdownList
+							items={SORT_OPTIONS}
+							isLoading={false}
+							onSelect={(opt) => {
+								setSortKey(opt.key)
+								setSortOpen(false)
+							}}
+							activeValue={currentSortLabel}
+						/>
+					)}
+					{mainList.length === 0 ? (
+						<View className="flex-1 items-center justify-center gap-3 py-20">
+							<Moon size={48} color="#475569" />
+							<Text className="text-sm text-text-tertiary">
+								Only overnight check-ins so far
+							</Text>
+						</View>
+					) : (
+						<View className="gap-2.5">
+							{mainList.map((visit) => (
+								<PersonCard
+									key={visit.personId}
+									name={visit.name}
+									imageUrl={visit.imageUrl}
+									batch={visit.batch}
+									stintType={visit.stintType}
+									badge={
+										overnightIds.has(visit.personId) ? <OvernightBadge /> : null
+									}
+									onPress={() => router.push(`/(app)/member/${visit.personId}`)}
+								/>
+							))}
+						</View>
+					)}
 				</View>
 			)}
 		</ScrollView>

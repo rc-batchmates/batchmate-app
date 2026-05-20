@@ -1,9 +1,66 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 import { createFileRoute, Link, redirect } from "@tanstack/react-router"
-import { CheckCircle, ChevronRight, MapPin, User, Users } from "lucide-react"
+import {
+	ArrowUpDown,
+	CheckCircle,
+	MapPin,
+	Moon,
+	User,
+	Users,
+} from "lucide-react"
+import { useMemo, useState } from "react"
+import { FilterDropdown } from "@/components/filter-dropdown"
 import { PageLayout } from "@/components/page-layout"
+import { PersonCard } from "@/components/person-card"
+import { ScopeChip } from "@/components/scope-chip"
 import { api } from "@/lib/api"
 import { authClient, useSession } from "@/lib/auth"
+
+type SortKey = "firstName" | "lastName" | "checkInTime"
+
+const SORT_OPTIONS: { id: number; name: string; key: SortKey }[] = [
+	{ id: 1, name: "First name", key: "firstName" },
+	{ id: 2, name: "Last name", key: "lastName" },
+	{ id: 3, name: "Check-in time", key: "checkInTime" },
+]
+
+function hourInNYT(iso: string): number | null {
+	if (!iso) return null
+	const d = new Date(iso)
+	if (Number.isNaN(d.getTime())) return null
+	return Number(
+		new Intl.DateTimeFormat("en-US", {
+			timeZone: "America/New_York",
+			hour: "numeric",
+			hour12: false,
+		}).format(d),
+	)
+}
+
+function firstName(name: string) {
+	return name.split(" ")[0] ?? ""
+}
+
+function lastName(name: string) {
+	const parts = name.split(" ")
+	return parts[parts.length - 1] ?? ""
+}
+
+function OvernightBadge() {
+	return (
+		<span className="group/badge relative flex items-center gap-1 rounded-full bg-indigo-500/10 px-2 py-0.5 text-[11px] font-medium text-indigo-300">
+			<Moon size={11} />
+			Overnight
+			<span
+				role="tooltip"
+				className="pointer-events-none absolute top-full right-0 z-50 mt-1 hidden w-56 rounded-md border border-border bg-background px-2.5 py-2 text-[11px] font-normal text-text-secondary shadow-lg group-hover/badge:block"
+			>
+				Some folks auto check in at midnight, so they may not actually be in the
+				hub yet.
+			</span>
+		</span>
+	)
+}
 
 export const Route = createFileRoute("/hub")({
 	beforeLoad: async () => {
@@ -14,48 +71,6 @@ export const Route = createFileRoute("/hub")({
 	},
 	component: HubPage,
 })
-
-function PersonCard({
-	personId,
-	name,
-	imageUrl,
-	batch,
-}: {
-	personId: number
-	name: string
-	imageUrl: string | null
-	batch: string | null
-}) {
-	const initials = name
-		.split(" ")
-		.map((n) => n[0])
-		.join("")
-		.slice(0, 2)
-		.toUpperCase()
-
-	return (
-		<Link
-			to="/member/$id"
-			params={{ id: String(personId) }}
-			className="flex items-center gap-3.5 rounded-xl bg-card px-4 py-3.5 no-underline transition-colors hover:bg-card/80"
-		>
-			<div className="flex h-10 w-10 shrink-0 items-center justify-center overflow-hidden rounded-full bg-surface-inset">
-				{imageUrl ? (
-					<img src={imageUrl} alt="" className="h-full w-full object-cover" />
-				) : (
-					<span className="text-sm font-semibold text-cyan">{initials}</span>
-				)}
-			</div>
-			<div className="flex min-w-0 flex-1 flex-col gap-0.5">
-				<span className="text-[15px] font-medium text-foreground">{name}</span>
-				<span className="text-xs text-text-tertiary">
-					{batch ?? "Recurser"}
-				</span>
-			</div>
-			<ChevronRight size={20} color="#475569" />
-		</Link>
-	)
-}
 
 function HubPage() {
 	const { data: session } = useSession()
@@ -78,6 +93,50 @@ function HubPage() {
 	const visitors = hub?.visitors
 	const isCheckedIn = hub?.isCheckedIn ?? false
 
+	const [sortKey, setSortKey] = useState<SortKey>("firstName")
+	const [showOvernight, setShowOvernight] = useState(false)
+	const [sortOpen, setSortOpen] = useState(false)
+
+	const { mainList, overnightCount, overnightIds } = useMemo(() => {
+		if (!visitors) {
+			return {
+				mainList: [],
+				overnightCount: 0,
+				overnightIds: new Set<number>(),
+			}
+		}
+		const overnightSet = new Set<number>()
+		const overnight: typeof visitors = []
+		const rest: typeof visitors = []
+		for (const v of visitors) {
+			const h = hourInNYT(v.checkedInAt)
+			if (h !== null && h < 7) {
+				overnight.push(v)
+				overnightSet.add(v.personId)
+			} else {
+				rest.push(v)
+			}
+		}
+		const pool = showOvernight ? [...rest, ...overnight] : rest
+		const sorted = [...pool].sort((a, b) => {
+			if (sortKey === "checkInTime") {
+				return (b.checkedInAt ?? "").localeCompare(a.checkedInAt ?? "")
+			}
+			const fn = sortKey === "lastName" ? lastName : firstName
+			return fn(a.name).localeCompare(fn(b.name), undefined, {
+				sensitivity: "base",
+			})
+		})
+		return {
+			mainList: sorted,
+			overnightCount: overnight.length,
+			overnightIds: overnightSet,
+		}
+	}, [visitors, sortKey, showOvernight])
+
+	const currentSortLabel =
+		SORT_OPTIONS.find((s) => s.key === sortKey)?.name ?? "Sort"
+
 	return (
 		<PageLayout
 			className="gap-6"
@@ -89,7 +148,7 @@ function HubPage() {
 						<div className="flex items-center gap-1.5 rounded-full bg-cyan/10 px-3.5 py-1.5">
 							<div className="h-2 w-2 rounded-full bg-cyan" />
 							<span className="text-[13px] font-medium text-cyan">
-								{visitors.length} {visitors.length === 1 ? "person" : "people"}
+								{mainList.length} {mainList.length === 1 ? "person" : "people"}
 							</span>
 						</div>
 					)}
@@ -159,17 +218,59 @@ function HubPage() {
 			)}
 
 			{visitors && visitors.length > 0 && (
-				<div className="flex flex-col gap-2.5 md:grid md:grid-cols-2 md:gap-3">
-					{visitors.map((visit) => (
-						<PersonCard
-							key={visit.personId}
-							personId={visit.personId}
-							name={visit.name}
-							imageUrl={visit.imageUrl}
-							batch={visit.batch}
+				<>
+					<div className="flex flex-wrap items-center gap-2">
+						<FilterDropdown
+							icon={ArrowUpDown}
+							label={currentSortLabel}
+							active={false}
+							items={SORT_OPTIONS}
+							isLoading={false}
+							open={sortOpen}
+							onToggle={() => setSortOpen((o) => !o)}
+							onSelect={(opt) => {
+								setSortKey(opt.key)
+								setSortOpen(false)
+							}}
+							clearable={false}
 						/>
-					))}
-				</div>
+						{overnightCount > 0 && (
+							<ScopeChip
+								label={
+									showOvernight
+										? `Hide ${overnightCount} overnight`
+										: `Show ${overnightCount} overnight`
+								}
+								active={showOvernight}
+								onClick={() => setShowOvernight((s) => !s)}
+							/>
+						)}
+					</div>
+					{mainList.length === 0 ? (
+						<div className="flex flex-1 flex-col items-center justify-center gap-3">
+							<Moon size={48} color="#475569" />
+							<span className="text-sm text-text-tertiary">
+								Only overnight check-ins so far
+							</span>
+						</div>
+					) : (
+						<div className="flex flex-col gap-2.5 md:grid md:grid-cols-2 md:gap-3">
+							{mainList.map((visit) => (
+								<PersonCard
+									key={visit.personId}
+									personId={visit.personId}
+									name={visit.name}
+									imageUrl={visit.imageUrl}
+									batch={visit.batch}
+									stintType={visit.stintType}
+									badge={
+										overnightIds.has(visit.personId) ? <OvernightBadge /> : null
+									}
+								/>
+							))}
+						</div>
+					)}
+				</>
 			)}
 		</PageLayout>
 	)

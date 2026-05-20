@@ -12,6 +12,7 @@ const HubVisitorSchema = z.object({
 	name: z.string(),
 	imageUrl: z.string().nullable(),
 	batch: z.string().nullable(),
+	stintType: z.string().nullable(),
 	notes: z.string(),
 	checkedInAt: z.string(),
 })

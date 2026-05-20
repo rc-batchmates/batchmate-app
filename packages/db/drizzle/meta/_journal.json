@@ -29,6 +29,13 @@
       "when": 1779284969321,
       "tag": "0003_stale_prowler",
       "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "6",
+      "when": 1779287599286,
+      "tag": "0004_tense_tarantula",
+      "breakpoints": true
     }
   ]
 }

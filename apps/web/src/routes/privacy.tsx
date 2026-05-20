@@ -10,9 +10,7 @@ function Section({ children }: { children: React.ReactNode }) {
 }
 
 function SectionTitle({ children }: { children: React.ReactNode }) {
-	return (
-		<h2 className="text-xl font-semibold text-foreground">{children}</h2>
-	)
+	return <h2 className="text-xl font-semibold text-foreground">{children}</h2>
 }
 
 function SubTitle({ children }: { children: React.ReactNode }) {
@@ -39,13 +37,7 @@ function UL({ children }: { children: React.ReactNode }) {
 	)
 }
 
-function A({
-	href,
-	children,
-}: {
-	href: string
-	children: React.ReactNode
-}) {
+function A({ href, children }: { href: string; children: React.ReactNode }) {
 	return (
 		<a
 			href={href}
@@ -60,10 +52,7 @@ function A({
 
 function PrivacyPolicy() {
 	return (
-		<PageLayout
-			title="Privacy Policy"
-			subtitle="Last updated: May 8, 2026"
-		>
+		<PageLayout title="Privacy Policy" subtitle="Last updated: May 8, 2026">
 			<div className="flex flex-col gap-8">
 				<Section>
 					<P>
@@ -99,15 +88,14 @@ function PrivacyPolicy() {
 						</li>
 						<li>
 							<strong className="text-foreground">Affiliate</strong> means an
-							entity that controls, is controlled by, or is under common
-							control with a party, where &quot;control&quot; means ownership
-							of 50% or more of the shares, equity interest or other securities
-							entitled to vote for election of directors or other managing
-							authority.
+							entity that controls, is controlled by, or is under common control
+							with a party, where &quot;control&quot; means ownership of 50% or
+							more of the shares, equity interest or other securities entitled
+							to vote for election of directors or other managing authority.
 						</li>
 						<li>
-							<strong className="text-foreground">Application</strong> refers
-							to batchmate, the software program provided by the Company.
+							<strong className="text-foreground">Application</strong> refers to
+							batchmate, the software program provided by the Company.
 						</li>
 						<li>
 							<strong className="text-foreground">Company</strong> (referred to
@@ -117,9 +105,9 @@ function PrivacyPolicy() {
 						</li>
 						<li>
 							<strong className="text-foreground">Cookies</strong> are small
-							files that are placed on Your computer, mobile device or any
-							other device by a website, containing the details of Your
-							browsing history on that website among its many uses.
+							files that are placed on Your computer, mobile device or any other
+							device by a website, containing the details of Your browsing
+							history on that website among its many uses.
 						</li>
 						<li>
 							<strong className="text-foreground">Country</strong> refers to:
@@ -138,8 +126,8 @@ function PrivacyPolicy() {
 							unless a law uses a specific term.
 						</li>
 						<li>
-							<strong className="text-foreground">Service</strong> refers to
-							the Application or the Website or both.
+							<strong className="text-foreground">Service</strong> refers to the
+							Application or the Website or both.
 						</li>
 						<li>
 							<strong className="text-foreground">Service Provider</strong>{" "}
@@ -171,9 +159,7 @@ function PrivacyPolicy() {
 				</Section>
 
 				<Section>
-					<SectionTitle>
-						Collecting and Using Your Personal Data
-					</SectionTitle>
+					<SectionTitle>Collecting and Using Your Personal Data</SectionTitle>
 
 					<SubTitle>Types of Data Collected</SubTitle>
 
@@ -193,9 +179,7 @@ function PrivacyPolicy() {
 					</UL>
 
 					<SubSubTitle>Usage Data</SubSubTitle>
-					<P>
-						Usage Data is collected automatically when using the Service.
-					</P>
+					<P>Usage Data is collected automatically when using the Service.</P>
 					<P>
 						Usage Data may include information such as Your Device's Internet
 						Protocol address (e.g. IP address), browser type, browser version,
@@ -212,9 +196,9 @@ function PrivacyPolicy() {
 						unique device identifiers and other diagnostic data.
 					</P>
 					<P>
-						We may also collect information that Your browser sends whenever
-						You visit Our Service or when You access the Service by or through
-						a mobile device.
+						We may also collect information that Your browser sends whenever You
+						visit Our Service or when You access the Service by or through a
+						mobile device.
 					</P>
 
 					<SubSubTitle>
@@ -226,12 +210,10 @@ function PrivacyPolicy() {
 					</P>
 					<UL>
 						<li>Information regarding your location</li>
+						<li>Information from your Device's phone book (contacts list)</li>
 						<li>
-							Information from your Device's phone book (contacts list)
-						</li>
-						<li>
-							Pictures and other information from your Device's camera and
-							photo library
+							Pictures and other information from your Device's camera and photo
+							library
 						</li>
 					</UL>
 					<P>
@@ -259,19 +241,19 @@ function PrivacyPolicy() {
 								Cookies or Browser Cookies.
 							</strong>{" "}
 							A cookie is a small file placed on Your Device. You can instruct
-							Your browser to refuse all Cookies or to indicate when a Cookie
-							is being sent. However, if You do not accept Cookies, You may not
-							be able to use some parts of our Service.
+							Your browser to refuse all Cookies or to indicate when a Cookie is
+							being sent. However, if You do not accept Cookies, You may not be
+							able to use some parts of our Service.
 						</li>
 						<li>
 							<strong className="text-foreground">Web Beacons.</strong> Certain
 							sections of our Service and our emails may contain small
 							electronic files known as web beacons (also referred to as clear
 							gifs, pixel tags, and single-pixel gifs) that permit the Company,
-							for example, to count users who have visited those pages or
-							opened an email and for other related website statistics (for
-							example, recording the popularity of a certain section and
-							verifying system and server integrity).
+							for example, to count users who have visited those pages or opened
+							an email and for other related website statistics (for example,
+							recording the popularity of a certain section and verifying system
+							and server integrity).
 						</li>
 					</UL>
 					<P>
@@ -305,8 +287,8 @@ function PrivacyPolicy() {
 								available through the Website and to enable You to use some of
 								its features. They help to authenticate users and prevent
 								fraudulent use of user accounts. Without these Cookies, the
-								services that You have asked for cannot be provided, and We
-								only use these Cookies to provide You with those services.
+								services that You have asked for cannot be provided, and We only
+								use these Cookies to provide You with those services.
 							</p>
 						</div>
 						<div className="rounded-xl bg-card p-4">
@@ -317,8 +299,8 @@ function PrivacyPolicy() {
 								Type: Persistent Cookies · Administered by: Us
 							</p>
 							<p className="mt-2 text-sm leading-relaxed text-text-secondary">
-								These Cookies identify if users have accepted the use of
-								cookies on the Website.
+								These Cookies identify if users have accepted the use of cookies
+								on the Website.
 							</p>
 						</div>
 						<div className="rounded-xl bg-card p-4">
@@ -329,11 +311,11 @@ function PrivacyPolicy() {
 								Type: Persistent Cookies · Administered by: Us
 							</p>
 							<p className="mt-2 text-sm leading-relaxed text-text-secondary">
-								These Cookies allow Us to remember choices You make when You
-								use the Website, such as remembering your login details or
-								language preference. The purpose of these Cookies is to provide
-								You with a more personal experience and to avoid You having to
-								re-enter your preferences every time You use the Website.
+								These Cookies allow Us to remember choices You make when You use
+								the Website, such as remembering your login details or language
+								preference. The purpose of these Cookies is to provide You with
+								a more personal experience and to avoid You having to re-enter
+								your preferences every time You use the Website.
 							</p>
 						</div>
 					</div>
@@ -346,9 +328,7 @@ function PrivacyPolicy() {
 
 				<Section>
 					<SubTitle>Use of Your Personal Data</SubTitle>
-					<P>
-						The Company may use Personal Data for the following purposes:
-					</P>
+					<P>The Company may use Personal Data for the following purposes:</P>
 					<UL>
 						<li>
 							<strong className="text-foreground">
@@ -360,34 +340,33 @@ function PrivacyPolicy() {
 							<strong className="text-foreground">
 								To manage Your Account:
 							</strong>{" "}
-							to manage Your registration as a user of the Service. The
-							Personal Data You provide can give You access to different
-							functionalities of the Service that are available to You as a
-							registered user.
+							to manage Your registration as a user of the Service. The Personal
+							Data You provide can give You access to different functionalities
+							of the Service that are available to You as a registered user.
 						</li>
 						<li>
 							<strong className="text-foreground">
 								For the performance of a contract:
 							</strong>{" "}
 							the development, compliance and undertaking of the purchase
-							contract for the products, items or services You have purchased
-							or of any other contract with Us through the Service.
+							contract for the products, items or services You have purchased or
+							of any other contract with Us through the Service.
 						</li>
 						<li>
 							<strong className="text-foreground">To contact You:</strong> To
 							contact You by email, telephone calls, SMS, or other equivalent
 							forms of electronic communication, such as a mobile application's
-							push notifications regarding updates or informative
-							communications related to the functionalities, products or
-							contracted services, including the security updates, when
-							necessary or reasonable for their implementation.
+							push notifications regarding updates or informative communications
+							related to the functionalities, products or contracted services,
+							including the security updates, when necessary or reasonable for
+							their implementation.
 						</li>
 						<li>
 							<strong className="text-foreground">To provide You</strong> with
 							news, special offers, and general information about other goods,
 							services and events which We offer that are similar to those that
-							you have already purchased or inquired about unless You have
-							opted not to receive such information.
+							you have already purchased or inquired about unless You have opted
+							not to receive such information.
 						</li>
 						<li>
 							<strong className="text-foreground">
@@ -414,9 +393,7 @@ function PrivacyPolicy() {
 							Service, products, services, marketing and your experience.
 						</li>
 					</UL>
-					<P>
-						We may share Your Personal Data in the following situations:
-					</P>
+					<P>We may share Your Personal Data in the following situations:</P>
 					<UL>
 						<li>
 							<strong className="text-foreground">
@@ -429,15 +406,15 @@ function PrivacyPolicy() {
 							<strong className="text-foreground">
 								For business transfers:
 							</strong>{" "}
-							We may share or transfer Your Personal Data in connection with,
-							or during negotiations of, any merger, sale of Company assets,
+							We may share or transfer Your Personal Data in connection with, or
+							during negotiations of, any merger, sale of Company assets,
 							financing, or acquisition of all or a portion of Our business to
 							another company.
 						</li>
 						<li>
 							<strong className="text-foreground">With Affiliates:</strong> We
-							may share Your Personal Data with Our affiliates, in which case
-							we will require those affiliates to honor this Privacy Policy.
+							may share Your Personal Data with Our affiliates, in which case we
+							will require those affiliates to honor this Privacy Policy.
 							Affiliates include Our parent company and any other subsidiaries,
 							joint venture partners or other companies that We control or that
 							are under common control with Us.
@@ -457,9 +434,9 @@ function PrivacyPolicy() {
 							distributed outside.
 						</li>
 						<li>
-							<strong className="text-foreground">With Your consent</strong>:
-							We may disclose Your Personal Data for any other purpose with
-							Your consent.
+							<strong className="text-foreground">With Your consent</strong>: We
+							may disclose Your Personal Data for any other purpose with Your
+							consent.
 						</li>
 					</UL>
 				</Section>
@@ -503,10 +480,9 @@ function PrivacyPolicy() {
 							</p>
 							<UL>
 								<li>
-									Support tickets and correspondence: up to 24 months from
-									the date of ticket closure to resolve follow-up inquiries,
-									track service quality, and defend against potential legal
-									claims.
+									Support tickets and correspondence: up to 24 months from the
+									date of ticket closure to resolve follow-up inquiries, track
+									service quality, and defend against potential legal claims.
 								</li>
 								<li>
 									Chat transcripts: up to 24 months for quality assurance and
@@ -528,16 +504,16 @@ function PrivacyPolicy() {
 									feature adoption and service improvements.
 								</li>
 								<li>
-									Server logs (IP addresses, access times): up to 24 months
-									for security monitoring and troubleshooting purposes.
+									Server logs (IP addresses, access times): up to 24 months for
+									security monitoring and troubleshooting purposes.
 								</li>
 							</UL>
 						</div>
 					</div>
 					<P>
 						Usage Data is retained in accordance with the retention periods
-						described above, and may be retained longer only where necessary
-						for security, fraud prevention, or legal compliance.
+						described above, and may be retained longer only where necessary for
+						security, fraud prevention, or legal compliance.
 					</P>
 					<P>
 						We may retain Personal Data beyond the periods stated above for
@@ -570,20 +546,20 @@ function PrivacyPolicy() {
 					</P>
 					<UL>
 						<li>
-							Deletion: Personal Data is removed from Our systems and no
-							longer actively processed.
+							Deletion: Personal Data is removed from Our systems and no longer
+							actively processed.
 						</li>
 						<li>
-							Backup retention: Residual copies may remain in encrypted
-							backups for a limited period consistent with our backup retention
-							schedule and are not restored except where necessary for
-							security, disaster recovery, or legal compliance.
+							Backup retention: Residual copies may remain in encrypted backups
+							for a limited period consistent with our backup retention schedule
+							and are not restored except where necessary for security, disaster
+							recovery, or legal compliance.
 						</li>
 						<li>
 							Anonymization: In some cases, We convert Personal Data into
-							anonymous statistical data that cannot be linked back to You.
-							This anonymized data may be retained indefinitely for research
-							and analytics.
+							anonymous statistical data that cannot be linked back to You. This
+							anonymized data may be retained indefinitely for research and
+							analytics.
 						</li>
 					</UL>
 				</Section>
@@ -602,13 +578,12 @@ function PrivacyPolicy() {
 					<P>
 						Where required by applicable law, We will ensure that international
 						transfers of Your Personal Data are subject to appropriate
-						safeguards and supplementary measures where appropriate. The
-						Company will take all steps reasonably necessary to ensure that
-						Your data is treated securely and in accordance with this Privacy
-						Policy and no transfer of Your Personal Data will take place to an
-						organization or a country unless there are adequate controls in
-						place including the security of Your data and other personal
-						information.
+						safeguards and supplementary measures where appropriate. The Company
+						will take all steps reasonably necessary to ensure that Your data is
+						treated securely and in accordance with this Privacy Policy and no
+						transfer of Your Personal Data will take place to an organization or
+						a country unless there are adequate controls in place including the
+						security of Your data and other personal information.
 					</P>
 				</Section>
 
@@ -630,9 +605,8 @@ function PrivacyPolicy() {
 						or delete any Personal Data that You have provided to Us.
 					</P>
 					<P>
-						Please note, however, that We may need to retain certain
-						information when we have a legal obligation or lawful basis to do
-						so.
+						Please note, however, that We may need to retain certain information
+						when we have a legal obligation or lawful basis to do so.
 					</P>
 				</Section>
 
@@ -642,29 +616,27 @@ function PrivacyPolicy() {
 					<SubSubTitle>Business Transactions</SubSubTitle>
 					<P>
 						If the Company is involved in a merger, acquisition or asset sale,
-						Your Personal Data may be transferred. We will provide notice
-						before Your Personal Data is transferred and becomes subject to a
-						different Privacy Policy.
+						Your Personal Data may be transferred. We will provide notice before
+						Your Personal Data is transferred and becomes subject to a different
+						Privacy Policy.
 					</P>
 
 					<SubSubTitle>Law enforcement</SubSubTitle>
 					<P>
-						Under certain circumstances, the Company may be required to
-						disclose Your Personal Data if required to do so by law or in
-						response to valid requests by public authorities (e.g. a court or a
-						government agency).
+						Under certain circumstances, the Company may be required to disclose
+						Your Personal Data if required to do so by law or in response to
+						valid requests by public authorities (e.g. a court or a government
+						agency).
 					</P>
 
 					<SubSubTitle>Other legal requirements</SubSubTitle>
 					<P>
-						The Company may disclose Your Personal Data in the good faith
-						belief that such action is necessary to:
+						The Company may disclose Your Personal Data in the good faith belief
+						that such action is necessary to:
 					</P>
 					<UL>
 						<li>Comply with a legal obligation</li>
-						<li>
-							Protect and defend the rights or property of the Company
-						</li>
+						<li>Protect and defend the rights or property of the Company</li>
 						<li>
 							Prevent or investigate possible wrongdoing in connection with the
 							Service
@@ -711,17 +683,14 @@ function PrivacyPolicy() {
 							<strong className="text-foreground">
 								Performance of a contract:
 							</strong>{" "}
-							Processing is necessary for the performance of a contract with
-							You or to take steps at Your request before entering into a
-							contract.
+							Processing is necessary for the performance of a contract with You
+							or to take steps at Your request before entering into a contract.
 						</li>
 						<li>
-							<strong className="text-foreground">
-								Legitimate interests:
-							</strong>{" "}
-							Processing is necessary for Our legitimate interests or those of
-							a third party, provided those interests are not overridden by
-							Your rights and interests.
+							<strong className="text-foreground">Legitimate interests:</strong>{" "}
+							Processing is necessary for Our legitimate interests or those of a
+							third party, provided those interests are not overridden by Your
+							rights and interests.
 						</li>
 						<li>
 							<strong className="text-foreground">Legal obligation:</strong>{" "}
@@ -749,9 +718,9 @@ function PrivacyPolicy() {
 							incomplete.
 						</li>
 						<li>
-							<strong className="text-foreground">Right to erasure:</strong>{" "}
-							You have the right to request that We erase Your Personal Data,
-							under certain conditions.
+							<strong className="text-foreground">Right to erasure:</strong> You
+							have the right to request that We erase Your Personal Data, under
+							certain conditions.
 						</li>
 						<li>
 							<strong className="text-foreground">
@@ -780,16 +749,16 @@ function PrivacyPolicy() {
 								Right to withdraw consent:
 							</strong>{" "}
 							Where We rely on Your consent to process Your Personal Data, You
-							have the right to withdraw that consent at any time. Withdrawal
-							of consent does not affect the lawfulness of processing based on
+							have the right to withdraw that consent at any time. Withdrawal of
+							consent does not affect the lawfulness of processing based on
 							consent before its withdrawal.
 						</li>
 					</UL>
 					<P>
 						If You wish to exercise any of the rights set out above, please
 						contact Us. We will respond to Your request within one month. That
-						period may be extended by two further months where necessary,
-						taking into account the complexity and number of requests.
+						period may be extended by two further months where necessary, taking
+						into account the complexity and number of requests.
 					</P>
 					<P>
 						You also have the right to lodge a complaint with a supervisory
@@ -802,9 +771,8 @@ function PrivacyPolicy() {
 						Your Personal Data may be transferred to and processed in countries
 						outside the EEA, United Kingdom, or Switzerland. When We transfer
 						Your data internationally, We ensure appropriate safeguards are in
-						place, such as Standard Contractual Clauses approved by the
-						European Commission or other legally recognized transfer
-						mechanisms.
+						place, such as Standard Contractual Clauses approved by the European
+						Commission or other legally recognized transfer mechanisms.
 					</P>
 				</Section>
 
@@ -813,10 +781,10 @@ function PrivacyPolicy() {
 						Your California Privacy Rights (CCPA/CPRA)
 					</SectionTitle>
 					<P>
-						If You are a California resident, You have specific rights
-						regarding Your Personal Information under the California Consumer
-						Privacy Act, as amended by the California Privacy Rights Act
-						(collectively, &quot;CCPA&quot;).
+						If You are a California resident, You have specific rights regarding
+						Your Personal Information under the California Consumer Privacy Act,
+						as amended by the California Privacy Rights Act (collectively,
+						&quot;CCPA&quot;).
 					</P>
 
 					<SubTitle>Categories of Personal Information Collected</SubTitle>
@@ -866,17 +834,17 @@ function PrivacyPolicy() {
 							Information, subject to certain exceptions.
 						</li>
 						<li>
-							<strong className="text-foreground">Right to correct:</strong>{" "}
-							You have the right to request the correction of inaccurate
-							Personal Information.
+							<strong className="text-foreground">Right to correct:</strong> You
+							have the right to request the correction of inaccurate Personal
+							Information.
 						</li>
 						<li>
 							<strong className="text-foreground">
 								Right to opt-out of sale or sharing:
 							</strong>{" "}
 							You have the right to opt out of the sale or sharing of Your
-							Personal Information. We do not sell Your Personal Information.
-							We do not share Your Personal Information for cross-context
+							Personal Information. We do not sell Your Personal Information. We
+							do not share Your Personal Information for cross-context
 							behavioral advertising.
 						</li>
 						<li>
@@ -903,10 +871,10 @@ function PrivacyPolicy() {
 					<P>
 						To exercise any of the rights described above, please contact Us by
 						email at{" "}
-						<A href="mailto:support@leftshift.com">support@leftshift.com</A>.
-						We will verify Your identity before processing Your request. You
-						may also designate an authorized agent to make a request on Your
-						behalf, subject to verification.
+						<A href="mailto:support@leftshift.com">support@leftshift.com</A>. We
+						will verify Your identity before processing Your request. You may
+						also designate an authorized agent to make a request on Your behalf,
+						subject to verification.
 					</P>
 					<P>
 						We will respond to a verifiable consumer request within 45 days of
@@ -914,16 +882,14 @@ function PrivacyPolicy() {
 						reason and extension period in writing.
 					</P>
 
-					<SubTitle>
-						&quot;Do Not Track&quot; / Global Privacy Control
-					</SubTitle>
+					<SubTitle>&quot;Do Not Track&quot; / Global Privacy Control</SubTitle>
 					<P>
 						Some browsers transmit &quot;Do Not Track&quot; (DNT) signals. We
 						currently honor Global Privacy Control (GPC) signals where required
 						by law. For other DNT mechanisms, Our Service does not currently
 						alter its practices when it receives a DNT signal, as no uniform
-						technology standard for recognizing and implementing DNT signals
-						has been finalized.
+						technology standard for recognizing and implementing DNT signals has
+						been finalized.
 					</P>
 
 					<SubTitle>Financial Incentives</SubTitle>
@@ -934,9 +900,7 @@ function PrivacyPolicy() {
 				</Section>
 
 				<Section>
-					<SectionTitle>
-						Your Canadian Privacy Rights (PIPEDA)
-					</SectionTitle>
+					<SectionTitle>Your Canadian Privacy Rights (PIPEDA)</SectionTitle>
 					<P>
 						If You are a resident of Canada, the federal Personal Information
 						Protection and Electronic Documents Act (&quot;PIPEDA&quot;) and
@@ -980,49 +944,41 @@ function PrivacyPolicy() {
 							correction of inaccurate or incomplete Personal Information.
 						</li>
 						<li>
-							<strong className="text-foreground">
-								Withdraw consent:
-							</strong>{" "}
+							<strong className="text-foreground">Withdraw consent:</strong>{" "}
 							Withdraw Your consent to Our collection, use, or disclosure of
 							Your Personal Information at any time, subject to legal or
 							contractual restrictions and reasonable notice. Withdrawing
-							consent may affect Our ability to provide certain features of
-							the Service.
+							consent may affect Our ability to provide certain features of the
+							Service.
 						</li>
 						<li>
-							<strong className="text-foreground">
-								Challenge compliance:
-							</strong>{" "}
+							<strong className="text-foreground">Challenge compliance:</strong>{" "}
 							Challenge Our compliance with PIPEDA by contacting Our Privacy
-							Officer. If You are not satisfied with Our response, You may
-							file a complaint with the Office of the Privacy Commissioner of
-							Canada at{" "}
-							<A href="https://www.priv.gc.ca">www.priv.gc.ca</A>.
+							Officer. If You are not satisfied with Our response, You may file
+							a complaint with the Office of the Privacy Commissioner of Canada
+							at <A href="https://www.priv.gc.ca">www.priv.gc.ca</A>.
 						</li>
 					</UL>
 
 					<SubTitle>Cross-Border Transfers</SubTitle>
 					<P>
-						Your Personal Information is processed and stored on servers
-						located outside of Canada, including in the United States, by Our
-						service providers (such as Cloudflare). While Your Personal
-						Information is in another jurisdiction, it may be accessible to law
-						enforcement and national security authorities of that jurisdiction
-						in accordance with the laws of that jurisdiction. We use
-						contractual and other measures to provide a comparable level of
-						protection while Your information is being processed by Our service
-						providers.
+						Your Personal Information is processed and stored on servers located
+						outside of Canada, including in the United States, by Our service
+						providers (such as Cloudflare). While Your Personal Information is
+						in another jurisdiction, it may be accessible to law enforcement and
+						national security authorities of that jurisdiction in accordance
+						with the laws of that jurisdiction. We use contractual and other
+						measures to provide a comparable level of protection while Your
+						information is being processed by Our service providers.
 					</P>
 				</Section>
 
 				<Section>
-					<SectionTitle>
-						Your Quebec Privacy Rights (Law 25)
-					</SectionTitle>
+					<SectionTitle>Your Quebec Privacy Rights (Law 25)</SectionTitle>
 					<P>
 						If You are a resident of Quebec, the Act respecting the protection
-						of personal information in the private sector (as amended by Law
-						25) provides You with additional rights regarding Your Personal
+						of personal information in the private sector (as amended by Law 25)
+						provides You with additional rights regarding Your Personal
 						Information.
 					</P>
 
@@ -1042,12 +998,14 @@ function PrivacyPolicy() {
 							right to access and rectification at the time of collection.
 						</li>
 						<li>
-							<strong className="text-foreground">Right of access:</strong>{" "}
-							You have the right to access the Personal Information We hold
-							about You.
+							<strong className="text-foreground">Right of access:</strong> You
+							have the right to access the Personal Information We hold about
+							You.
 						</li>
 						<li>
-							<strong className="text-foreground">Right to rectification:</strong>{" "}
+							<strong className="text-foreground">
+								Right to rectification:
+							</strong>{" "}
 							You have the right to have inaccurate, incomplete, or equivocal
 							Personal Information corrected.
 						</li>
@@ -1055,18 +1013,18 @@ function PrivacyPolicy() {
 							<strong className="text-foreground">
 								Right to data portability:
 							</strong>{" "}
-							You have the right to obtain the computerized Personal
-							Information We hold about You in a structured, commonly used
-							technological format, and to have it transferred to another
-							person or body authorized by law to collect such information.
+							You have the right to obtain the computerized Personal Information
+							We hold about You in a structured, commonly used technological
+							format, and to have it transferred to another person or body
+							authorized by law to collect such information.
 						</li>
 						<li>
 							<strong className="text-foreground">
 								Right to withdraw consent and to de-indexing:
 							</strong>{" "}
 							You have the right to withdraw Your consent to the use of Your
-							Personal Information and, in certain circumstances, to require
-							Us to cease disseminating it or to de-index hyperlinks providing
+							Personal Information and, in certain circumstances, to require Us
+							to cease disseminating it or to de-index hyperlinks providing
 							access to it.
 						</li>
 						<li>
@@ -1075,32 +1033,33 @@ function PrivacyPolicy() {
 							</strong>{" "}
 							You may file a complaint with the Commission d&apos;accès à
 							l&apos;information du Québec at{" "}
-							<A href="https://www.cai.gouv.qc.ca">www.cai.gouv.qc.ca</A> if
-							You believe Your rights have been violated.
+							<A href="https://www.cai.gouv.qc.ca">www.cai.gouv.qc.ca</A> if You
+							believe Your rights have been violated.
 						</li>
 					</UL>
 
 					<SubTitle>Automated Decision-Making</SubTitle>
 					<P>
 						We do not use Your Personal Information to render decisions based
-						exclusively on automated processing. If this changes, We will
-						inform You at or before the time the decision is made and provide
-						You with the opportunity to submit observations.
+						exclusively on automated processing. If this changes, We will inform
+						You at or before the time the decision is made and provide You with
+						the opportunity to submit observations.
 					</P>
 
-					<SubTitle>Communication of Personal Information Outside Quebec</SubTitle>
+					<SubTitle>
+						Communication of Personal Information Outside Quebec
+					</SubTitle>
 					<P>
 						Your Personal Information may be communicated to and stored by
-						service providers located outside of Quebec, including in the
-						United States. Before communicating Personal Information outside
-						Quebec, We conduct a privacy impact assessment to confirm that the
-						information will receive adequate protection, considering the
-						sensitivity of the information, the purposes for which it will be
-						used, the protection measures applied to it, and the legal
-						framework applicable in the jurisdiction where it will be
-						communicated. By using the Service, You acknowledge that Your
-						Personal Information may be communicated outside Quebec for the
-						purposes described in this Privacy Policy.
+						service providers located outside of Quebec, including in the United
+						States. Before communicating Personal Information outside Quebec, We
+						conduct a privacy impact assessment to confirm that the information
+						will receive adequate protection, considering the sensitivity of the
+						information, the purposes for which it will be used, the protection
+						measures applied to it, and the legal framework applicable in the
+						jurisdiction where it will be communicated. By using the Service,
+						You acknowledge that Your Personal Information may be communicated
+						outside Quebec for the purposes described in this Privacy Policy.
 					</P>
 				</Section>
 
@@ -1117,8 +1076,8 @@ function PrivacyPolicy() {
 
 					<SubTitle>Usage, Performance and Miscellaneous</SubTitle>
 					<P>
-						We may use third-party Service Providers to maintain and improve
-						our Service.
+						We may use third-party Service Providers to maintain and improve our
+						Service.
 					</P>
 					<div className="flex flex-col gap-4">
 						<div className="rounded-xl bg-card p-4">
@@ -1199,15 +1158,13 @@ function PrivacyPolicy() {
 				<Section>
 					<SectionTitle>Contact Us</SectionTitle>
 					<P>
-						If you have any questions about this Privacy Policy, You can
-						contact us:
+						If you have any questions about this Privacy Policy, You can contact
+						us:
 					</P>
 					<UL>
 						<li>
 							By email:{" "}
-							<A href="mailto:support@leftshift.com">
-								support@leftshift.com
-							</A>
+							<A href="mailto:support@leftshift.com">support@leftshift.com</A>
 						</li>
 					</UL>
 				</Section>

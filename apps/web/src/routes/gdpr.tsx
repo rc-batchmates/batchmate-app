@@ -10,9 +10,7 @@ function Section({ children }: { children: React.ReactNode }) {
 }
 
 function SectionTitle({ children }: { children: React.ReactNode }) {
-	return (
-		<h2 className="text-xl font-semibold text-foreground">{children}</h2>
-	)
+	return <h2 className="text-xl font-semibold text-foreground">{children}</h2>
 }
 
 function P({ children }: { children: React.ReactNode }) {
@@ -29,13 +27,7 @@ function UL({ children }: { children: React.ReactNode }) {
 	)
 }
 
-function A({
-	href,
-	children,
-}: {
-	href: string
-	children: React.ReactNode
-}) {
+function A({ href, children }: { href: string; children: React.ReactNode }) {
 	return (
 		<a
 			href={href}
@@ -50,10 +42,7 @@ function A({
 
 function GDPRPage() {
 	return (
-		<PageLayout
-			title="GDPR"
-			subtitle="General Data Protection Regulation"
-		>
+		<PageLayout title="GDPR" subtitle="General Data Protection Regulation">
 			<div className="flex flex-col gap-8">
 				<Section>
 					<P>
@@ -99,17 +88,14 @@ function GDPRPage() {
 							<strong className="text-foreground">
 								Performance of a contract:
 							</strong>{" "}
-							Processing is necessary for the performance of a contract with
-							You or to take steps at Your request before entering into a
-							contract.
+							Processing is necessary for the performance of a contract with You
+							or to take steps at Your request before entering into a contract.
 						</li>
 						<li>
-							<strong className="text-foreground">
-								Legitimate interests:
-							</strong>{" "}
-							Processing is necessary for Our legitimate interests or those of
-							a third party, provided those interests are not overridden by
-							Your rights and interests.
+							<strong className="text-foreground">Legitimate interests:</strong>{" "}
+							Processing is necessary for Our legitimate interests or those of a
+							third party, provided those interests are not overridden by Your
+							rights and interests.
 						</li>
 						<li>
 							<strong className="text-foreground">Legal obligation:</strong>{" "}
@@ -122,9 +108,9 @@ function GDPRPage() {
 				<Section>
 					<SectionTitle>What Personal Data We Collect</SectionTitle>
 					<P>
-						When You sign in via Recurse Center SSO, We receive information
-						from Your Recurse Center profile. Personal Data We collect may
-						include, but is not limited to:
+						When You sign in via Recurse Center SSO, We receive information from
+						Your Recurse Center profile. Personal Data We collect may include,
+						but is not limited to:
 					</P>
 					<UL>
 						<li>Email address</li>
@@ -162,9 +148,9 @@ function GDPRPage() {
 							incomplete.
 						</li>
 						<li>
-							<strong className="text-foreground">Right to erasure:</strong>{" "}
-							You have the right to request that We erase Your Personal Data,
-							under certain conditions.
+							<strong className="text-foreground">Right to erasure:</strong> You
+							have the right to request that We erase Your Personal Data, under
+							certain conditions.
 						</li>
 						<li>
 							<strong className="text-foreground">
@@ -193,8 +179,8 @@ function GDPRPage() {
 								Right to withdraw consent:
 							</strong>{" "}
 							Where We rely on Your consent to process Your Personal Data, You
-							have the right to withdraw that consent at any time. Withdrawal
-							of consent does not affect the lawfulness of processing based on
+							have the right to withdraw that consent at any time. Withdrawal of
+							consent does not affect the lawfulness of processing based on
 							consent before its withdrawal.
 						</li>
 					</UL>
@@ -204,10 +190,10 @@ function GDPRPage() {
 					<SectionTitle>How to Exercise Your Rights</SectionTitle>
 					<P>
 						To exercise any of the rights set out above, please contact Us at{" "}
-						<A href="mailto:support@leftshift.com">support@leftshift.com</A>.
-						We will respond to Your request within one month. That period may
-						be extended by two further months where necessary, taking into
-						account the complexity and number of requests.
+						<A href="mailto:support@leftshift.com">support@leftshift.com</A>. We
+						will respond to Your request within one month. That period may be
+						extended by two further months where necessary, taking into account
+						the complexity and number of requests.
 					</P>
 					<P>
 						We may need to verify Your identity before processing Your request.
@@ -223,9 +209,8 @@ function GDPRPage() {
 						Your Personal Data may be transferred to and processed in countries
 						outside the EEA, United Kingdom, or Switzerland. When We transfer
 						Your data internationally, We ensure appropriate safeguards are in
-						place, such as Standard Contractual Clauses approved by the
-						European Commission or other legally recognized transfer
-						mechanisms.
+						place, such as Standard Contractual Clauses approved by the European
+						Commission or other legally recognized transfer mechanisms.
 					</P>
 				</Section>
 
@@ -255,11 +240,11 @@ function GDPRPage() {
 				<Section>
 					<SectionTitle>Right to Lodge a Complaint</SectionTitle>
 					<P>
-						You have the right to lodge a complaint with a supervisory
-						authority if You believe that Our processing of Your Personal Data
-						violates applicable data protection law. We would, however,
-						appreciate the chance to address Your concerns before You approach a
-						supervisory authority, so please contact Us first.
+						You have the right to lodge a complaint with a supervisory authority
+						if You believe that Our processing of Your Personal Data violates
+						applicable data protection law. We would, however, appreciate the
+						chance to address Your concerns before You approach a supervisory
+						authority, so please contact Us first.
 					</P>
 				</Section>
 			</div>

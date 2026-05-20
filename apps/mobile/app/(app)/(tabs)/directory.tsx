@@ -1,23 +1,13 @@
-import { getInitials, getSubtitle, ROLES, SCOPES, Text } from "@batchmate/ui"
+import { ROLES, SCOPES, Text } from "@batchmate/ui"
 import { useInfiniteQuery, useQuery } from "@tanstack/react-query"
 import { useRouter } from "expo-router"
-import {
-	Briefcase,
-	Calendar,
-	ChevronDown,
-	ChevronRight,
-	MapPin,
-	Search,
-} from "lucide-react-native"
+import { Briefcase, Calendar, MapPin, Search } from "lucide-react-native"
 import { useRef, useState } from "react"
-import {
-	FlatList,
-	Image,
-	Pressable,
-	ScrollView,
-	TextInput,
-	View,
-} from "react-native"
+import { FlatList, TextInput, View } from "react-native"
+import { DropdownList } from "../../../src/components/dropdown-list"
+import { FilterChip } from "../../../src/components/filter-chip"
+import { PersonCard } from "../../../src/components/person-card"
+import { ScopeChip } from "../../../src/components/scope-chip"
 import { api } from "../../../src/lib/api"
 
 const PAGE_SIZE = 50
@@ -25,162 +15,6 @@ const SEARCH_DEBOUNCE_MS = 300
 
 type Scope = "current" | "overlap" | "ngw"
 type Role = "recurser" | "resident" | "faculty"
-
-// --- Components ---
-
-function PersonCard({
-	name,
-	imageUrl,
-	batch,
-	stintType,
-	onPress,
-}: {
-	name: string
-	imageUrl: string | null
-	batch: string | null
-	stintType: string | null
-	onPress: () => void
-}) {
-	return (
-		<Pressable
-			className="flex-row items-center gap-3 rounded-xl bg-card px-4 py-3.5"
-			onPress={onPress}
-		>
-			<View className="h-10 w-10 items-center justify-center overflow-hidden rounded-full bg-surface-inset">
-				{imageUrl ? (
-					<Image source={{ uri: imageUrl }} className="h-full w-full" />
-				) : (
-					<Text className="text-sm font-semibold text-primary">
-						{getInitials(name)}
-					</Text>
-				)}
-			</View>
-			<View className="flex-1 gap-0.5">
-				<Text className="text-[15px] font-medium">{name}</Text>
-				<Text className="text-xs text-text-tertiary">
-					{getSubtitle(batch, stintType)}
-				</Text>
-			</View>
-			<ChevronRight size={20} color="#475569" />
-		</Pressable>
-	)
-}
-
-function ScopeChip({
-	label,
-	active,
-	onPress,
-}: {
-	label: string
-	active: boolean
-	onPress: () => void
-}) {
-	return (
-		<Pressable
-			className={`flex-row items-center gap-1.5 rounded-full border px-3.5 py-1.5 ${
-				active ? "border-cyan/30 bg-cyan/10" : "border-border bg-card"
-			}`}
-			onPress={onPress}
-		>
-			{active && <View className="h-1.5 w-1.5 rounded-full bg-cyan" />}
-			<Text
-				className={`text-xs font-medium ${active ? "text-primary" : "text-text-secondary"}`}
-			>
-				{label}
-			</Text>
-		</Pressable>
-	)
-}
-
-function FilterChip({
-	icon: Icon,
-	label,
-	active,
-	onPress,
-}: {
-	icon: typeof Calendar
-	label: string
-	active: boolean
-	onPress: () => void
-}) {
-	return (
-		<Pressable
-			className={`flex-row items-center gap-1.5 rounded-lg border px-3 py-2 ${
-				active ? "border-cyan/30 bg-cyan/10" : "border-border bg-card"
-			}`}
-			onPress={onPress}
-		>
-			<Icon size={14} color={active ? "#22D3EE" : "#94A3B8"} />
-			<Text
-				className={`text-[13px] font-medium ${active ? "text-primary" : "text-text-secondary"}`}
-			>
-				{label}
-			</Text>
-			<ChevronDown size={14} color={active ? "#22D3EE" : "#64748B"} />
-		</Pressable>
-	)
-}
-
-function DropdownList<T extends { id: number; name: string }>({
-	items,
-	isLoading,
-	onSelect,
-	activeValue,
-}: {
-	items: T[]
-	isLoading: boolean
-	onSelect: (item: T) => void
-	activeValue?: string
-}) {
-	const [search, setSearch] = useState("")
-	const filtered = items.filter((item) =>
-		item.name.toLowerCase().includes(search.toLowerCase()),
-	)
-
-	return (
-		<View className="mt-2 overflow-hidden rounded-lg border border-border bg-background">
-			<View className="border-b border-border p-2">
-				<TextInput
-					placeholder="Search..."
-					placeholderTextColor="#64748B"
-					value={search}
-					onChangeText={setSearch}
-					className="rounded-md bg-card px-3 py-1.5 text-sm text-foreground"
-					autoFocus
-				/>
-			</View>
-			<ScrollView style={{ maxHeight: 192 }}>
-				{isLoading && (
-					<View className="px-3 py-2">
-						<Text className="text-sm text-text-tertiary">Loading...</Text>
-					</View>
-				)}
-				{!isLoading && filtered.length === 0 && (
-					<View className="px-3 py-2">
-						<Text className="text-sm text-text-tertiary">No results</Text>
-					</View>
-				)}
-				{filtered.map((item) => (
-					<Pressable
-						key={item.id}
-						onPress={() => onSelect(item)}
-						className="px-3 py-2"
-					>
-						<Text
-							className={`text-sm ${
-								activeValue === item.name ? "text-primary" : "text-foreground"
-							}`}
-						>
-							{item.name}
-						</Text>
-					</Pressable>
-				))}
-			</ScrollView>
-		</View>
-	)
-}
-
-// --- Header ---
 
 function DirectoryHeader({
 	query,

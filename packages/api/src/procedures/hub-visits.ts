@@ -7,6 +7,19 @@ import { server } from "../context"
 const PROFILE_CACHE_TTL_MS = 7 * 24 * 60 * 60 * 1000
 
 export const hubVisits = server.hubVisits.handler(async ({ context }) => {
+	try {
+		return await hubVisitsImpl(context)
+	} catch (e) {
+		console.error("[hubVisits] error", e)
+		if (e instanceof ORPCError) throw e
+		const msg = e instanceof Error ? `${e.message}\n${e.stack}` : String(e)
+		throw new ORPCError("INTERNAL_SERVER_ERROR", { message: msg })
+	}
+})
+
+async function hubVisitsImpl(
+	context: Parameters<Parameters<typeof server.hubVisits.handler>[0]>[0]["context"],
+) {
 	if (!context.user) {
 		throw new ORPCError("UNAUTHORIZED")
 	}
@@ -45,7 +58,11 @@ export const hubVisits = server.hubVisits.handler(async ({ context }) => {
 	const uniqueIds = [...new Set(data.map((v) => v.person.id))]
 	const profiles = new Map<
 		number,
-		{ imageUrl: string | null; batch: string | null }
+		{
+			imageUrl: string | null
+			batch: string | null
+			stintType: string | null
+		}
 	>()
 
 	if (uniqueIds.length > 0) {
@@ -62,6 +79,7 @@ export const hubVisits = server.hubVisits.handler(async ({ context }) => {
 				profiles.set(row.personId, {
 					imageUrl: row.imageUrl,
 					batch: row.batch,
+					stintType: row.stintType,
 				})
 				staleIds.delete(row.personId)
 			}
@@ -80,6 +98,7 @@ export const hubVisits = server.hubVisits.handler(async ({ context }) => {
 						personId: id,
 						imageUrl: profile.image_path ?? null,
 						batch: lastStint?.batch?.name ?? null,
+						stintType: lastStint?.type ?? null,
 					}
 				}),
 			)
@@ -92,6 +111,7 @@ export const hubVisits = server.hubVisits.handler(async ({ context }) => {
 				profiles.set(row.personId, {
 					imageUrl: row.imageUrl,
 					batch: row.batch,
+					stintType: row.stintType,
 				})
 			}
 
@@ -105,6 +125,7 @@ export const hubVisits = server.hubVisits.handler(async ({ context }) => {
 						set: {
 							imageUrl: sql`excluded.image_url`,
 							batch: sql`excluded.batch`,
+							stintType: sql`excluded.stint_type`,
 							cachedAt: sql`excluded.cached_at`,
 						},
 					})
@@ -133,9 +154,10 @@ export const hubVisits = server.hubVisits.handler(async ({ context }) => {
 				name: visit.person.name,
 				imageUrl: profile?.imageUrl ?? null,
 				batch: profile?.batch ?? null,
+				stintType: profile?.stintType ?? null,
 				notes: visit.notes ?? "",
 				checkedInAt: visit.created_at ?? "",
 			}
 		}),
 	}
-})
+}

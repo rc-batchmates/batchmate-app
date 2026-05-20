@@ -1,3 +1,4 @@
+import { InfoRow, SocialRow } from "@batchmate/ui"
 import { useQuery } from "@tanstack/react-query"
 import { createFileRoute, redirect, useRouter } from "@tanstack/react-router"
 import {
@@ -10,7 +11,6 @@ import {
 	Twitter,
 	User,
 } from "lucide-react"
-import { InfoRow, SocialRow } from "@batchmate/ui"
 import { PageLayout } from "@/components/page-layout"
 import { api } from "@/lib/api"
 import { authClient } from "@/lib/auth"

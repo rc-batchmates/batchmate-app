@@ -1,3 +1,4 @@
+import { InfoRow, SocialRow } from "@batchmate/ui"
 import { createFileRoute, redirect, useNavigate } from "@tanstack/react-router"
 import {
 	Github,
@@ -9,7 +10,6 @@ import {
 	Twitter,
 	User,
 } from "lucide-react"
-import { InfoRow, SocialRow } from "@batchmate/ui"
 import { PageLayout } from "@/components/page-layout"
 import { authClient, signOut, useSession } from "@/lib/auth"
 

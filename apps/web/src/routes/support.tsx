@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router"
-import { PageLayout } from "@/components/page-layout"
 import { Mail } from "lucide-react"
+import { PageLayout } from "@/components/page-layout"
 
 export const Route = createFileRoute("/support")({
 	component: SupportPage,

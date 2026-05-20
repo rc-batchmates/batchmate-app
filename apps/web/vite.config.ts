@@ -92,7 +92,10 @@ export default defineConfig({
 		alias: {
 			"react-native": "react-native-web",
 			"lucide-react-native": "lucide-react",
-			"expo-clipboard": path.resolve(__dirname, "./src/stubs/expo-clipboard.ts"),
+			"expo-clipboard": path.resolve(
+				__dirname,
+				"./src/stubs/expo-clipboard.ts",
+			),
 			"@": path.resolve(__dirname, "./src"),
 		},
 	},
