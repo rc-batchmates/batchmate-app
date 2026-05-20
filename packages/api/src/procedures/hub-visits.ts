@@ -7,19 +7,6 @@ import { server } from "../context"
 const PROFILE_CACHE_TTL_MS = 7 * 24 * 60 * 60 * 1000
 
 export const hubVisits = server.hubVisits.handler(async ({ context }) => {
-	try {
-		return await hubVisitsImpl(context)
-	} catch (e) {
-		console.error("[hubVisits] error", e)
-		if (e instanceof ORPCError) throw e
-		const msg = e instanceof Error ? `${e.message}\n${e.stack}` : String(e)
-		throw new ORPCError("INTERNAL_SERVER_ERROR", { message: msg })
-	}
-})
-
-async function hubVisitsImpl(
-	context: Parameters<Parameters<typeof server.hubVisits.handler>[0]>[0]["context"],
-) {
 	if (!context.user) {
 		throw new ORPCError("UNAUTHORIZED")
 	}
@@ -117,18 +104,25 @@ async function hubVisitsImpl(
 
 			if (rows.length > 0) {
 				const now = new Date()
-				await context.db
-					.insert(recurseProfile)
-					.values(rows.map((r) => ({ ...r, cachedAt: now })))
-					.onConflictDoUpdate({
-						target: recurseProfile.personId,
-						set: {
-							imageUrl: sql`excluded.image_url`,
-							batch: sql`excluded.batch`,
-							stintType: sql`excluded.stint_type`,
-							cachedAt: sql`excluded.cached_at`,
-						},
-					})
+				// D1 caps each statement at ~100 bound parameters. With 5 columns
+				// per row, 20 rows fits under the limit with headroom.
+				const CHUNK = 20
+				for (let i = 0; i < rows.length; i += CHUNK) {
+					await context.db
+						.insert(recurseProfile)
+						.values(
+							rows.slice(i, i + CHUNK).map((r) => ({ ...r, cachedAt: now })),
+						)
+						.onConflictDoUpdate({
+							target: recurseProfile.personId,
+							set: {
+								imageUrl: sql`excluded.image_url`,
+								batch: sql`excluded.batch`,
+								stintType: sql`excluded.stint_type`,
+								cachedAt: sql`excluded.cached_at`,
+							},
+						})
+				}
 			}
 		}
 	}
@@ -160,4 +154,4 @@ async function hubVisitsImpl(
 			}
 		}),
 	}
-}
+})
