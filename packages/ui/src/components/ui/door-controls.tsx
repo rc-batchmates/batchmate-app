@@ -210,7 +210,7 @@ function IntercomCard({
 
 	return (
 		<Pressable
-			className="flex-row items-start gap-4 overflow-hidden rounded-xl bg-card p-5 select-none"
+			className="flex-row items-start gap-4 overflow-hidden rounded-xl border border-primary/30 bg-card p-5 select-none"
 			style={{ ...webHoldStyle }}
 			onPressIn={onPressIn}
 			onPressOut={onPressOut}
@@ -345,7 +345,7 @@ function StairsCard({
 
 	return (
 		<Pressable
-			className="flex-1 justify-between overflow-hidden rounded-xl bg-card p-5 select-none"
+			className="flex-1 justify-between overflow-hidden rounded-xl border border-primary/30 bg-card p-5 select-none"
 			style={{ height: 120, minWidth: 120, ...webHoldStyle }}
 			onPressIn={onPressIn}
 			onPressOut={onPressOut}
