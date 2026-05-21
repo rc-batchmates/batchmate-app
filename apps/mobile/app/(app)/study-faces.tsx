@@ -170,13 +170,14 @@ export default function StudyFacesScreen() {
 	function pick(optionIndex: number) {
 		if (picked !== null || !card) return
 		setPicked(optionIndex)
-		if (optionIndex === card.correctIndex) setCorrect((n) => n + 1)
+		const isCorrect = optionIndex === card.correctIndex
+		if (isCorrect) setCorrect((n) => n + 1)
 		else setWrong((n) => n + 1)
-	}
-
-	function advance() {
-		setPicked(null)
-		setIndex((i) => i + 1)
+		const delay = isCorrect ? 600 : 1200
+		setTimeout(() => {
+			setPicked(null)
+			setIndex((i) => i + 1)
+		}, delay)
 	}
 
 	function optionStyle(optionIndex: number): string {
@@ -294,16 +295,6 @@ export default function StudyFacesScreen() {
 						))}
 					</View>
 
-					{picked !== null && (
-						<Pressable
-							onPress={advance}
-							className="items-center rounded-xl bg-cyan py-3.5"
-						>
-							<Text className="text-[15px] font-semibold text-background">
-								{index + 1 < deck.length ? "Next" : "See results"}
-							</Text>
-						</Pressable>
-					)}
 				</View>
 			)}
 
