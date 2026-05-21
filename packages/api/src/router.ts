@@ -8,6 +8,10 @@ import { hubVisits } from "./procedures/hub-visits"
 import { intercomOpen } from "./procedures/intercom-open"
 import { locations } from "./procedures/locations"
 import { memberProfile } from "./procedures/member-profile"
+import { presentationsCreate } from "./procedures/presentations-create"
+import { presentationsDelete } from "./procedures/presentations-delete"
+import { presentationsList } from "./procedures/presentations-list"
+import { presentationsUpdate } from "./procedures/presentations-update"
 import { zoomRooms } from "./procedures/zoom-rooms"
 
 export const router = server.router({
@@ -21,6 +25,10 @@ export const router = server.router({
 	batches,
 	locations,
 	zoomRooms,
+	presentationsList,
+	presentationsCreate,
+	presentationsUpdate,
+	presentationsDelete,
 })
 
 export type Router = typeof router

@@ -100,6 +100,42 @@ const ZoomRoomsResponseSchema = z.array(ZoomRoomSchema)
 
 export type ZoomRoom = z.infer<typeof ZoomRoomSchema>
 
+const PresentationSchema = z.object({
+	id: z.string(),
+	presenter: z.string(),
+	title: z.string(),
+	date: z.number().nullable(),
+	lastUpdated: z.number().nullable(),
+})
+
+const PresentationsListResponseSchema = z.object({
+	sessionStartMs: z.number(),
+	windowStartMs: z.number(),
+	windowEndMs: z.number(),
+	maxSignUps: z.number(),
+	presentations: z.array(PresentationSchema),
+})
+
+const PresentationsCreateInputSchema = z.object({
+	presenter: z.string().min(1),
+	title: z.string(),
+})
+
+const PresentationsUpdateInputSchema = z.object({
+	id: z.string().min(1),
+	presenter: z.string().min(1).optional(),
+	title: z.string().optional(),
+})
+
+const PresentationsDeleteInputSchema = z.object({
+	id: z.string().min(1),
+})
+
+export type Presentation = z.infer<typeof PresentationSchema>
+export type PresentationsListResponse = z.infer<
+	typeof PresentationsListResponseSchema
+>
+
 export const contract = oc.router({
 	health: oc.route({ method: "GET", path: "/health" }).output(
 		z.object({
@@ -154,6 +190,21 @@ export const contract = oc.router({
 	zoomRooms: oc
 		.route({ method: "GET", path: "/zoom-rooms" })
 		.output(ZoomRoomsResponseSchema),
+	presentationsList: oc
+		.route({ method: "GET", path: "/presentations" })
+		.output(PresentationsListResponseSchema),
+	presentationsCreate: oc
+		.route({ method: "POST", path: "/presentations" })
+		.input(PresentationsCreateInputSchema)
+		.output(PresentationSchema),
+	presentationsUpdate: oc
+		.route({ method: "PATCH", path: "/presentations/{id}" })
+		.input(PresentationsUpdateInputSchema)
+		.output(z.object({ success: z.boolean() })),
+	presentationsDelete: oc
+		.route({ method: "DELETE", path: "/presentations/{id}" })
+		.input(PresentationsDeleteInputSchema)
+		.output(z.object({ success: z.boolean() })),
 })
 
 export type Contract = typeof contract

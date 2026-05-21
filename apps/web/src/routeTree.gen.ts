@@ -13,6 +13,7 @@ import { Route as SupportRouteImport } from "./routes/support"
 import { Route as StudyFacesRouteImport } from "./routes/study-faces"
 import { Route as ProfileRouteImport } from "./routes/profile"
 import { Route as PrivacyRouteImport } from "./routes/privacy"
+import { Route as PresentationsRouteImport } from "./routes/presentations"
 import { Route as HubRouteImport } from "./routes/hub"
 import { Route as GdprRouteImport } from "./routes/gdpr"
 import { Route as DirectoryRouteImport } from "./routes/directory"
@@ -40,6 +41,11 @@ const ProfileRoute = ProfileRouteImport.update({
 const PrivacyRoute = PrivacyRouteImport.update({
   id: "/privacy",
   path: "/privacy",
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PresentationsRoute = PresentationsRouteImport.update({
+  id: "/presentations",
+  path: "/presentations",
   getParentRoute: () => rootRouteImport,
 } as any)
 const HubRoute = HubRouteImport.update({
@@ -88,6 +94,7 @@ export interface FileRoutesByFullPath {
   "/directory": typeof DirectoryRoute
   "/gdpr": typeof GdprRoute
   "/hub": typeof HubRoute
+  "/presentations": typeof PresentationsRoute
   "/privacy": typeof PrivacyRoute
   "/profile": typeof ProfileRoute
   "/study-faces": typeof StudyFacesRoute
@@ -101,6 +108,7 @@ export interface FileRoutesByTo {
   "/directory": typeof DirectoryRoute
   "/gdpr": typeof GdprRoute
   "/hub": typeof HubRoute
+  "/presentations": typeof PresentationsRoute
   "/privacy": typeof PrivacyRoute
   "/profile": typeof ProfileRoute
   "/study-faces": typeof StudyFacesRoute
@@ -116,6 +124,7 @@ export interface FileRoutesById {
   "/directory": typeof DirectoryRoute
   "/gdpr": typeof GdprRoute
   "/hub": typeof HubRoute
+  "/presentations": typeof PresentationsRoute
   "/privacy": typeof PrivacyRoute
   "/profile": typeof ProfileRoute
   "/study-faces": typeof StudyFacesRoute
@@ -131,6 +140,7 @@ export interface FileRouteTypes {
     | "/directory"
     | "/gdpr"
     | "/hub"
+    | "/presentations"
     | "/privacy"
     | "/profile"
     | "/study-faces"
@@ -144,6 +154,7 @@ export interface FileRouteTypes {
     | "/directory"
     | "/gdpr"
     | "/hub"
+    | "/presentations"
     | "/privacy"
     | "/profile"
     | "/study-faces"
@@ -158,6 +169,7 @@ export interface FileRouteTypes {
     | "/directory"
     | "/gdpr"
     | "/hub"
+    | "/presentations"
     | "/privacy"
     | "/profile"
     | "/study-faces"
@@ -173,6 +185,7 @@ export interface RootRouteChildren {
   DirectoryRoute: typeof DirectoryRoute
   GdprRoute: typeof GdprRoute
   HubRoute: typeof HubRoute
+  PresentationsRoute: typeof PresentationsRoute
   PrivacyRoute: typeof PrivacyRoute
   ProfileRoute: typeof ProfileRoute
   StudyFacesRoute: typeof StudyFacesRoute
@@ -208,6 +221,13 @@ declare module "@tanstack/react-router" {
       path: "/privacy"
       fullPath: "/privacy"
       preLoaderRoute: typeof PrivacyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    "/presentations": {
+      id: "/presentations"
+      path: "/presentations"
+      fullPath: "/presentations"
+      preLoaderRoute: typeof PresentationsRouteImport
       parentRoute: typeof rootRouteImport
     }
     "/hub": {
@@ -288,6 +308,7 @@ const rootRouteChildren: RootRouteChildren = {
   DirectoryRoute: DirectoryRoute,
   GdprRoute: GdprRoute,
   HubRoute: HubRoute,
+  PresentationsRoute: PresentationsRoute,
   PrivacyRoute: PrivacyRoute,
   ProfileRoute: ProfileRoute,
   StudyFacesRoute: StudyFacesRoute,

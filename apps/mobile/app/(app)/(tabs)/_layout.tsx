@@ -1,5 +1,5 @@
 import { Tabs } from "expo-router"
-import { House, Search, User, Users } from "lucide-react-native"
+import { House, Megaphone, Search, User, Users } from "lucide-react-native"
 import { useSafeAreaInsets } from "react-native-safe-area-context"
 
 export default function TabsLayout() {
@@ -37,6 +37,15 @@ export default function TabsLayout() {
 				options={{
 					title: "Hub",
 					tabBarIcon: ({ color, size }) => <Users size={size} color={color} />,
+				}}
+			/>
+			<Tabs.Screen
+				name="presentations"
+				options={{
+					title: "Talks",
+					tabBarIcon: ({ color, size }) => (
+						<Megaphone size={size} color={color} />
+					),
 				}}
 			/>
 			<Tabs.Screen

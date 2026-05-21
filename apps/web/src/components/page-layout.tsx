@@ -1,10 +1,11 @@
 import { Link, useMatches } from "@tanstack/react-router"
-import { House, Search, User, Users } from "lucide-react"
+import { House, Megaphone, Search, User, Users } from "lucide-react"
 import type { ReactNode } from "react"
 
 const navItems = [
 	{ to: "/", label: "Home" },
 	{ to: "/hub", label: "Hub" },
+	{ to: "/presentations", label: "Talks" },
 	{ to: "/directory", label: "Directory" },
 	{ to: "/profile", label: "Profile" },
 ] as const
@@ -41,6 +42,7 @@ function DesktopNav() {
 const mobileNavItems = [
 	{ to: "/", label: "Home", icon: House },
 	{ to: "/hub", label: "Hub", icon: Users },
+	{ to: "/presentations", label: "Talks", icon: Megaphone },
 	{ to: "/directory", label: "Directory", icon: Search },
 	{ to: "/profile", label: "Profile", icon: User },
 ] as const
