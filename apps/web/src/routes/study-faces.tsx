@@ -180,29 +180,23 @@ function StudyFacesPage() {
 	function pick(optionIndex: number) {
 		if (picked !== null || !card) return
 		setPicked(optionIndex)
-		if (optionIndex === card.correctIndex) setCorrect((n) => n + 1)
+		const isCorrect = optionIndex === card.correctIndex
+		if (isCorrect) setCorrect((n) => n + 1)
 		else setWrong((n) => n + 1)
-	}
-
-	function advance() {
-		setPicked(null)
-		setIndex((i) => i + 1)
+		const delay = isCorrect ? 600 : 1200
+		setTimeout(() => {
+			setPicked(null)
+			setIndex((i) => i + 1)
+		}, delay)
 	}
 
 	useEffect(() => {
 		function handler(e: KeyboardEvent) {
-			if (!card || done) return
-			if (picked === null) {
-				const n = Number.parseInt(e.key, 10)
-				if (n >= 1 && n <= OPTION_COUNT) {
-					e.preventDefault()
-					pick(n - 1)
-				}
-				return
-			}
-			if (e.key === "Enter" || e.key === " " || e.key === "ArrowRight") {
+			if (!card || done || picked !== null) return
+			const n = Number.parseInt(e.key, 10)
+			if (n >= 1 && n <= OPTION_COUNT) {
 				e.preventDefault()
-				advance()
+				pick(n - 1)
 			}
 		}
 		document.addEventListener("keydown", handler)
@@ -211,7 +205,7 @@ function StudyFacesPage() {
 
 	function optionClass(optionIndex: number): string {
 		const base =
-			"flex w-full cursor-pointer items-center justify-center rounded-xl px-4 py-3.5 text-base font-medium transition-colors"
+			"relative flex w-full cursor-pointer items-center justify-center rounded-xl px-4 py-3.5 text-base font-medium transition-colors"
 		if (picked === null) {
 			return `${base} border border-border bg-surface-inset text-foreground hover:bg-surface-inset/70`
 		}
@@ -309,20 +303,17 @@ function StudyFacesPage() {
 								disabled={picked !== null}
 								className={optionClass(i)}
 							>
+								<span className="absolute left-4 font-mono text-xs text-text-tertiary">
+									{i + 1}
+								</span>
 								{option}
 							</button>
 						))}
 					</div>
 
-					{picked !== null && (
-						<button
-							type="button"
-							onClick={advance}
-							className="flex w-full cursor-pointer items-center justify-center rounded-xl bg-cyan py-3.5 text-[15px] font-semibold text-background"
-						>
-							{index + 1 < deck.length ? "Next" : "See results"}
-						</button>
-					)}
+					<span className="text-center text-xs text-text-tertiary">
+						Tip: press 1–4 on your keyboard
+					</span>
 				</div>
 			)}
 
