@@ -224,13 +224,10 @@ function IntercomCard({
 				<Text className="text-base font-semibold">{label}</Text>
 				<View className="gap-0.5">
 					<Text className="text-xs text-text-secondary">
-						1. Approach the entrance
+						1. Call “Recurse Center – 4th floor” on the intercom
 					</Text>
 					<Text className="text-xs text-text-secondary">
-						2. Call “Recurse Center – 4th floor” on the intercom
-					</Text>
-					<Text className="text-xs text-text-secondary">
-						3. Pull the door open
+						3. Press and hold this button
 					</Text>
 				</View>
 			</View>
