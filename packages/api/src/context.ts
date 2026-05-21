@@ -12,6 +12,7 @@ import { contract } from "./contract"
 export interface BaseContext {
 	db: Database
 	securityComputer: Fetcher
+	doorbotToken: string | null
 	rcOAuth: { clientId: string; clientSecret: string } | null
 	user: {
 		id: string

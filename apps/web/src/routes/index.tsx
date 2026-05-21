@@ -35,6 +35,12 @@ function HomePage() {
 		onSettled: () => setPendingAction(null),
 	})
 
+	const openIntercom = useMutation({
+		...api.intercomOpen.mutationOptions({}),
+		onSuccess: () => setJustUnlocked({ entry: "intercom" }),
+		onSettled: () => setPendingAction(null),
+	})
+
 	return (
 		<PageLayout
 			subtitle="Welcome back,"
@@ -70,9 +76,13 @@ function HomePage() {
 			<DoorControls
 				onOpenDoor={(action) => {
 					setPendingAction(action)
-					openDoor.mutate(action)
+					if (action.entry === "intercom") {
+						openIntercom.mutate({})
+					} else {
+						openDoor.mutate(action)
+					}
 				}}
-				isPending={openDoor.isPending}
+				isPending={openDoor.isPending || openIntercom.isPending}
 				pendingAction={pendingAction}
 				justUnlockedAction={justUnlocked}
 				onUnlockEnd={() => setJustUnlocked(null)}

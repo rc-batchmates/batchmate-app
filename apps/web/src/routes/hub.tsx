@@ -118,7 +118,7 @@ function HubPage() {
 		const rest: typeof visitors = []
 		for (const v of visitors) {
 			const h = hourInNYT(v.checkedInAt)
-			if (h !== null && h < 7) {
+			if (h !== null && h < 5) {
 				overnight.push(v)
 				overnightSet.add(v.personId)
 			} else {

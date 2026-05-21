@@ -11,6 +11,10 @@ RC_BATCHMATE_CLIENT_ID=""
 RC_BATCHMATE_CLIENT_SECRET=""
 BASE_URL="http://localhost:8787"
 
+# Personal access token from recurse.com/settings/apps. Used to open the
+# main entrance via https://doorbot.recurse.com/api/sesame/intercom.
+DOORBOT_TOKEN=""
+
 # Used only by `pnpm scrape:zoom` to resolve recurse.com/zoom/<slug>
 # redirects. The chain hops through two auth domains, so paste the full
 # `Cookie:` header value from a logged-in request on each (DevTools →

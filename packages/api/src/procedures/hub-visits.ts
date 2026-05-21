@@ -6,6 +6,19 @@ import { server } from "../context"
 
 const PROFILE_CACHE_TTL_MS = 7 * 24 * 60 * 60 * 1000
 
+function hourInNYT(iso: string | null | undefined): number | null {
+	if (!iso) return null
+	const d = new Date(iso)
+	if (Number.isNaN(d.getTime())) return null
+	return Number(
+		new Intl.DateTimeFormat("en-US", {
+			timeZone: "America/New_York",
+			hour: "numeric",
+			hour12: false,
+		}).format(d),
+	)
+}
+
 export const hubVisits = server.hubVisits.handler(async ({ context }) => {
 	if (!context.user) {
 		throw new ORPCError("UNAUTHORIZED")
@@ -38,9 +51,23 @@ export const hubVisits = server.hubVisits.handler(async ({ context }) => {
 		})
 	}
 
-	const isCheckedIn = rcId
-		? data.some((visit) => visit.person.id === rcId)
-		: false
+	let isCheckedIn = false
+	if (rcId) {
+		const myVisits = data.filter((v) => v.person.id === rcId)
+		if (myVisits.length > 0) {
+			const latest = myVisits.reduce((a, b) =>
+				(a.created_at ?? "") > (b.created_at ?? "") ? a : b,
+			)
+			const checkInHour = hourInNYT(latest.created_at)
+			const nowHour = hourInNYT(new Date().toISOString())
+			const isStaleOvernight =
+				checkInHour !== null &&
+				checkInHour < 5 &&
+				nowHour !== null &&
+				nowHour >= 5
+			isCheckedIn = !isStaleOvernight
+		}
+	}
 
 	const uniqueIds = [...new Set(data.map((v) => v.person.id))]
 	const profiles = new Map<

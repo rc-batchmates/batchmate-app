@@ -1,5 +1,10 @@
 import * as Haptics from "expo-haptics"
-import { createLucideIcon, DoorOpen, Info } from "lucide-react-native"
+import {
+	Building2,
+	createLucideIcon,
+	DoorOpen,
+	Info,
+} from "lucide-react-native"
 import { useCallback, useEffect, useRef, useState } from "react"
 import { Animated, Platform, Pressable, View } from "react-native"
 import { Text } from "./text"
@@ -19,6 +24,7 @@ type Floor = "4" | "5"
 export type DoorAction =
 	| { entry: "stairs"; floor: Floor }
 	| { entry: "elevator"; floor: "all" }
+	| { entry: "intercom" }
 
 export interface DoorControlsProps {
 	onOpenDoor: (action: DoorAction) => void
@@ -31,7 +37,9 @@ export interface DoorControlsProps {
 }
 
 function isSameAction(a: DoorAction, b: DoorAction | null | undefined) {
-	return !!b && a.entry === b.entry && a.floor === b.floor
+	if (!b || a.entry !== b.entry) return false
+	if (a.entry === "intercom") return true
+	return a.floor === (b as Extract<DoorAction, { floor: unknown }>).floor
 }
 
 const webHoldGuards =
@@ -166,6 +174,73 @@ function useHoldGesture({
 	)
 
 	return { isHolding, onPressIn, onPressOut: cancel }
+}
+
+function IntercomCard({
+	onCommit,
+	isPending,
+	isThis,
+	isUnlocked,
+	unlockDurationMs,
+	holdDurationMs,
+}: {
+	onCommit: () => void
+	isPending?: boolean
+	isThis: boolean
+	isUnlocked: boolean
+	unlockDurationMs: number
+	holdDurationMs: number
+}) {
+	const { isHolding, onPressIn, onPressOut } = useHoldGesture({
+		holdDurationMs,
+		disabled: !!isPending,
+		onCommit,
+	})
+
+	const label =
+		isThis && isPending
+			? "Buzzing..."
+			: isHolding
+				? "Hold..."
+				: isUnlocked
+					? "Buzzed in"
+					: "Building entrance"
+
+	const phase: Phase = isHolding ? "holding" : isUnlocked ? "unlocked" : "idle"
+
+	return (
+		<Pressable
+			className="flex-row items-start gap-4 overflow-hidden rounded-xl bg-card p-5 select-none"
+			style={{ ...webHoldStyle }}
+			onPressIn={onPressIn}
+			onPressOut={onPressOut}
+			disabled={isPending}
+			{...webHoldGuards}
+		>
+			<View className="h-12 w-12 items-center justify-center rounded-[12px] bg-surface-inset">
+				<Building2 size={24} color="#22D3EE" />
+			</View>
+			<View className="flex-1 gap-1.5">
+				<Text className="text-base font-semibold">{label}</Text>
+				<View className="gap-0.5">
+					<Text className="text-xs text-text-secondary">
+						1. Approach the entrance
+					</Text>
+					<Text className="text-xs text-text-secondary">
+						2. Call “Recurse Center – 4th floor” on the intercom
+					</Text>
+					<Text className="text-xs text-text-secondary">
+						3. Pull the door open
+					</Text>
+				</View>
+			</View>
+			<ProgressBar
+				phase={phase}
+				holdDurationMs={holdDurationMs}
+				unlockDurationMs={unlockDurationMs}
+			/>
+		</Pressable>
+	)
 }
 
 function ElevatorCard({
@@ -305,6 +380,7 @@ function DoorControls({
 	holdDurationMs = 200,
 	onUnlockEnd,
 }: DoorControlsProps) {
+	const intercomAction: DoorAction = { entry: "intercom" }
 	const elevatorAction: DoorAction = { entry: "elevator", floor: "all" }
 	const stairs4Action: DoorAction = { entry: "stairs", floor: "4" }
 	const stairs5Action: DoorAction = { entry: "stairs", floor: "5" }
@@ -323,6 +399,14 @@ function DoorControls({
 					DOOR CONTROLS
 				</Text>
 			</View>
+			<IntercomCard
+				onCommit={() => onOpenDoor(intercomAction)}
+				isPending={isPending}
+				isThis={isSameAction(intercomAction, pendingAction)}
+				isUnlocked={isSameAction(intercomAction, justUnlockedAction)}
+				unlockDurationMs={unlockDurationMs}
+				holdDurationMs={holdDurationMs}
+			/>
 			<View className="flex-row gap-3">
 				<View className="flex-1 gap-3">
 					<StairsCard

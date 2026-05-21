@@ -115,6 +115,11 @@ export const contract = oc.router({
 				success: z.boolean(),
 			}),
 		),
+	intercomOpen: oc.route({ method: "POST", path: "/doors/intercom" }).output(
+		z.object({
+			success: z.boolean(),
+		}),
+	),
 	hubVisits: oc
 		.route({ method: "GET", path: "/hub" })
 		.output(HubResponseSchema),

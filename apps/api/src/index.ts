@@ -20,6 +20,7 @@ type Env = {
 		// minted there also uses these creds, so do not unset until Phase 3.
 		RC_BATCHMATE_CLIENT_ID: string
 		RC_BATCHMATE_CLIENT_SECRET: string
+		DOORBOT_TOKEN?: string
 		BASE_URL?: string
 	}
 }
@@ -141,6 +142,7 @@ app.use("/api/v1/*", async (c, next) => {
 		context: {
 			db,
 			securityComputer: c.env.SECURITY_COMPUTER,
+			doorbotToken: c.env.DOORBOT_TOKEN ?? null,
 			rcOAuth: rcCreds,
 			user: session?.user ?? null,
 			session: session?.session ?? null,
