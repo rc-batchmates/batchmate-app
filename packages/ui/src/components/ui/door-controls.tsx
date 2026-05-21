@@ -302,7 +302,7 @@ function DoorControls({
 	pendingAction,
 	justUnlockedAction,
 	unlockDurationMs = 5000,
-	holdDurationMs = 400,
+	holdDurationMs = 200,
 	onUnlockEnd,
 }: DoorControlsProps) {
 	const elevatorAction: DoorAction = { entry: "elevator", floor: "all" }
