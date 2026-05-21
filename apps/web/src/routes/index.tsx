@@ -1,7 +1,7 @@
 import { type DoorAction, DoorControls, ZoomLinks } from "@batchmate/ui"
 import { useMutation, useQuery } from "@tanstack/react-query"
 import { createFileRoute, Link, redirect } from "@tanstack/react-router"
-import { User } from "lucide-react"
+import { Sparkles, User } from "lucide-react"
 import { useState } from "react"
 import { PageLayout } from "@/components/page-layout"
 import { api } from "@/lib/api"
@@ -77,6 +77,25 @@ function HomePage() {
 				justUnlockedAction={justUnlocked}
 				onUnlockEnd={() => setJustUnlocked(null)}
 			/>
+
+			{/* Study faces */}
+			<Link
+				to="/study-faces"
+				className="flex items-center justify-between rounded-xl border border-cyan/20 bg-cyan/5 px-4 py-3 no-underline transition-colors hover:bg-cyan/10"
+			>
+				<div className="flex items-center gap-2.5">
+					<Sparkles size={18} color="#22D3EE" />
+					<div className="flex flex-col">
+						<span className="text-[15px] font-semibold text-cyan">
+							Study faces
+						</span>
+						<span className="text-xs text-text-tertiary">
+							Quiz yourself on faces and names
+						</span>
+					</div>
+				</div>
+				<span className="text-xs font-medium text-cyan">→</span>
+			</Link>
 
 			{/* Zoom Rooms */}
 			<ZoomLinks directUrls={zoomDirectUrls} />

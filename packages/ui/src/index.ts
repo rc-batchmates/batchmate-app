@@ -23,6 +23,11 @@ export { LoginForm, type LoginFormProps } from "./components/ui/login-form"
 export { SocialRow } from "./components/ui/social-row"
 export { Text, TextClassContext } from "./components/ui/text"
 export { ZoomLinks } from "./components/ui/zoom-links"
+export {
+	AVATAR_FACE_OBJECT_POSITION,
+	AVATAR_SIZE_PX,
+	type AvatarSize,
+} from "./lib/avatar-tokens"
 export { cn } from "./lib/cn"
 export { ROLES, SCOPES } from "./lib/directory-constants"
 export { getInitials, getSubtitle, stintTypeLabels } from "./lib/stint-labels"

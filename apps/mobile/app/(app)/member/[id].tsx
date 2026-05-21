@@ -9,14 +9,17 @@ import {
 	Linkedin,
 	Mail,
 	Twitter,
-	User,
 } from "lucide-react-native"
-import { Image, Pressable, ScrollView, View } from "react-native"
+import { useState } from "react"
+import { Pressable, ScrollView, View } from "react-native"
+import { Avatar } from "../../../src/components/avatar"
+import { PhotoPeek } from "../../../src/components/photo-peek"
 import { api } from "../../../src/lib/api"
 
 export default function MemberProfileScreen() {
 	const { id } = useLocalSearchParams<{ id: string }>()
 	const router = useRouter()
+	const [peeking, setPeeking] = useState(false)
 	const {
 		data: member,
 		isLoading,
@@ -59,16 +62,18 @@ export default function MemberProfileScreen() {
 
 			{/* Avatar */}
 			<View className="items-center gap-3">
-				<View className="h-24 w-24 items-center justify-center overflow-hidden rounded-full bg-card">
-					{member.imageUrl ? (
-						<Image
-							source={{ uri: member.imageUrl }}
-							className="h-full w-full"
-						/>
-					) : (
-						<User size={44} color="#22D3EE" />
-					)}
-				</View>
+				<Pressable
+					onPress={() => member.imageUrl && setPeeking(true)}
+					disabled={!member.imageUrl}
+					accessibilityLabel="View photo"
+				>
+					<Avatar
+						imageUrl={member.imageUrl}
+						name={member.name}
+						size="xl"
+						fallback="icon"
+					/>
+				</Pressable>
 				<Text className="text-[22px] font-semibold">{member.name}</Text>
 				{member.pronouns && (
 					<Text className="text-sm text-text-tertiary">{member.pronouns}</Text>
@@ -152,6 +157,13 @@ export default function MemberProfileScreen() {
 					/>
 				</View>
 			</View>
+			<PhotoPeek
+				visible={peeking}
+				onClose={() => setPeeking(false)}
+				name={member.name}
+				imageUrl={member.imageUrl}
+				batch={member.batch}
+			/>
 		</ScrollView>
 	)
 }

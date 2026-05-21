@@ -9,9 +9,11 @@ import {
 	Linkedin,
 	Mail,
 	Twitter,
-	User,
 } from "lucide-react"
+import { useState } from "react"
+import { Avatar } from "@/components/avatar"
 import { PageLayout } from "@/components/page-layout"
+import { PhotoPeek } from "@/components/photo-peek"
 import { api } from "@/lib/api"
 import { authClient } from "@/lib/auth"
 
@@ -28,6 +30,7 @@ export const Route = createFileRoute("/member/$id")({
 function MemberProfilePage() {
 	const router = useRouter()
 	const { id } = Route.useParams()
+	const [peeking, setPeeking] = useState(false)
 	const {
 		data: member,
 		isLoading,
@@ -66,17 +69,28 @@ function MemberProfilePage() {
 		>
 			{/* Avatar */}
 			<div className="flex flex-col items-center gap-3">
-				<div className="flex h-24 w-24 items-center justify-center overflow-hidden rounded-full bg-card">
-					{member.imageUrl ? (
-						<img
-							src={member.imageUrl}
-							alt=""
-							className="h-full w-full object-cover"
+				{member.imageUrl ? (
+					<button
+						type="button"
+						onClick={() => setPeeking(true)}
+						className="cursor-zoom-in border-0 bg-transparent p-0"
+						aria-label="View photo"
+					>
+						<Avatar
+							imageUrl={member.imageUrl}
+							name={member.name}
+							size="xl"
+							fallback="icon"
 						/>
-					) : (
-						<User size={44} color="#22D3EE" />
-					)}
-				</div>
+					</button>
+				) : (
+					<Avatar
+						imageUrl={member.imageUrl}
+						name={member.name}
+						size="xl"
+						fallback="icon"
+					/>
+				)}
 				<span className="text-[22px] font-semibold text-foreground">
 					{member.name}
 				</span>
@@ -165,6 +179,13 @@ function MemberProfilePage() {
 					</div>
 				</div>
 			</div>
+			<PhotoPeek
+				open={peeking}
+				onClose={() => setPeeking(false)}
+				name={member.name}
+				imageUrl={member.imageUrl}
+				batch={member.batch}
+			/>
 		</PageLayout>
 	)
 }

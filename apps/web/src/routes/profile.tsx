@@ -8,8 +8,8 @@ import {
 	LogOut,
 	Mail,
 	Twitter,
-	User,
 } from "lucide-react"
+import { Avatar } from "@/components/avatar"
 import { PageLayout } from "@/components/page-layout"
 import { authClient, signOut, useSession } from "@/lib/auth"
 
@@ -60,17 +60,12 @@ function ProfilePage() {
 		>
 			{/* Avatar */}
 			<div className="flex flex-col items-center gap-3">
-				<div className="flex h-24 w-24 items-center justify-center overflow-hidden rounded-full bg-card">
-					{user?.image ? (
-						<img
-							src={user.image}
-							alt=""
-							className="h-full w-full object-cover"
-						/>
-					) : (
-						<User size={44} color="#22D3EE" />
-					)}
-				</div>
+				<Avatar
+					imageUrl={user?.image ?? null}
+					name={user?.name ?? ""}
+					size="lg"
+					fallback="icon"
+				/>
 				<span className="text-[22px] font-semibold text-foreground">
 					{user?.name}
 				</span>

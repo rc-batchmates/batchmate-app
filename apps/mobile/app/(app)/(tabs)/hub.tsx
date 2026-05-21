@@ -13,8 +13,11 @@ import { Alert, Pressable, ScrollView, View } from "react-native"
 import { DropdownList } from "../../../src/components/dropdown-list"
 import { FilterChip } from "../../../src/components/filter-chip"
 import { PersonCard } from "../../../src/components/person-card"
+import { PersonGridCard } from "../../../src/components/person-grid-card"
 import { ScopeChip } from "../../../src/components/scope-chip"
+import { ViewToggle } from "../../../src/components/view-toggle"
 import { api } from "../../../src/lib/api"
+import { useStoredView } from "../../../src/lib/use-stored-view"
 
 type SortKey = "firstName" | "lastName" | "checkInTime"
 
@@ -92,6 +95,7 @@ export default function HubScreen() {
 	const [sortKey, setSortKey] = useState<SortKey>("firstName")
 	const [showOvernight, setShowOvernight] = useState(false)
 	const [sortOpen, setSortOpen] = useState(false)
+	const [view, setView] = useStoredView("hub")
 
 	const { mainList, overnightCount, overnightIds } = useMemo(() => {
 		if (!visitors) {
@@ -218,6 +222,7 @@ export default function HubScreen() {
 								onPress={() => setShowOvernight((s) => !s)}
 							/>
 						)}
+						<ViewToggle view={view} onSetView={setView} />
 					</View>
 					{sortOpen && (
 						<DropdownList
@@ -236,6 +241,26 @@ export default function HubScreen() {
 							<Text className="text-sm text-text-tertiary">
 								Only overnight check-ins so far
 							</Text>
+						</View>
+					) : view === "grid" ? (
+						<View className="flex-row flex-wrap -mx-1">
+							{mainList.map((visit) => (
+								<View
+									key={visit.personId}
+									className="w-1/2 px-1 pb-2"
+								>
+									<PersonGridCard
+										name={visit.name}
+										imageUrl={visit.imageUrl}
+										batch={visit.batch}
+										stintType={visit.stintType}
+										badge={
+											overnightIds.has(visit.personId) ? <OvernightBadge /> : null
+										}
+										onPress={() => router.push(`/(app)/member/${visit.personId}`)}
+									/>
+								</View>
+							))}
 						</View>
 					) : (
 						<View className="gap-2.5">

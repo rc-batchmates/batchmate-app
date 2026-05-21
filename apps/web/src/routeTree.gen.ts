@@ -10,6 +10,7 @@
 
 import { Route as rootRouteImport } from "./routes/__root"
 import { Route as SupportRouteImport } from "./routes/support"
+import { Route as StudyFacesRouteImport } from "./routes/study-faces"
 import { Route as ProfileRouteImport } from "./routes/profile"
 import { Route as PrivacyRouteImport } from "./routes/privacy"
 import { Route as HubRouteImport } from "./routes/hub"
@@ -24,6 +25,11 @@ import { Route as AuthLoginRouteImport } from "./routes/_auth/login"
 const SupportRoute = SupportRouteImport.update({
   id: "/support",
   path: "/support",
+  getParentRoute: () => rootRouteImport,
+} as any)
+const StudyFacesRoute = StudyFacesRouteImport.update({
+  id: "/study-faces",
+  path: "/study-faces",
   getParentRoute: () => rootRouteImport,
 } as any)
 const ProfileRoute = ProfileRouteImport.update({
@@ -84,6 +90,7 @@ export interface FileRoutesByFullPath {
   "/hub": typeof HubRoute
   "/privacy": typeof PrivacyRoute
   "/profile": typeof ProfileRoute
+  "/study-faces": typeof StudyFacesRoute
   "/support": typeof SupportRoute
   "/login": typeof AuthLoginRoute
   "/member/$id": typeof MemberIdRoute
@@ -96,6 +103,7 @@ export interface FileRoutesByTo {
   "/hub": typeof HubRoute
   "/privacy": typeof PrivacyRoute
   "/profile": typeof ProfileRoute
+  "/study-faces": typeof StudyFacesRoute
   "/support": typeof SupportRoute
   "/login": typeof AuthLoginRoute
   "/member/$id": typeof MemberIdRoute
@@ -110,6 +118,7 @@ export interface FileRoutesById {
   "/hub": typeof HubRoute
   "/privacy": typeof PrivacyRoute
   "/profile": typeof ProfileRoute
+  "/study-faces": typeof StudyFacesRoute
   "/support": typeof SupportRoute
   "/_auth/login": typeof AuthLoginRoute
   "/member/$id": typeof MemberIdRoute
@@ -124,6 +133,7 @@ export interface FileRouteTypes {
     | "/hub"
     | "/privacy"
     | "/profile"
+    | "/study-faces"
     | "/support"
     | "/login"
     | "/member/$id"
@@ -136,6 +146,7 @@ export interface FileRouteTypes {
     | "/hub"
     | "/privacy"
     | "/profile"
+    | "/study-faces"
     | "/support"
     | "/login"
     | "/member/$id"
@@ -149,6 +160,7 @@ export interface FileRouteTypes {
     | "/hub"
     | "/privacy"
     | "/profile"
+    | "/study-faces"
     | "/support"
     | "/_auth/login"
     | "/member/$id"
@@ -163,6 +175,7 @@ export interface RootRouteChildren {
   HubRoute: typeof HubRoute
   PrivacyRoute: typeof PrivacyRoute
   ProfileRoute: typeof ProfileRoute
+  StudyFacesRoute: typeof StudyFacesRoute
   SupportRoute: typeof SupportRoute
   MemberIdRoute: typeof MemberIdRoute
 }
@@ -174,6 +187,13 @@ declare module "@tanstack/react-router" {
       path: "/support"
       fullPath: "/support"
       preLoaderRoute: typeof SupportRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    "/study-faces": {
+      id: "/study-faces"
+      path: "/study-faces"
+      fullPath: "/study-faces"
+      preLoaderRoute: typeof StudyFacesRouteImport
       parentRoute: typeof rootRouteImport
     }
     "/profile": {
@@ -270,6 +290,7 @@ const rootRouteChildren: RootRouteChildren = {
   HubRoute: HubRoute,
   PrivacyRoute: PrivacyRoute,
   ProfileRoute: ProfileRoute,
+  StudyFacesRoute: StudyFacesRoute,
   SupportRoute: SupportRoute,
   MemberIdRoute: MemberIdRoute,
 }

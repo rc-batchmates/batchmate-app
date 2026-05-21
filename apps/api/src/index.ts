@@ -102,13 +102,19 @@ app.get("/api/v1/docs", (c) => {
 </html>`)
 })
 
+function resolveBaseUrl(env: Env["Bindings"], reqUrlStr: string): URL {
+	if (env.BASE_URL) return new URL(env.BASE_URL)
+	const reqUrl = new URL(reqUrlStr)
+	return new URL(`${reqUrl.protocol}//${reqUrl.host}`)
+}
+
 app.on(["GET", "POST"], "/api/v1/auth/**", async (c) => {
 	const db = createDb(c.env.DB)
-	const reqUrl = new URL(c.req.url)
-	const rcCreds = rcOAuthCredsForHost(c.env, reqUrl.hostname)
+	const baseUrl = resolveBaseUrl(c.env, c.req.url)
+	const rcCreds = rcOAuthCredsForHost(c.env, baseUrl.hostname)
 	const auth = createAuth(db, {
 		...c.env,
-		BASE_URL: `${reqUrl.protocol}//${reqUrl.host}`,
+		BASE_URL: baseUrl.origin,
 		RC_CLIENT_ID: rcCreds.clientId,
 		RC_CLIENT_SECRET: rcCreds.clientSecret,
 	})
@@ -117,11 +123,11 @@ app.on(["GET", "POST"], "/api/v1/auth/**", async (c) => {
 
 app.use("/api/v1/*", async (c, next) => {
 	const db = createDb(c.env.DB)
-	const reqUrl = new URL(c.req.url)
-	const rcCreds = rcOAuthCredsForHost(c.env, reqUrl.hostname)
+	const baseUrl = resolveBaseUrl(c.env, c.req.url)
+	const rcCreds = rcOAuthCredsForHost(c.env, baseUrl.hostname)
 	const auth = createAuth(db, {
 		...c.env,
-		BASE_URL: `${reqUrl.protocol}//${reqUrl.host}`,
+		BASE_URL: baseUrl.origin,
 		RC_CLIENT_ID: rcCreds.clientId,
 		RC_CLIENT_SECRET: rcCreds.clientSecret,
 	})

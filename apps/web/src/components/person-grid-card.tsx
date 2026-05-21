@@ -1,10 +1,9 @@
 import { getSubtitle } from "@batchmate/ui"
 import { Link } from "@tanstack/react-router"
-import { ChevronRight } from "lucide-react"
 import type { ReactNode } from "react"
 import { Avatar } from "./avatar"
 
-export function PersonCard({
+export function PersonGridCard({
 	personId,
 	name,
 	imageUrl,
@@ -23,17 +22,18 @@ export function PersonCard({
 		<Link
 			to="/member/$id"
 			params={{ id: String(personId) }}
-			className="flex items-center gap-3.5 rounded-xl bg-card px-4 py-3 no-underline transition-colors hover:bg-card/80"
+			className="flex flex-col items-center gap-2.5 rounded-2xl bg-card p-3 no-underline transition-colors hover:bg-card/80"
 		>
-			<Avatar imageUrl={imageUrl} name={name} size="md" />
-			<div className="flex min-w-0 flex-1 flex-col gap-1">
-				<span className="text-[15px] font-medium text-foreground">{name}</span>
-				<span className="text-xs text-text-tertiary">
+			<Avatar imageUrl={imageUrl} name={name} size="xl" />
+			<div className="flex w-full flex-col items-center gap-1">
+				<span className="line-clamp-1 text-center text-sm font-medium text-foreground">
+					{name}
+				</span>
+				<span className="line-clamp-1 text-center text-[11px] text-text-tertiary">
 					{getSubtitle(batch, stintType ?? null)}
 				</span>
+				{badge}
 			</div>
-			{badge}
-			<ChevronRight size={20} color="#475569" />
 		</Link>
 	)
 }

@@ -1,7 +1,7 @@
 import { type DoorAction, DoorControls, Text, ZoomLinks } from "@batchmate/ui"
 import { useMutation, useQuery } from "@tanstack/react-query"
 import { useRouter } from "expo-router"
-import { User } from "lucide-react-native"
+import { Sparkles, User } from "lucide-react-native"
 import { useState } from "react"
 import { Image, Pressable, ScrollView, View } from "react-native"
 import { api } from "../../../src/lib/api"
@@ -75,6 +75,25 @@ export default function HomeScreen() {
 				justUnlockedAction={justUnlocked}
 				onUnlockEnd={() => setJustUnlocked(null)}
 			/>
+
+			{/* Study faces */}
+			<Pressable
+				className="flex-row items-center justify-between rounded-xl border border-cyan/20 bg-cyan/5 px-4 py-3"
+				onPress={() => router.push("/(app)/study-faces")}
+			>
+				<View className="flex-row items-center gap-2.5">
+					<Sparkles size={18} color="#22D3EE" />
+					<View>
+						<Text className="text-[15px] font-semibold text-primary">
+							Study faces
+						</Text>
+						<Text className="text-xs text-text-tertiary">
+							Quiz yourself on faces and names
+						</Text>
+					</View>
+				</View>
+				<Text className="text-xs font-medium text-primary">→</Text>
+			</Pressable>
 
 			{/* Zoom Rooms */}
 			<ZoomLinks directUrls={zoomDirectUrls} />

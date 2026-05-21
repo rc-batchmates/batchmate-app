@@ -12,9 +12,12 @@ import { z } from "zod"
 import { FilterDropdown } from "@/components/filter-dropdown"
 import { PageLayout } from "@/components/page-layout"
 import { PersonCard } from "@/components/person-card"
+import { PersonGridCard } from "@/components/person-grid-card"
 import { ScopeChip } from "@/components/scope-chip"
+import { ViewToggle } from "@/components/view-toggle"
 import { api } from "@/lib/api"
 import { authClient, useSession } from "@/lib/auth"
+import { useStoredView } from "@/lib/use-stored-view"
 
 const PAGE_SIZE = 50
 const SEARCH_DEBOUNCE_MS = 300
@@ -53,6 +56,7 @@ function DirectoryPage() {
 		"batch" | "role" | "location" | null
 	>(null)
 	const [searchInput, setSearchInput] = useState(query ?? "")
+	const [view, setView] = useStoredView("directory")
 	const debounceRef = useRef<ReturnType<typeof setTimeout>>(null)
 
 	// Sync local input when URL query changes externally (e.g. back/forward)
@@ -251,7 +255,7 @@ function DirectoryPage() {
 				)}
 			</div>
 
-			{/* Scope chips */}
+			{/* Scope chips + view toggle */}
 			<div className="flex items-center gap-2">
 				{SCOPES.map((s) => (
 					<ScopeChip
@@ -265,6 +269,7 @@ function DirectoryPage() {
 						}
 					/>
 				))}
+				<ViewToggle view={view} onSetView={setView} />
 			</div>
 
 			{/* People list */}
@@ -281,20 +286,34 @@ function DirectoryPage() {
 				</div>
 			)}
 
-			{people.length > 0 && (
-				<div className="flex flex-col gap-2.5 md:grid md:grid-cols-2 md:gap-3">
-					{people.map((person) => (
-						<PersonCard
-							key={person.id}
-							personId={person.id}
-							name={person.name}
-							imageUrl={person.imageUrl}
-							batch={person.batch}
-							stintType={person.stintType}
-						/>
-					))}
-				</div>
-			)}
+			{people.length > 0 &&
+				(view === "grid" ? (
+					<div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
+						{people.map((person) => (
+							<PersonGridCard
+								key={person.id}
+								personId={person.id}
+								name={person.name}
+								imageUrl={person.imageUrl}
+								batch={person.batch}
+								stintType={person.stintType}
+							/>
+						))}
+					</div>
+				) : (
+					<div className="flex flex-col gap-2.5 md:grid md:grid-cols-2 md:gap-3">
+						{people.map((person) => (
+							<PersonCard
+								key={person.id}
+								personId={person.id}
+								name={person.name}
+								imageUrl={person.imageUrl}
+								batch={person.batch}
+								stintType={person.stintType}
+							/>
+						))}
+					</div>
+				))}
 			{isFetchingNextPage && (
 				<div className="flex items-center justify-center py-4">
 					<span className="text-sm text-text-tertiary">Loading...</span>

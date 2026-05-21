@@ -8,9 +8,9 @@ import {
 	LogOut,
 	Mail,
 	Twitter,
-	User,
 } from "lucide-react-native"
-import { Image, Pressable, ScrollView, View } from "react-native"
+import { Pressable, ScrollView, View } from "react-native"
+import { Avatar } from "../../../src/components/avatar"
 import { signOut, useSession } from "../../../src/lib/auth"
 
 export default function ProfileScreen() {
@@ -50,13 +50,12 @@ export default function ProfileScreen() {
 
 			{/* Avatar */}
 			<View className="items-center gap-3">
-				<View className="h-24 w-24 items-center justify-center overflow-hidden rounded-full bg-card">
-					{user?.image ? (
-						<Image source={{ uri: user.image }} className="h-full w-full" />
-					) : (
-						<User size={44} color="#22D3EE" />
-					)}
-				</View>
+				<Avatar
+					imageUrl={user?.image ?? null}
+					name={user?.name ?? ""}
+					size="lg"
+					fallback="icon"
+				/>
 				<Text className="text-[22px] font-semibold">{user?.name}</Text>
 				<View className="flex-row items-center gap-1.5">
 					<View className="h-2 w-2 rounded-full bg-cyan" />

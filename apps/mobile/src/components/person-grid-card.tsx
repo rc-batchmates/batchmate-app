@@ -1,10 +1,9 @@
 import { getSubtitle, Text } from "@batchmate/ui"
-import { ChevronRight } from "lucide-react-native"
 import type { ReactNode } from "react"
 import { Pressable, View } from "react-native"
 import { Avatar } from "./avatar"
 
-export function PersonCard({
+export function PersonGridCard({
 	name,
 	imageUrl,
 	batch,
@@ -21,18 +20,22 @@ export function PersonCard({
 }) {
 	return (
 		<Pressable
-			className="flex-row items-center gap-3.5 rounded-xl bg-card px-4 py-3"
+			className="items-center gap-2.5 rounded-2xl bg-card p-3"
 			onPress={onPress}
 		>
-			<Avatar imageUrl={imageUrl} name={name} size="md" />
-			<View className="flex-1 gap-1">
-				<Text className="text-[15px] font-medium">{name}</Text>
-				<Text className="text-xs text-text-tertiary">
+			<Avatar imageUrl={imageUrl} name={name} size="xl" />
+			<View className="w-full items-center gap-1">
+				<Text className="text-center text-sm font-medium" numberOfLines={1}>
+					{name}
+				</Text>
+				<Text
+					className="text-center text-[11px] text-text-tertiary"
+					numberOfLines={1}
+				>
 					{getSubtitle(batch, stintType ?? null)}
 				</Text>
+				{badge}
 			</View>
-			{badge}
-			<ChevronRight size={20} color="#475569" />
 		</Pressable>
 	)
 }

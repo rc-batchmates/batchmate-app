@@ -7,8 +7,11 @@ import { FlatList, TextInput, View } from "react-native"
 import { DropdownList } from "../../../src/components/dropdown-list"
 import { FilterChip } from "../../../src/components/filter-chip"
 import { PersonCard } from "../../../src/components/person-card"
+import { PersonGridCard } from "../../../src/components/person-grid-card"
 import { ScopeChip } from "../../../src/components/scope-chip"
+import { ViewToggle } from "../../../src/components/view-toggle"
 import { api } from "../../../src/lib/api"
+import { useStoredView } from "../../../src/lib/use-stored-view"
 
 const PAGE_SIZE = 50
 const SEARCH_DEBOUNCE_MS = 300
@@ -38,6 +41,8 @@ function DirectoryHeader({
 	batchesLoading,
 	locations,
 	locationsLoading,
+	view,
+	onSetView,
 }: {
 	query: string
 	onSearchChange: (value: string) => void
@@ -60,6 +65,8 @@ function DirectoryHeader({
 	batchesLoading: boolean
 	locations: { id: number; name: string }[]
 	locationsLoading: boolean
+	view: "grid" | "list"
+	onSetView: (v: "grid" | "list") => void
 }) {
 	return (
 		<View className="gap-5 pb-2">
@@ -140,7 +147,7 @@ function DirectoryHeader({
 				/>
 			)}
 
-			<View className="flex-row gap-2">
+			<View className="flex-row items-center gap-2">
 				{SCOPES.map((s) => (
 					<ScopeChip
 						key={s.value}
@@ -149,6 +156,7 @@ function DirectoryHeader({
 						onPress={() => onSetScope(scope === s.value ? undefined : s.value)}
 					/>
 				))}
+				<ViewToggle view={view} onSetView={onSetView} />
 			</View>
 		</View>
 	)
@@ -169,6 +177,7 @@ export default function DirectoryScreen() {
 	const [openDropdown, setOpenDropdown] = useState<
 		"batch" | "role" | "location" | null
 	>(null)
+	const [view, setView] = useStoredView("directory")
 	const debounceRef = useRef<ReturnType<typeof setTimeout>>(null)
 
 	function handleSearchInput(value: string) {
@@ -229,11 +238,14 @@ export default function DirectoryScreen() {
 
 	return (
 		<FlatList
+			key={view}
 			className="flex-1 bg-background"
 			contentContainerClassName="px-6 py-4"
 			data={people}
 			keyExtractor={(item) => String(item.id)}
 			keyboardShouldPersistTaps="handled"
+			numColumns={view === "grid" ? 2 : 1}
+			columnWrapperClassName={view === "grid" ? "gap-2" : undefined}
 			ListHeaderComponent={
 				<DirectoryHeader
 					query={query}
@@ -274,19 +286,33 @@ export default function DirectoryScreen() {
 					batchesLoading={batchesLoading}
 					locations={locations ?? []}
 					locationsLoading={locationsLoading}
+					view={view}
+					onSetView={setView}
 				/>
 			}
-			renderItem={({ item }) => (
-				<View className="pb-2.5">
-					<PersonCard
-						name={item.name}
-						imageUrl={item.imageUrl}
-						batch={item.batch}
-						stintType={item.stintType}
-						onPress={() => router.push(`/(app)/member/${item.id}`)}
-					/>
-				</View>
-			)}
+			renderItem={({ item }) =>
+				view === "grid" ? (
+					<View className="flex-1 pb-2">
+						<PersonGridCard
+							name={item.name}
+							imageUrl={item.imageUrl}
+							batch={item.batch}
+							stintType={item.stintType}
+							onPress={() => router.push(`/(app)/member/${item.id}`)}
+						/>
+					</View>
+				) : (
+					<View className="pb-2.5">
+						<PersonCard
+							name={item.name}
+							imageUrl={item.imageUrl}
+							batch={item.batch}
+							stintType={item.stintType}
+							onPress={() => router.push(`/(app)/member/${item.id}`)}
+						/>
+					</View>
+				)
+			}
 			ListEmptyComponent={
 				isLoading ? (
 					<View className="items-center py-20">

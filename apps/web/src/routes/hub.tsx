@@ -12,9 +12,12 @@ import { useMemo, useState } from "react"
 import { FilterDropdown } from "@/components/filter-dropdown"
 import { PageLayout } from "@/components/page-layout"
 import { PersonCard } from "@/components/person-card"
+import { PersonGridCard } from "@/components/person-grid-card"
 import { ScopeChip } from "@/components/scope-chip"
+import { ViewToggle } from "@/components/view-toggle"
 import { api } from "@/lib/api"
 import { authClient, useSession } from "@/lib/auth"
+import { useStoredView } from "@/lib/use-stored-view"
 
 type SortKey = "firstName" | "lastName" | "checkInTime"
 
@@ -100,6 +103,7 @@ function HubPage() {
 	const [sortKey, setSortKey] = useState<SortKey>("firstName")
 	const [showOvernight, setShowOvernight] = useState(false)
 	const [sortOpen, setSortOpen] = useState(false)
+	const [view, setView] = useStoredView("hub")
 
 	const { mainList, overnightCount, overnightIds } = useMemo(() => {
 		if (!visitors) {
@@ -249,6 +253,7 @@ function HubPage() {
 								onClick={() => setShowOvernight((s) => !s)}
 							/>
 						)}
+						<ViewToggle view={view} onSetView={setView} />
 					</div>
 					{mainList.length === 0 ? (
 						<div className="flex flex-1 flex-col items-center justify-center gap-3">
@@ -256,6 +261,22 @@ function HubPage() {
 							<span className="text-sm text-text-tertiary">
 								Only overnight check-ins so far
 							</span>
+						</div>
+					) : view === "grid" ? (
+						<div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
+							{mainList.map((visit) => (
+								<PersonGridCard
+									key={visit.personId}
+									personId={visit.personId}
+									name={visit.name}
+									imageUrl={visit.imageUrl}
+									batch={visit.batch}
+									stintType={visit.stintType}
+									badge={
+										overnightIds.has(visit.personId) ? <OvernightBadge /> : null
+									}
+								/>
+							))}
 						</div>
 					) : (
 						<div className="flex flex-col gap-2.5 md:grid md:grid-cols-2 md:gap-3">
