@@ -20,6 +20,7 @@
 		"react-native-css": "^3.0.6",
 		"react-native-web": "^0.21.0",
 		"tailwindcss": "^4.2.1",
+		"ts-fsrs": "^5.4.0",
 		"zod": "^3.25.76"
 	},
 	"devDependencies": {

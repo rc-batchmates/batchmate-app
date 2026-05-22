@@ -226,6 +226,9 @@ importers:
       tailwindcss:
         specifier: ^4.2.1
         version: 4.2.2
+      ts-fsrs:
+        specifier: ^5.4.0
+        version: 5.4.0
       zod:
         specifier: ^3.25.76
         version: 3.25.76
@@ -6411,6 +6414,10 @@ packages:
   tr46@0.0.3:
     resolution: {integrity: sha512-N3WMsuqV66lT30CrXNbEjx4GEwlow3v6rr4mCcv6prnfwhS01rkgyFdjPNBYd9br7LpXV1+Emh01fHnq2Gdgrw==}
 
+  ts-fsrs@5.4.0:
+    resolution: {integrity: sha512-Gjr6vcUSdqOvrV6M9t/idbBlRAFsvpjUuVWrVwzV8fTMJzOc0FDCt9UfqGMBmYNUx8pnRRM8JaOtd/odvKFiOA==}
+    engines: {node: '>=20.0.0'}
+
   ts-interface-checker@0.1.13:
     resolution: {integrity: sha512-Y/arvbn+rrz3JCKl9C4kVNfTfSm2/mEp5FSz5EsZSANGPSlQrpRI5M4PKF+mJnE52jOO90PnPSc3Ur3bTQw0gA==}
 
@@ -7597,7 +7604,7 @@ snapshots:
       '@opentelemetry/api': 1.9.1
       '@opentelemetry/semantic-conventions': 1.40.0
       '@standard-schema/spec': 1.1.0
-      better-call: 1.3.2(zod@4.3.6)
+      better-call: 1.3.2(zod@3.25.76)
       jose: 6.2.2
       kysely: 0.28.14
       nanostores: 1.2.0
@@ -9957,7 +9964,7 @@ snapshots:
       '@better-fetch/fetch': 1.1.21
       '@noble/ciphers': 2.1.1
       '@noble/hashes': 2.0.1
-      better-call: 1.3.2(zod@4.3.6)
+      better-call: 1.3.2(zod@3.25.76)
       defu: 6.1.4
       jose: 6.2.2
       kysely: 0.28.14
@@ -9983,6 +9990,15 @@ snapshots:
       set-cookie-parser: 2.7.2
     optionalDependencies:
       zod: 4.3.6
+
+  better-call@1.3.2(zod@3.25.76):
+    dependencies:
+      '@better-auth/utils': 0.3.1
+      '@better-fetch/fetch': 1.1.21
+      rou3: 0.7.12
+      set-cookie-parser: 3.1.0
+    optionalDependencies:
+      zod: 3.25.76
 
   better-call@1.3.2(zod@4.3.6):
     dependencies:
@@ -13229,6 +13245,8 @@ snapshots:
       tldts: 7.0.27
 
   tr46@0.0.3: {}
+
+  ts-fsrs@5.4.0: {}
 
   ts-interface-checker@0.1.13: {}
 
