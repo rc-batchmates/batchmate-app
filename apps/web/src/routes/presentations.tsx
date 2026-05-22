@@ -1,6 +1,7 @@
 import { type PresentationItem, PresentationsList } from "@batchmate/ui"
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
-import { createFileRoute, redirect } from "@tanstack/react-router"
+import { createFileRoute, Link, redirect } from "@tanstack/react-router"
+import { User } from "lucide-react"
 import { PageLayout } from "@/components/page-layout"
 import { api } from "@/lib/api"
 import { authClient, useSession } from "@/lib/auth"
@@ -48,7 +49,27 @@ function PresentationsPage() {
 	}
 
 	return (
-		<PageLayout subtitle="This week" title="Presentations" className="gap-6">
+		<PageLayout
+			subtitle="This week"
+			title="Presentations"
+			className="gap-6"
+			headerRight={
+				<Link
+					to="/profile"
+					className="flex h-11 w-11 items-center justify-center overflow-hidden rounded-full bg-card"
+				>
+					{session?.user?.image ? (
+						<img
+							src={session.user.image}
+							alt=""
+							className="h-full w-full object-cover"
+						/>
+					) : (
+						<User size={22} color="#22D3EE" />
+					)}
+				</Link>
+			}
+		>
 			<PresentationsList
 				sessionStartMs={presentationsQuery.data?.sessionStartMs ?? null}
 				presentations={presentationsQuery.data?.presentations ?? []}
