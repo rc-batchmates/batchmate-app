@@ -8,9 +8,11 @@
 		"./theme.css": "./src/theme.css"
 	},
 	"dependencies": {
+		"@batchmate/api-client": "workspace:*",
 		"@rn-primitives/label": "^1.2.0",
 		"@rn-primitives/slot": "^1.2.0",
 		"@rn-primitives/types": "^1.2.0",
+		"@tanstack/react-query": "^5.80.7",
 		"class-variance-authority": "^0.7.1",
 		"clsx": "^2.1.1",
 		"expo-clipboard": "~8.0.8",
@@ -21,7 +23,8 @@
 		"react-native-css": "^3.0.6",
 		"react-native-web": "^0.21.0",
 		"tailwind-merge": "^3.5.0",
-		"tailwindcss": "^4.2.1"
+		"tailwindcss": "^4.2.1",
+		"ts-fsrs": "^5.4.0"
 	},
 	"devDependencies": {
 		"@types/react": "^19.2.7",

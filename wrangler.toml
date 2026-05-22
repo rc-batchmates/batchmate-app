@@ -8,10 +8,6 @@ compatibility_flags = ["nodejs_compat"]
 VIRTUAL_CARD_SITE_CODE = "999"
 VIRTUAL_CARD_PREFIX = "99900000000"
 
-[dev]
-ip = "0.0.0.0"
-port = 8787
-
 [[routes]]
 pattern = "batchmate.app"
 custom_domain = true
