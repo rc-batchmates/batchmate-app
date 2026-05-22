@@ -89,110 +89,31 @@ export async function deletePresentation(id: string): Promise<void> {
 	}
 }
 
-// Presentations are on Thursdays at 4:00 PM ET. The sign-up cutoff is
-// Thursday 5:30 PM ET in NY local time (DST-aware) — same instant for both
-// the window's right edge and the flip to next week's session, so there is
-// no seam where new sign-ups appear to vanish.
-const NY_TZ = "America/New_York"
-const CUTOFF_HOUR_ET = 17
-const CUTOFF_MIN_ET = 30
-const SESSION_HOUR_ET = 16
-const THURSDAY = 4
-const WEEKDAY_INDEX: Record<string, number> = {
-	Sun: 0,
-	Mon: 1,
-	Tue: 2,
-	Wed: 3,
-	Thu: 4,
-	Fri: 5,
-	Sat: 6,
-}
-
-function getNyParts(d: Date) {
-	const parts = new Intl.DateTimeFormat("en-US", {
-		timeZone: NY_TZ,
-		year: "numeric",
-		month: "numeric",
-		day: "numeric",
-		weekday: "short",
-		hour12: false,
-	}).formatToParts(d)
-	const m: Record<string, string> = {}
-	for (const p of parts) m[p.type] = p.value
-	return {
-		year: Number(m.year),
-		month: Number(m.month),
-		day: Number(m.day),
-		weekday: WEEKDAY_INDEX[m.weekday] ?? 0,
-	}
-}
-
-function getNyOffsetMs(d: Date): number {
-	const parts = new Intl.DateTimeFormat("en-US", {
-		timeZone: NY_TZ,
-		timeZoneName: "longOffset",
-	}).formatToParts(d)
-	const tz = parts.find((p) => p.type === "timeZoneName")?.value
-	const match = tz?.match(/GMT([+-])(\d{1,2}):(\d{2})/)
-	if (!match) return -5 * 60 * 60 * 1000
-	const sign = match[1] === "+" ? 1 : -1
-	const h = Number(match[2])
-	const min = Number(match[3])
-	return sign * (h * 3600 + min * 60) * 1000
-}
-
-// Convert a wall-clock NY date/time to a UTC timestamp. Thursdays at our
-// chosen hours never coincide with US DST transitions (those happen on
-// Sundays in March and November), so the offset lookup is unambiguous.
-function nyWallClockToUtcMs(
-	year: number,
-	month: number,
-	day: number,
-	hour: number,
-	minute: number,
-): number {
-	const naive = Date.UTC(year, month - 1, day, hour, minute, 0, 0)
-	const offset = getNyOffsetMs(new Date(naive))
-	return naive - offset
-}
+// Mirrors presentations.recurse.com (bundle.js): step UTC days forward to
+// land on Thursday, anchor at 21:00 UTC for display, end the window at
+// Fri 00:00 UTC. The week flips at midnight UTC Friday — same instant as
+// the official app — so users see both apps transition in lockstep.
+const THURSDAY_UTC = 4
+const SESSION_HOUR_UTC = 21
+const ONE_WEEK_MS = 7 * 24 * 60 * 60 * 1000
+const THREE_HOURS_MS = 3 * 60 * 60 * 1000
 
 export function getUpcomingThursdaySessionUtcMs(now: Date = new Date()): {
 	startMs: number
 	endMs: number
 	sessionStartMs: number
 } {
-	const ny = getNyParts(now)
-
-	let daysAhead = (THURSDAY - ny.weekday + 7) % 7
-	if (daysAhead === 0) {
-		const todayCutoff = nyWallClockToUtcMs(
-			ny.year,
-			ny.month,
-			ny.day,
-			CUTOFF_HOUR_ET,
-			CUTOFF_MIN_ET,
-		)
-		if (now.getTime() > todayCutoff) {
-			daysAhead = 7
-		}
+	const cursor = new Date(now)
+	while (cursor.getUTCDay() !== THURSDAY_UTC) {
+		cursor.setUTCDate(cursor.getUTCDate() + 1)
 	}
-
-	// Walk N days forward in UTC date space to land on the target NY date.
-	// Safe because we're only adding whole days and reading back y/m/d, which
-	// gives the right calendar slot regardless of DST.
-	const advanced = new Date(Date.UTC(ny.year, ny.month - 1, ny.day))
-	advanced.setUTCDate(advanced.getUTCDate() + daysAhead)
-	const y = advanced.getUTCFullYear()
-	const m = advanced.getUTCMonth() + 1
-	const d = advanced.getUTCDate()
-
-	const sessionStartMs = nyWallClockToUtcMs(y, m, d, SESSION_HOUR_ET, 0)
-	const endMs = nyWallClockToUtcMs(y, m, d, CUTOFF_HOUR_ET, CUTOFF_MIN_ET)
-	const oneWeekMs = 7 * 24 * 60 * 60 * 1000
+	cursor.setUTCHours(SESSION_HOUR_UTC, 0, 0, 0)
+	const sessionStartMs = cursor.getTime()
+	const endMs = sessionStartMs + THREE_HOURS_MS
 
 	return {
 		sessionStartMs,
-		startMs: endMs - oneWeekMs,
+		startMs: endMs - ONE_WEEK_MS,
 		endMs,
 	}
 }
