@@ -1,7 +1,12 @@
 import { getSubtitle } from "@batchmate/ui"
 import { useInfiniteQuery, useQuery } from "@tanstack/react-query"
-import { createFileRoute, redirect, useRouter } from "@tanstack/react-router"
-import { ChevronLeft, RotateCcw, Sparkles } from "lucide-react"
+import {
+	createFileRoute,
+	Link,
+	redirect,
+	useRouter,
+} from "@tanstack/react-router"
+import { ChevronLeft, RotateCcw, Sparkles, User } from "lucide-react"
 import { useEffect, useMemo, useState } from "react"
 import { Avatar } from "@/components/avatar"
 import { PageLayout } from "@/components/page-layout"
@@ -233,6 +238,22 @@ function StudyFacesPage() {
 					<ChevronLeft size={14} color="#64748B" />
 					Back
 				</button>
+			}
+			headerRight={
+				<Link
+					to="/profile"
+					className="flex h-11 w-11 items-center justify-center overflow-hidden rounded-full bg-card"
+				>
+					{session?.user?.image ? (
+						<img
+							src={session.user.image}
+							alt=""
+							className="h-full w-full object-cover"
+						/>
+					) : (
+						<User size={22} color="#22D3EE" />
+					)}
+				</Link>
 			}
 		>
 			{/* Mode selector */}
