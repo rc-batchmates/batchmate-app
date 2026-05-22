@@ -13,12 +13,17 @@ export const DoorOpenInputSchema = z.object({
 })
 export type DoorOpenInput = z.infer<typeof DoorOpenInputSchema>
 
+export const RecurseRoleSchema = z.enum(["current", "alumni", "faculty"])
+export type RecurseRole = z.infer<typeof RecurseRoleSchema>
+
 const HubVisitorSchema = z.object({
 	personId: z.number(),
 	name: z.string(),
 	imageUrl: z.string().nullable(),
 	batch: z.string().nullable(),
 	stintType: z.string().nullable(),
+	pronouns: z.string().nullable(),
+	role: RecurseRoleSchema.nullable(),
 	notes: z.string(),
 	checkedInAt: z.string(),
 })
@@ -62,6 +67,8 @@ const DirectoryPersonSchema = z.object({
 	imageUrl: z.string().nullable(),
 	batch: z.string().nullable(),
 	stintType: z.string().nullable(),
+	pronouns: z.string().nullable(),
+	role: RecurseRoleSchema.nullable(),
 })
 
 const DirectoryResponseSchema = z.object({

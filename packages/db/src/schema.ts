@@ -8,6 +8,8 @@ export const recurseProfile = sqliteTable("recurse_profile", {
 	imageUrl: text("image_url"),
 	batch: text("batch"),
 	stintType: text("stint_type"),
+	stintInProgress: integer("stint_in_progress", { mode: "boolean" }),
+	pronouns: text("pronouns"),
 	cachedAt: integer("cached_at", { mode: "timestamp_ms" })
 		.default(sql`(cast(unixepoch('subsecond') * 1000 as integer))`)
 		.notNull(),

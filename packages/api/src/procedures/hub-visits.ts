@@ -3,6 +3,7 @@ import { recurseProfile } from "@batchmate/db/schema"
 import { ORPCError } from "@orpc/server"
 import { and, eq, inArray, sql } from "drizzle-orm"
 import { server } from "../context"
+import { getRoleFromCachedStint, getRoleFromStints } from "../lib/role"
 
 const PROFILE_CACHE_TTL_MS = 7 * 24 * 60 * 60 * 1000
 
@@ -76,6 +77,8 @@ export const hubVisits = server.hubVisits.handler(async ({ context }) => {
 			imageUrl: string | null
 			batch: string | null
 			stintType: string | null
+			stintInProgress: boolean | null
+			pronouns: string | null
 		}
 	>()
 
@@ -94,6 +97,8 @@ export const hubVisits = server.hubVisits.handler(async ({ context }) => {
 					imageUrl: row.imageUrl,
 					batch: row.batch,
 					stintType: row.stintType,
+					stintInProgress: row.stintInProgress,
+					pronouns: row.pronouns,
 				})
 				staleIds.delete(row.personId)
 			}
@@ -113,6 +118,9 @@ export const hubVisits = server.hubVisits.handler(async ({ context }) => {
 						imageUrl: profile.image_path ?? null,
 						batch: lastStint?.batch?.name ?? null,
 						stintType: lastStint?.type ?? null,
+						stintInProgress: lastStint?.in_progress ?? false,
+						pronouns: profile.pronouns ?? null,
+						role: getRoleFromStints(profile.stints),
 					}
 				}),
 			)
@@ -126,19 +134,24 @@ export const hubVisits = server.hubVisits.handler(async ({ context }) => {
 					imageUrl: row.imageUrl,
 					batch: row.batch,
 					stintType: row.stintType,
+					stintInProgress: row.stintInProgress,
+					pronouns: row.pronouns,
 				})
 			}
 
 			if (rows.length > 0) {
 				const now = new Date()
-				// D1 caps each statement at ~100 bound parameters. With 5 columns
-				// per row, 20 rows fits under the limit with headroom.
-				const CHUNK = 20
+				// D1 caps each statement at ~100 bound parameters. With 7 columns
+				// per row, 14 rows fits under the limit with headroom.
+				const CHUNK = 14
 				for (let i = 0; i < rows.length; i += CHUNK) {
 					await context.db
 						.insert(recurseProfile)
 						.values(
-							rows.slice(i, i + CHUNK).map((r) => ({ ...r, cachedAt: now })),
+							rows.slice(i, i + CHUNK).map(({ role: _role, ...r }) => ({
+								...r,
+								cachedAt: now,
+							})),
 						)
 						.onConflictDoUpdate({
 							target: recurseProfile.personId,
@@ -146,6 +159,8 @@ export const hubVisits = server.hubVisits.handler(async ({ context }) => {
 								imageUrl: sql`excluded.image_url`,
 								batch: sql`excluded.batch`,
 								stintType: sql`excluded.stint_type`,
+								stintInProgress: sql`excluded.stint_in_progress`,
+								pronouns: sql`excluded.pronouns`,
 								cachedAt: sql`excluded.cached_at`,
 							},
 						})
@@ -176,6 +191,13 @@ export const hubVisits = server.hubVisits.handler(async ({ context }) => {
 				imageUrl: profile?.imageUrl ?? null,
 				batch: profile?.batch ?? null,
 				stintType: profile?.stintType ?? null,
+				pronouns: profile?.pronouns ?? null,
+				role: profile
+					? getRoleFromCachedStint(
+							profile.stintType,
+							profile.stintInProgress,
+						)
+					: null,
 				notes: visit.notes ?? "",
 				checkedInAt: visit.created_at ?? "",
 			}

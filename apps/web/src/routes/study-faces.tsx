@@ -39,6 +39,8 @@ const MODE_LABELS: { id: Mode; label: string }[] = [
 
 type ChallengeType = "face-to-name" | "name-to-face"
 
+type Role = "current" | "alumni" | "faculty"
+
 type Person = {
 	personId: number
 	name: string
@@ -46,6 +48,8 @@ type Person = {
 	imageUrl: string | null
 	batch: string | null
 	stintType: string | null
+	pronouns: string | null
+	role: Role | null
 }
 
 const STREAK_MILESTONES: Record<number, { name: string; color: string }> = {
@@ -218,13 +222,13 @@ function buildChallenge(
 		}
 	}
 
-	// Priority 1: same stintType + unique firstName
+	// Priority 1: same pronouns + unique firstName (matches rc-srs behaviour)
 	const shuffled = shuffle(people)
 	for (const p of shuffled) {
 		if (distractors.length >= distractorsNeeded) break
 		if (p.personId === correct.personId) continue
 		if (distractors.some((d) => d.personId === p.personId)) continue
-		if (p.stintType === correct.stintType && !usedFirstNames.has(p.firstName)) {
+		if (p.pronouns === correct.pronouns && !usedFirstNames.has(p.firstName)) {
 			distractors.push(p)
 			usedFirstNames.add(p.firstName)
 		}
@@ -374,6 +378,8 @@ function StudyFacesPage() {
 					imageUrl: v.imageUrl,
 					batch: v.batch,
 					stintType: v.stintType,
+					pronouns: v.pronouns,
+					role: v.role,
 				})) ?? []
 		} else {
 			const combined = dirData?.pages.flatMap((p) => p.people) ?? []
@@ -389,6 +395,8 @@ function StudyFacesPage() {
 					imageUrl: p.imageUrl,
 					batch: p.batch,
 					stintType: p.stintType,
+					pronouns: p.pronouns,
+					role: p.role,
 				})
 			}
 		}
@@ -757,6 +765,17 @@ function StudyFacesPage() {
 				<div className="mx-auto flex w-full max-w-sm flex-col gap-3">
 					{/* Prompt */}
 					<div className="flex flex-col items-center gap-2 rounded-2xl bg-card p-3">
+						{challenge.correct.role && challenge.correct.role !== "current" && (
+							<span
+								className={`rounded-full px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider ${
+									challenge.correct.role === "faculty"
+										? "bg-cyan/15 text-cyan"
+										: "bg-surface-inset text-text-tertiary"
+								}`}
+							>
+								{challenge.correct.role}
+							</span>
+						)}
 						{challenge.type === "face-to-name" ? (
 							<div className="h-28 w-28 overflow-hidden rounded-xl bg-surface-inset">
 								{challenge.correct.imageUrl && (

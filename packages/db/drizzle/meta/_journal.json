@@ -43,6 +43,13 @@
       "when": 1779303268866,
       "tag": "0005_stormy_scalphunter",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "6",
+      "when": 1779424855481,
+      "tag": "0006_medical_shotgun",
+      "breakpoints": true
     }
   ]
 }

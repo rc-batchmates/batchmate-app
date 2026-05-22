@@ -1,5 +1,6 @@
 import { ORPCError } from "@orpc/server"
 import { server } from "../context"
+import { getRoleFromStints } from "../lib/role"
 
 export const directorySearch = server.directorySearch.handler(
 	async ({ input, context }) => {
@@ -42,6 +43,8 @@ export const directorySearch = server.directorySearch.handler(
 					imageUrl: profile.image_path ?? null,
 					batch: lastStint?.batch?.name ?? null,
 					stintType: lastStint?.type ?? null,
+					pronouns: profile.pronouns ?? null,
+					role: getRoleFromStints(profile.stints),
 				}
 			}),
 		}
