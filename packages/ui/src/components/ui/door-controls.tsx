@@ -227,7 +227,7 @@ function IntercomCard({
 						1. Call “Recurse Center – 4th floor” on the intercom
 					</Text>
 					<Text className="text-xs text-text-secondary">
-						3. Press and hold this button
+						2. Press and hold this button
 					</Text>
 				</View>
 			</View>
