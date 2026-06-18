@@ -44,10 +44,7 @@ function isCheckInActive(createdAt: string | null | undefined): boolean {
 	const checkInHour = hourInNYT(createdAt)
 	const nowHour = hourInNYT(new Date().toISOString())
 	const isStaleOvernight =
-		checkInHour !== null &&
-		checkInHour < 5 &&
-		nowHour !== null &&
-		nowHour >= 5
+		checkInHour !== null && checkInHour < 5 && nowHour !== null && nowHour >= 5
 	return !isStaleOvernight
 }
 
@@ -258,10 +255,13 @@ export const isCheckedIn = server.isCheckedIn.handler(async ({ context }) => {
 
 	const person_id = Number(rcAccount.accountId)
 	const date = todayInNYT()
-	const { data: visit, error, response } = await context.recurseApi.GET(
-		"/hub_visits/{person_id}/{date}",
-		{ params: { path: { person_id, date } } },
-	)
+	const {
+		data: visit,
+		error,
+		response,
+	} = await context.recurseApi.GET("/hub_visits/{person_id}/{date}", {
+		params: { path: { person_id, date } },
+	})
 
 	// 404 is expected: it means the user has no visit for today, i.e. they're
 	// simply not checked in — not an error.
