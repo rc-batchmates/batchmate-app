@@ -21,6 +21,37 @@ function hourInNYT(iso: string | null | undefined): number | null {
 }
 
 /**
+ * Current calendar date as `YYYY-MM-DD` in RC's timezone (America/New_York).
+ * Hub visits are keyed by NYT date, so "today" must be computed there — a UTC
+ * date would be a day off for the late-evening NYT hours.
+ */
+function todayInNYT(): string {
+	return new Intl.DateTimeFormat("en-CA", {
+		timeZone: "America/New_York",
+		year: "numeric",
+		month: "2-digit",
+		day: "2-digit",
+	}).format(new Date())
+}
+
+/**
+ * Whether a hub check-in should still count as "checked in", given when it was
+ * created. A check-in from before 5am NYT is treated as stale
+ * once the clock passes 5am — they may not actually be in the hub.
+ * A missing/invalid timestamp is treated as not stale.
+ */
+function isCheckInActive(createdAt: string | null | undefined): boolean {
+	const checkInHour = hourInNYT(createdAt)
+	const nowHour = hourInNYT(new Date().toISOString())
+	const isStaleOvernight =
+		checkInHour !== null &&
+		checkInHour < 5 &&
+		nowHour !== null &&
+		nowHour >= 5
+	return !isStaleOvernight
+}
+
+/**
  * fetches the current user's check-in status,
  * and all checked-in users' profiles
  */
@@ -63,14 +94,7 @@ export const hubVisits = server.hubVisits.handler(async ({ context }) => {
 			const latest = myVisits.reduce((a, b) =>
 				(a.created_at ?? "") > (b.created_at ?? "") ? a : b,
 			)
-			const checkInHour = hourInNYT(latest.created_at)
-			const nowHour = hourInNYT(new Date().toISOString())
-			const isStaleOvernight =
-				checkInHour !== null &&
-				checkInHour < 5 &&
-				nowHour !== null &&
-				nowHour >= 5
-			isCheckedIn = !isStaleOvernight
+			isCheckedIn = isCheckInActive(latest.created_at)
 		}
 	}
 
@@ -206,7 +230,6 @@ export const hubVisits = server.hubVisits.handler(async ({ context }) => {
 	}
 })
 
-// TODO factor out helper functions for shared code with the endpoint above
 /** fetches only the current user's check-in status */
 export const isCheckedIn = server.isCheckedIn.handler(async ({ context }) => {
 	if (!context.user) {
@@ -234,17 +257,23 @@ export const isCheckedIn = server.isCheckedIn.handler(async ({ context }) => {
 	}
 
 	const person_id = Number(rcAccount.accountId)
-	const date = new Date().toISOString()
-	const { data: visit, error } = await context.recurseApi.GET(
+	const date = todayInNYT()
+	const { data: visit, error, response } = await context.recurseApi.GET(
 		"/hub_visits/{person_id}/{date}",
 		{ params: { path: { person_id, date } } },
 	)
 
-	if (error) {
+	// 404 is expected: it means the user has no visit for today, i.e. they're
+	// simply not checked in — not an error.
+	if (response.status === 404) {
+		return { isCheckedIn: false }
+	}
+
+	if (error || !visit) {
 		throw new ORPCError("INTERNAL_SERVER_ERROR", {
 			message: "Failed to fetch hub visits",
 		})
 	}
 
-	return { isCheckedIn: !!visit }
+	return { isCheckedIn: isCheckInActive(visit.created_at) }
 })

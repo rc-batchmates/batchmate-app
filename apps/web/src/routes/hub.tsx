@@ -79,26 +79,37 @@ function HubPage() {
 	const { data: session } = useSession()
 	const queryClient = useQueryClient()
 
-	// TODO split this into two separate API calls, for current & other users
+	// Check-in status has its own lightweight endpoint so the check-in section at
+	// the top can render before the slower visitor profiles below. This endpoint
+	// is the source of truth for the current user's status.
+	const { data: checkInStatus } = useQuery(api.isCheckedIn.queryOptions({}))
+
+	// Visitor profiles (the list below) — slower to load; fetched separately.
 	const {
 		data: hub,
 		isLoading,
 		error,
 	} = useQuery(api.hubVisits.queryOptions({}))
 
+	const isCheckedInQueryKey = api.isCheckedIn.queryOptions({}).queryKey
 	const hubQueryKey = api.hubVisits.queryOptions({}).queryKey
 	const checkin = useMutation({
 		...api.hubCheckin.mutationOptions({}),
 		onSuccess: () => {
-			queryClient.setQueryData(hubQueryKey, (old: typeof hub | undefined) =>
-				old ? { ...old, isCheckedIn: true } : old,
+			// Optimistically flip the source-of-truth status, then invalidate it and
+			// the visitor list so the freshly checked-in user shows up below.
+			queryClient.setQueryData(
+				isCheckedInQueryKey,
+				(old: typeof checkInStatus | undefined) =>
+					old ? { ...old, isCheckedIn: true } : old,
 			)
+			queryClient.invalidateQueries({ queryKey: isCheckedInQueryKey })
 			queryClient.invalidateQueries({ queryKey: hubQueryKey })
 		},
 	})
 
 	const visitors = hub?.visitors
-	const isCheckedIn = hub?.isCheckedIn ?? false
+	const isCheckedIn = checkInStatus?.isCheckedIn ?? false
 
 	const [sortKey, setSortKey] = useState<SortKey>("firstName")
 	const [showOvernight, setShowOvernight] = useState(false)
@@ -178,7 +189,7 @@ function HubPage() {
 			}
 		>
 			{/* Check in */}
-			{hub && !isCheckedIn && (
+			{checkInStatus && !isCheckedIn && (
 				<button
 					type="button"
 					onClick={() => checkin.mutate({})}
@@ -192,7 +203,7 @@ function HubPage() {
 				</button>
 			)}
 
-			{hub && isCheckedIn && (
+			{checkInStatus && isCheckedIn && (
 				<div className="flex h-12 w-full items-center justify-center gap-2 rounded-xl border border-cyan/20 bg-cyan/10">
 					<CheckCircle size={18} color="#22D3EE" />
 					<span className="text-sm font-medium text-cyan">
