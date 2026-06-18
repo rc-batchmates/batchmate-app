@@ -20,6 +20,10 @@ function hourInNYT(iso: string | null | undefined): number | null {
 	)
 }
 
+/**
+ * fetches the current user's check-in status,
+ * and all checked-in users' profiles
+ */
 export const hubVisits = server.hubVisits.handler(async ({ context }) => {
 	if (!context.user) {
 		throw new ORPCError("UNAUTHORIZED")
@@ -203,4 +207,47 @@ export const hubVisits = server.hubVisits.handler(async ({ context }) => {
 			}
 		}),
 	}
+})
+
+// TODO factor out helper functions for shared code with the endpoint above
+/** fetches only the current user's check-in status */
+export const isCheckedIn = server.isCheckedIn.handler(async ({ context }) => {
+	if (!context.user) {
+		throw new ORPCError("UNAUTHORIZED")
+	}
+
+	if (!context.recurseApi) {
+		throw new ORPCError("INTERNAL_SERVER_ERROR", {
+			message: "Recurse API not available",
+		})
+	}
+
+	const rcAccount = await context.db
+		.select({ accountId: account.accountId })
+		.from(account)
+		.where(
+			and(
+				eq(account.userId, context.user.id),
+				eq(account.providerId, "recurse"),
+			),
+		)
+		.get()
+	if (!rcAccount) {
+		throw new ORPCError("UNAUTHORIZED")
+	}
+
+	const person_id = Number(rcAccount.accountId)
+	const date = new Date().toISOString()
+	const { data: visit, error } = await context.recurseApi.GET(
+		"/hub_visits/{person_id}/{date}",
+		{ params: { path: { person_id, date } } },
+	)
+
+	if (error) {
+		throw new ORPCError("INTERNAL_SERVER_ERROR", {
+			message: "Failed to fetch hub visits",
+		})
+	}
+
+	return { isCheckedIn: !!visit }
 })

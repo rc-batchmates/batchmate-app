@@ -78,6 +78,8 @@ export const Route = createFileRoute("/hub")({
 function HubPage() {
 	const { data: session } = useSession()
 	const queryClient = useQueryClient()
+
+	// TODO split this into two separate API calls, for current & other users
 	const {
 		data: hub,
 		isLoading,
