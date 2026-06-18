@@ -80,10 +80,8 @@ export default function HubScreen() {
 	const checkin = useMutation({
 		...api.hubCheckin.mutationOptions({}),
 		onSuccess: () => {
-			queryClient.setQueryData(
-				hubQueryKey,
-				(old: typeof hub | undefined) =>
-					old ? { ...old, isCheckedIn: true } : old,
+			queryClient.setQueryData(hubQueryKey, (old: typeof hub | undefined) =>
+				old ? { ...old, isCheckedIn: true } : old,
 			)
 			queryClient.invalidateQueries({ queryKey: hubQueryKey })
 		},
@@ -245,19 +243,20 @@ export default function HubScreen() {
 					) : view === "grid" ? (
 						<View className="flex-row flex-wrap -mx-1">
 							{mainList.map((visit) => (
-								<View
-									key={visit.personId}
-									className="w-1/2 px-1 pb-2"
-								>
+								<View key={visit.personId} className="w-1/2 px-1 pb-2">
 									<PersonGridCard
 										name={visit.name}
 										imageUrl={visit.imageUrl}
 										batch={visit.batch}
 										stintType={visit.stintType}
 										badge={
-											overnightIds.has(visit.personId) ? <OvernightBadge /> : null
+											overnightIds.has(visit.personId) ? (
+												<OvernightBadge />
+											) : null
 										}
-										onPress={() => router.push(`/(app)/member/${visit.personId}`)}
+										onPress={() =>
+											router.push(`/(app)/member/${visit.personId}`)
+										}
 									/>
 								</View>
 							))}

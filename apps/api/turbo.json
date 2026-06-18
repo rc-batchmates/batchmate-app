@@ -4,6 +4,9 @@
 	"tasks": {
 		"dev": {
 			"dependsOn": ["@batchmate/web#build"]
+		},
+		"dev:local": {
+			"dependsOn": ["@batchmate/web#build"]
 		}
 	}
 }

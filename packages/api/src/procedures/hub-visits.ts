@@ -197,10 +197,7 @@ export const hubVisits = server.hubVisits.handler(async ({ context }) => {
 				stintType: profile?.stintType ?? null,
 				pronouns: profile?.pronouns ?? null,
 				role: profile
-					? getRoleFromCachedStint(
-							profile.stintType,
-							profile.stintInProgress,
-						)
+					? getRoleFromCachedStint(profile.stintType, profile.stintInProgress)
 					: null,
 				notes: visit.notes ?? "",
 				checkedInAt: visit.created_at ?? "",

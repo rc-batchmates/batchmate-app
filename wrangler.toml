@@ -37,3 +37,35 @@ migrations_dir = "packages/db/drizzle"
 binding = "SECURITY_COMPUTER"
 service_id = "019d3b5c-0656-75c0-9a92-da593cdb8c17"
 remote = true
+
+# Local dev environment. Re-declares the bindings local dev needs but replaces the
+# remote SECURITY_COMPUTER VPC binding above with a local mock worker (see the
+# [[env.local.services]] binding below), so `wrangler dev --env local` (run via
+# `pnpm dev:local`) starts offline without a Cloudflare login. Door/security calls
+# hit the mock instead of the real computer; everything else (hub-visits, auth,
+# D1, assets) works. The production config above is unchanged. Inherited keys
+# (main, compatibility_date, compatibility_flags, account_id) carry over; vars,
+# services, d1_databases, assets, and routes are not inherited and so are repeated
+# here.
+[env.local.vars]
+VIRTUAL_CARD_SITE_CODE = "999"
+VIRTUAL_CARD_PREFIX = "99900000000"
+
+# Stand-in for the remote SECURITY_COMPUTER VPC binding. Points at the local
+# `security-mock` worker (apps/security-mock), which `pnpm dev:local` starts
+# alongside this one; Wrangler's local dev registry wires the service binding by
+# name. Lets first-login user provisioning and door-open simulation run offline.
+[[env.local.services]]
+binding = "SECURITY_COMPUTER"
+service = "security-mock"
+
+[[env.local.d1_databases]]
+binding = "DB"
+database_name = "batchmate"
+database_id = "bdce32aa-261e-4ea3-9d8e-0ad0e149ba3f"
+migrations_dir = "packages/db/drizzle"
+
+[env.local.assets]
+directory = "apps/web/dist"
+binding = "ASSETS"
+run_worker_first = true
