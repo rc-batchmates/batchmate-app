@@ -1,8 +1,9 @@
+import type { Database } from "@batchmate/db"
 import { account } from "@batchmate/db/auth-schema"
 import { recurseProfile } from "@batchmate/db/schema"
 import { ORPCError } from "@orpc/server"
 import { and, eq, inArray, sql } from "drizzle-orm"
-import { server } from "../context"
+import { type Context, server } from "../context"
 import { getRoleFromCachedStint, getRoleFromStints } from "../lib/role"
 
 const PROFILE_CACHE_TTL_MS = 7 * 24 * 60 * 60 * 1000
@@ -45,14 +46,18 @@ function isCheckInActive(createdAt: string | null | undefined): boolean {
 	const nowHour = hourInNYT(new Date().toISOString())
 	const isStaleOvernight =
 		checkInHour !== null && checkInHour < 5 && nowHour !== null && nowHour >= 5
+
 	return !isStaleOvernight
 }
 
 /**
- * fetches the current user's check-in status,
- * and all checked-in users' profiles
+ * Guards shared by both hub routes: require an authenticated user and an
+ * available Recurse API client, returning them narrowed to non-null.
  */
-export const hubVisits = server.hubVisits.handler(async ({ context }) => {
+function requireRecurseUser(context: Context): {
+	user: NonNullable<Context["user"]>
+	recurseApi: NonNullable<Context["recurseApi"]>
+} {
 	if (!context.user) {
 		throw new ORPCError("UNAUTHORIZED")
 	}
@@ -63,20 +68,32 @@ export const hubVisits = server.hubVisits.handler(async ({ context }) => {
 		})
 	}
 
-	const rcAccount = await context.db
+	return { user: context.user, recurseApi: context.recurseApi }
+}
+
+/** The caller's linked Recurse person id, or null if their account is unlinked. */
+async function getRcPersonId(
+	db: Database,
+	userId: string,
+): Promise<number | null> {
+	const rcAccount = await db
 		.select({ accountId: account.accountId })
 		.from(account)
-		.where(
-			and(
-				eq(account.userId, context.user.id),
-				eq(account.providerId, "recurse"),
-			),
-		)
+		.where(and(eq(account.userId, userId), eq(account.providerId, "recurse")))
 		.get()
 
-	const rcId = rcAccount ? Number(rcAccount.accountId) : null
+	return rcAccount ? Number(rcAccount.accountId) : null
+}
 
-	const { data, error } = await context.recurseApi.GET("/hub_visits")
+/**
+ * fetches the current user's check-in status,
+ * and all checked-in users' profiles
+ */
+export const hubVisits = server.hubVisits.handler(async ({ context }) => {
+	const { user, recurseApi } = requireRecurseUser(context)
+	const rcId = await getRcPersonId(context.db, user.id)
+
+	const { data, error } = await recurseApi.GET("/hub_visits")
 
 	if (error || !data) {
 		throw new ORPCError("INTERNAL_SERVER_ERROR", {
@@ -132,7 +149,7 @@ export const hubVisits = server.hubVisits.handler(async ({ context }) => {
 		if (staleIds.size > 0) {
 			const fetched = await Promise.allSettled(
 				[...staleIds].map(async (id) => {
-					const { data: profile } = await context.recurseApi!.GET(
+					const { data: profile } = await recurseApi.GET(
 						"/profiles/{person_id_or_email}",
 						{ params: { path: { person_id_or_email: String(id) } } },
 					)
@@ -229,37 +246,18 @@ export const hubVisits = server.hubVisits.handler(async ({ context }) => {
 
 /** fetches only the current user's check-in status */
 export const isCheckedIn = server.isCheckedIn.handler(async ({ context }) => {
-	if (!context.user) {
+	const { user, recurseApi } = requireRecurseUser(context)
+	const person_id = await getRcPersonId(context.db, user.id)
+	if (person_id === null) {
 		throw new ORPCError("UNAUTHORIZED")
 	}
 
-	if (!context.recurseApi) {
-		throw new ORPCError("INTERNAL_SERVER_ERROR", {
-			message: "Recurse API not available",
-		})
-	}
-
-	const rcAccount = await context.db
-		.select({ accountId: account.accountId })
-		.from(account)
-		.where(
-			and(
-				eq(account.userId, context.user.id),
-				eq(account.providerId, "recurse"),
-			),
-		)
-		.get()
-	if (!rcAccount) {
-		throw new ORPCError("UNAUTHORIZED")
-	}
-
-	const person_id = Number(rcAccount.accountId)
 	const date = todayInNYT()
 	const {
 		data: visit,
 		error,
 		response,
-	} = await context.recurseApi.GET("/hub_visits/{person_id}/{date}", {
+	} = await recurseApi.GET("/hub_visits/{person_id}/{date}", {
 		params: { path: { person_id, date } },
 	})
 
