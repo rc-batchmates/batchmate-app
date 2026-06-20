@@ -70,25 +70,32 @@ function OvernightBadge() {
 export default function HubScreen() {
 	const router = useRouter()
 	const queryClient = useQueryClient()
+
+	const { data: checkInStatus } = useQuery(api.isCheckedIn.queryOptions({}))
+
 	const {
 		data: hub,
-		isLoading,
-		error,
+		isLoading: hubIsLoading,
+		error: hubError,
 	} = useQuery(api.hubVisits.queryOptions({}))
 
+	const isCheckedInQueryKey = api.isCheckedIn.queryOptions({}).queryKey
 	const hubQueryKey = api.hubVisits.queryOptions({}).queryKey
 	const checkin = useMutation({
 		...api.hubCheckin.mutationOptions({}),
 		onSuccess: () => {
-			queryClient.setQueryData(hubQueryKey, (old: typeof hub | undefined) =>
-				old ? { ...old, isCheckedIn: true } : old,
+			queryClient.setQueryData(
+				isCheckedInQueryKey,
+				(old: typeof checkInStatus | undefined) =>
+					old ? { ...old, isCheckedIn: true } : old,
 			)
+			queryClient.invalidateQueries({ queryKey: isCheckedInQueryKey })
 			queryClient.invalidateQueries({ queryKey: hubQueryKey })
 		},
 	})
 
 	const visitors = hub?.visitors
-	const isCheckedIn = hub?.isCheckedIn ?? false
+	const isCheckedIn = checkInStatus?.isCheckedIn ?? false
 
 	const [sortKey, setSortKey] = useState<SortKey>("firstName")
 	const [showOvernight, setShowOvernight] = useState(false)
@@ -155,7 +162,7 @@ export default function HubScreen() {
 				)}
 			</View>
 
-			{hub && !isCheckedIn && (
+			{checkInStatus && !isCheckedIn && (
 				<Pressable
 					className="h-12 flex-row items-center justify-center gap-2 rounded-xl bg-cyan"
 					onPress={() => checkin.mutate({})}
@@ -168,7 +175,7 @@ export default function HubScreen() {
 				</Pressable>
 			)}
 
-			{hub && isCheckedIn && (
+			{checkInStatus && isCheckedIn && (
 				<View className="h-12 flex-row items-center justify-center gap-2 rounded-xl border border-cyan/20 bg-cyan/10">
 					<CheckCircle size={18} color="#22D3EE" />
 					<Text className="text-sm font-medium text-primary">
@@ -177,13 +184,13 @@ export default function HubScreen() {
 				</View>
 			)}
 
-			{isLoading && (
+			{hubIsLoading && (
 				<View className="flex-1 items-center justify-center py-20">
 					<Text className="text-sm text-text-tertiary">Loading...</Text>
 				</View>
 			)}
 
-			{error && (
+			{hubError && (
 				<View className="flex-1 items-center justify-center py-20">
 					<Text className="text-sm text-destructive">
 						Failed to load hub visits

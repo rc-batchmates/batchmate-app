@@ -79,16 +79,12 @@ function HubPage() {
 	const { data: session } = useSession()
 	const queryClient = useQueryClient()
 
-	// Check-in status has its own lightweight endpoint so the check-in section at
-	// the top can render before the slower visitor profiles below. This endpoint
-	// is the source of truth for the current user's status.
 	const { data: checkInStatus } = useQuery(api.isCheckedIn.queryOptions({}))
 
-	// Visitor profiles (the list below) — slower to load; fetched separately.
 	const {
 		data: hub,
-		isLoading,
-		error,
+		isLoading: hubIsLoading,
+		error: hubError,
 	} = useQuery(api.hubVisits.queryOptions({}))
 
 	const isCheckedInQueryKey = api.isCheckedIn.queryOptions({}).queryKey
@@ -96,8 +92,6 @@ function HubPage() {
 	const checkin = useMutation({
 		...api.hubCheckin.mutationOptions({}),
 		onSuccess: () => {
-			// Optimistically flip the source-of-truth status, then invalidate it and
-			// the visitor list so the freshly checked-in user shows up below.
 			queryClient.setQueryData(
 				isCheckedInQueryKey,
 				(old: typeof checkInStatus | undefined) =>
@@ -213,13 +207,13 @@ function HubPage() {
 			)}
 
 			{/* People list */}
-			{isLoading && (
+			{hubIsLoading && (
 				<div className="flex flex-1 items-center justify-center">
 					<span className="text-sm text-text-tertiary">Loading...</span>
 				</div>
 			)}
 
-			{error && (
+			{hubError && (
 				<div className="flex flex-1 flex-col items-center justify-center gap-2">
 					<span className="text-sm text-destructive">
 						Failed to load hub visits
