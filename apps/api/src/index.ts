@@ -59,6 +59,17 @@ app.use(async (c, next) => {
 		url.searchParams.set("from", "recurse.rocks")
 		return c.redirect(url.toString(), 302)
 	}
+	// batchmate.recurse.com is RC's custom-subdomain reverse proxy
+	// (github.com/recursecenter/proxy) pointed at batchmate.app. It rewrites
+	// the Host header to batchmate.app and preserves the original host only in
+	// X-Forwarded-Host, so we can't match on url.hostname here — that already
+	// reads batchmate.app. Detect the proxy via X-Forwarded-Host and 302 the
+	// browser to the canonical origin so the visible URL becomes batchmate.app.
+	if (
+		c.req.header("x-forwarded-host")?.toLowerCase() === "batchmate.recurse.com"
+	) {
+		return c.redirect(url.toString(), 302)
+	}
 	await next()
 })
 
