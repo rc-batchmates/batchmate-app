@@ -71,7 +71,11 @@ export default function HubScreen() {
 	const router = useRouter()
 	const queryClient = useQueryClient()
 
-	const { data: checkInStatus } = useQuery(api.isCheckedIn.queryOptions({}))
+	const {
+		data: checkInStatus,
+		isLoading: checkInStatusIsLoading,
+		error: checkInStatusError,
+	} = useQuery(api.isCheckedIn.queryOptions({}))
 
 	const {
 		data: hub,
@@ -161,6 +165,24 @@ export default function HubScreen() {
 					</View>
 				)}
 			</View>
+
+			{checkInStatusIsLoading && (
+				<View className="h-12 flex-row items-center justify-center gap-2 rounded-xl bg-cyan opacity-50">
+					<MapPin size={18} color="#0A0F1C" />
+					<Text className="text-[15px] font-semibold text-background">
+						Loading check-in status...
+					</Text>
+				</View>
+			)}
+
+			{checkInStatusError && (
+				<View className="h-12 flex-row items-center justify-center gap-2 rounded-xl border border-destructive/40 opacity-60">
+					<MapPin size={18} color="#ef4444" />
+					<Text className="text-[15px] font-semibold text-destructive">
+						Failed to load check-in status.
+					</Text>
+				</View>
+			)}
 
 			{checkInStatus && !isCheckedIn && (
 				<Pressable

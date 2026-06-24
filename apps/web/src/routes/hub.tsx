@@ -79,7 +79,11 @@ function HubPage() {
 	const { data: session } = useSession()
 	const queryClient = useQueryClient()
 
-	const { data: checkInStatus } = useQuery(api.isCheckedIn.queryOptions({}))
+	const {
+		data: checkInStatus,
+		isLoading: checkInStatusIsLoading,
+		error: checkInStatusError,
+	} = useQuery(api.isCheckedIn.queryOptions({}))
 
 	const {
 		data: hub,
@@ -183,6 +187,28 @@ function HubPage() {
 			}
 		>
 			{/* Check in */}
+			{checkInStatusIsLoading && (
+				<button
+					type="button"
+					disabled
+					className="flex h-12 w-full items-center justify-center gap-2 rounded-xl bg-cyan text-background disabled:opacity-50"
+				>
+					<MapPin size={18} />
+					<span className="text-[15px] font-semibold">
+						Loading check-in status...
+					</span>
+				</button>
+			)}
+
+			{checkInStatusError && (
+				<div className="flex h-12 w-full items-center justify-center gap-2 rounded-xl border border-destructive/40 opacity-60">
+					<MapPin size={18} className="text-destructive" />
+					<span className="text-[15px] font-semibold text-destructive">
+						Failed to load check-in status.
+					</span>
+				</div>
+			)}
+
 			{checkInStatus && !isCheckedIn && (
 				<button
 					type="button"
