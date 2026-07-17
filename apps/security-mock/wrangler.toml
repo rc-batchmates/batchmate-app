@@ -1,0 +1,10 @@
+# Local-only mock of the door/security computer (the production SECURITY_COMPUTER
+# VPC service). It is wired into the API's `local` env via a service binding
+# (see the root wrangler.toml `[[env.local.services]]`), so first-login user
+# provisioning and door-open simulation succeed offline. Not deployed.
+name = "security-mock"
+main = "src/index.ts"
+compatibility_date = "2025-04-01"
+
+[dev]
+port = 8788

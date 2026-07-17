@@ -1,14 +1,18 @@
 BETTER_AUTH_SECRET="" # generate with: pnpm --filter @batchmate/auth exec better-auth secret
+
 # RC OAuth app whose callback is registered for recurse.rocks (and localhost).
 # Used for requests landing on those hosts.
+# You can create an RC OAuth app for local dev at: https://www.recurse.com/settings/apps
 RC_CLIENT_ID=""
 RC_CLIENT_SECRET=""
+
 # RC OAuth app whose callback is registered for batchmate.app. Used for
 # requests landing on batchmate.app. Required even for local dev if you
 # want to test the batchmate.app code path; otherwise the legacy creds
 # above are fine for localhost.
 RC_BATCHMATE_CLIENT_ID=""
 RC_BATCHMATE_CLIENT_SECRET=""
+
 BASE_URL="http://localhost:8787"
 
 # Personal access token from recurse.com/settings/apps. Used to open the

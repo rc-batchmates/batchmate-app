@@ -155,6 +155,10 @@ writeFileSync(outSqlPath, sql)
 console.log(`Wrote ${outSqlPath}`)
 console.log("")
 console.log("Apply locally:")
-console.log("  pnpm wrangler d1 execute batchmate --local --file=packages/db/tmp/seed-zoom.sql")
+console.log(
+	"  pnpm wrangler d1 execute batchmate --local --file=packages/db/tmp/seed-zoom.sql",
+)
 console.log("Apply remote:")
-console.log("  pnpm wrangler d1 execute batchmate --remote --file=packages/db/tmp/seed-zoom.sql")
+console.log(
+	"  pnpm wrangler d1 execute batchmate --remote --file=packages/db/tmp/seed-zoom.sql",
+)

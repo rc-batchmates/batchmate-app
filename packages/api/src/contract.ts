@@ -33,6 +33,10 @@ const HubResponseSchema = z.object({
 	visitors: z.array(HubVisitorSchema),
 })
 
+const IsCheckedInSchema = z.object({
+	isCheckedIn: z.boolean(),
+})
+
 export type HubVisitor = z.infer<typeof HubVisitorSchema>
 export type HubResponse = z.infer<typeof HubResponseSchema>
 
@@ -166,6 +170,9 @@ export const contract = oc.router({
 	hubVisits: oc
 		.route({ method: "GET", path: "/hub" })
 		.output(HubResponseSchema),
+	isCheckedIn: oc
+		.route({ method: "GET", path: "/hub/is-checked-in" })
+		.output(IsCheckedInSchema),
 	hubCheckin: oc
 		.route({ method: "POST", path: "/hub/checkin" })
 		.output(z.object({ success: z.boolean() })),

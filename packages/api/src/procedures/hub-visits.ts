@@ -1,8 +1,9 @@
+import type { Database } from "@batchmate/db"
 import { account } from "@batchmate/db/auth-schema"
 import { recurseProfile } from "@batchmate/db/schema"
 import { ORPCError } from "@orpc/server"
 import { and, eq, inArray, sql } from "drizzle-orm"
-import { server } from "../context"
+import { type Context, server } from "../context"
 import { getRoleFromCachedStint, getRoleFromStints } from "../lib/role"
 
 const PROFILE_CACHE_TTL_MS = 7 * 24 * 60 * 60 * 1000
@@ -20,7 +21,43 @@ function hourInNYT(iso: string | null | undefined): number | null {
 	)
 }
 
-export const hubVisits = server.hubVisits.handler(async ({ context }) => {
+/**
+ * Current calendar date as `YYYY-MM-DD` in RC's timezone (America/New_York).
+ * Hub visits are keyed by NYT date, so "today" must be computed there — a UTC
+ * date would be a day off for the late-evening NYT hours.
+ */
+function todayInNYT(): string {
+	return new Intl.DateTimeFormat("en-CA", {
+		timeZone: "America/New_York",
+		year: "numeric",
+		month: "2-digit",
+		day: "2-digit",
+	}).format(new Date())
+}
+
+/**
+ * Whether a hub check-in should still count as "checked in", given when it was
+ * created. A check-in from before 5am NYT is treated as stale
+ * once the clock passes 5am — they may not actually be in the hub.
+ * A missing/invalid timestamp is treated as not stale.
+ */
+function isCheckInActive(createdAt: string | null | undefined): boolean {
+	const checkInHour = hourInNYT(createdAt)
+	const nowHour = hourInNYT(new Date().toISOString())
+	const isStaleOvernight =
+		checkInHour !== null && checkInHour < 5 && nowHour !== null && nowHour >= 5
+
+	return !isStaleOvernight
+}
+
+/**
+ * Guards shared by both hub routes: require an authenticated user and an
+ * available Recurse API client, returning them narrowed to non-null.
+ */
+function requireRecurseUser(context: Context): {
+	user: NonNullable<Context["user"]>
+	recurseApi: NonNullable<Context["recurseApi"]>
+} {
 	if (!context.user) {
 		throw new ORPCError("UNAUTHORIZED")
 	}
@@ -31,20 +68,32 @@ export const hubVisits = server.hubVisits.handler(async ({ context }) => {
 		})
 	}
 
-	const rcAccount = await context.db
+	return { user: context.user, recurseApi: context.recurseApi }
+}
+
+/** The caller's linked Recurse person id, or null if their account is unlinked. */
+async function getRcPersonId(
+	db: Database,
+	userId: string,
+): Promise<number | null> {
+	const rcAccount = await db
 		.select({ accountId: account.accountId })
 		.from(account)
-		.where(
-			and(
-				eq(account.userId, context.user.id),
-				eq(account.providerId, "recurse"),
-			),
-		)
+		.where(and(eq(account.userId, userId), eq(account.providerId, "recurse")))
 		.get()
 
-	const rcId = rcAccount ? Number(rcAccount.accountId) : null
+	return rcAccount ? Number(rcAccount.accountId) : null
+}
 
-	const { data, error } = await context.recurseApi.GET("/hub_visits")
+/**
+ * fetches the current user's check-in status,
+ * and all checked-in users' profiles
+ */
+export const hubVisits = server.hubVisits.handler(async ({ context }) => {
+	const { user, recurseApi } = requireRecurseUser(context)
+	const rcId = await getRcPersonId(context.db, user.id)
+
+	const { data, error } = await recurseApi.GET("/hub_visits")
 
 	if (error || !data) {
 		throw new ORPCError("INTERNAL_SERVER_ERROR", {
@@ -59,14 +108,7 @@ export const hubVisits = server.hubVisits.handler(async ({ context }) => {
 			const latest = myVisits.reduce((a, b) =>
 				(a.created_at ?? "") > (b.created_at ?? "") ? a : b,
 			)
-			const checkInHour = hourInNYT(latest.created_at)
-			const nowHour = hourInNYT(new Date().toISOString())
-			const isStaleOvernight =
-				checkInHour !== null &&
-				checkInHour < 5 &&
-				nowHour !== null &&
-				nowHour >= 5
-			isCheckedIn = !isStaleOvernight
+			isCheckedIn = isCheckInActive(latest.created_at)
 		}
 	}
 
@@ -107,7 +149,7 @@ export const hubVisits = server.hubVisits.handler(async ({ context }) => {
 		if (staleIds.size > 0) {
 			const fetched = await Promise.allSettled(
 				[...staleIds].map(async (id) => {
-					const { data: profile } = await context.recurseApi!.GET(
+					const { data: profile } = await recurseApi.GET(
 						"/profiles/{person_id_or_email}",
 						{ params: { path: { person_id_or_email: String(id) } } },
 					)
@@ -193,14 +235,43 @@ export const hubVisits = server.hubVisits.handler(async ({ context }) => {
 				stintType: profile?.stintType ?? null,
 				pronouns: profile?.pronouns ?? null,
 				role: profile
-					? getRoleFromCachedStint(
-							profile.stintType,
-							profile.stintInProgress,
-						)
+					? getRoleFromCachedStint(profile.stintType, profile.stintInProgress)
 					: null,
 				notes: visit.notes ?? "",
 				checkedInAt: visit.created_at ?? "",
 			}
 		}),
 	}
+})
+
+/** fetches only the current user's check-in status */
+export const isCheckedIn = server.isCheckedIn.handler(async ({ context }) => {
+	const { user, recurseApi } = requireRecurseUser(context)
+	const person_id = await getRcPersonId(context.db, user.id)
+	if (person_id === null) {
+		throw new ORPCError("UNAUTHORIZED")
+	}
+
+	const date = todayInNYT()
+	const {
+		data: visit,
+		error,
+		response,
+	} = await recurseApi.GET("/hub_visits/{person_id}/{date}", {
+		params: { path: { person_id, date } },
+	})
+
+	// 404 is expected: it means the user has no visit for today, i.e. they're
+	// simply not checked in — not an error.
+	if (response.status === 404) {
+		return { isCheckedIn: false }
+	}
+
+	if (error || !visit) {
+		throw new ORPCError("INTERNAL_SERVER_ERROR", {
+			message: "Failed to fetch hub visits",
+		})
+	}
+
+	return { isCheckedIn: isCheckInActive(visit.created_at) }
 })
