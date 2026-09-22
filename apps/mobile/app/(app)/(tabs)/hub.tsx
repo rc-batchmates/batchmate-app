@@ -1,4 +1,4 @@
-import { Text } from "@batchmate/ui"
+import { groupPeopleByBatch, Text } from "@batchmate/ui"
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 import { useRouter } from "expo-router"
 import {
@@ -17,15 +17,18 @@ import { PersonGridCard } from "../../../src/components/person-grid-card"
 import { ScopeChip } from "../../../src/components/scope-chip"
 import { ViewToggle } from "../../../src/components/view-toggle"
 import { api } from "../../../src/lib/api"
+import { useStoredPreference } from "../../../src/lib/use-stored-preference"
 import { useStoredView } from "../../../src/lib/use-stored-view"
 
-type SortKey = "firstName" | "lastName" | "checkInTime"
+type SortKey = "firstName" | "lastName" | "checkInTime" | "batch"
 
 const SORT_OPTIONS: { id: number; name: string; key: SortKey }[] = [
 	{ id: 1, name: "First name", key: "firstName" },
 	{ id: 2, name: "Last name", key: "lastName" },
 	{ id: 3, name: "Check-in time", key: "checkInTime" },
+	{ id: 4, name: "Batch", key: "batch" },
 ]
+const SORT_KEYS = SORT_OPTIONS.map((option) => option.key)
 
 function hourInNYT(iso: string): number | null {
 	if (!iso) return null
@@ -80,10 +83,8 @@ export default function HubScreen() {
 	const checkin = useMutation({
 		...api.hubCheckin.mutationOptions({}),
 		onSuccess: () => {
-			queryClient.setQueryData(
-				hubQueryKey,
-				(old: typeof hub | undefined) =>
-					old ? { ...old, isCheckedIn: true } : old,
+			queryClient.setQueryData(hubQueryKey, (old: typeof hub | undefined) =>
+				old ? { ...old, isCheckedIn: true } : old,
 			)
 			queryClient.invalidateQueries({ queryKey: hubQueryKey })
 		},
@@ -92,7 +93,11 @@ export default function HubScreen() {
 	const visitors = hub?.visitors
 	const isCheckedIn = hub?.isCheckedIn ?? false
 
-	const [sortKey, setSortKey] = useState<SortKey>("firstName")
+	const [sortKey, setSortKey] = useStoredPreference<SortKey>(
+		"hub-sort",
+		"firstName",
+		SORT_KEYS,
+	)
 	const [showOvernight, setShowOvernight] = useState(false)
 	const [sortOpen, setSortOpen] = useState(false)
 	const [view, setView] = useStoredView("hub")
@@ -136,6 +141,44 @@ export default function HubScreen() {
 
 	const currentSortLabel =
 		SORT_OPTIONS.find((s) => s.key === sortKey)?.name ?? "Sort"
+	const batchGroups = useMemo(
+		() => (sortKey === "batch" ? groupPeopleByBatch(mainList) : []),
+		[mainList, sortKey],
+	)
+
+	const renderPeople = (people: typeof mainList) =>
+		view === "grid" ? (
+			<View className="flex-row flex-wrap -mx-1">
+				{people.map((visit) => (
+					<View key={visit.personId} className="w-1/2 px-1 pb-2">
+						<PersonGridCard
+							name={visit.name}
+							imageUrl={visit.imageUrl}
+							batch={visit.batch}
+							stintType={visit.stintType}
+							badge={
+								overnightIds.has(visit.personId) ? <OvernightBadge /> : null
+							}
+							onPress={() => router.push(`/(app)/member/${visit.personId}`)}
+						/>
+					</View>
+				))}
+			</View>
+		) : (
+			<View className="gap-2.5">
+				{people.map((visit) => (
+					<PersonCard
+						key={visit.personId}
+						name={visit.name}
+						imageUrl={visit.imageUrl}
+						batch={visit.batch}
+						stintType={visit.stintType}
+						badge={overnightIds.has(visit.personId) ? <OvernightBadge /> : null}
+						onPress={() => router.push(`/(app)/member/${visit.personId}`)}
+					/>
+				))}
+			</View>
+		)
 
 	return (
 		<ScrollView
@@ -242,41 +285,23 @@ export default function HubScreen() {
 								Only overnight check-ins so far
 							</Text>
 						</View>
-					) : view === "grid" ? (
-						<View className="flex-row flex-wrap -mx-1">
-							{mainList.map((visit) => (
-								<View
-									key={visit.personId}
-									className="w-1/2 px-1 pb-2"
-								>
-									<PersonGridCard
-										name={visit.name}
-										imageUrl={visit.imageUrl}
-										batch={visit.batch}
-										stintType={visit.stintType}
-										badge={
-											overnightIds.has(visit.personId) ? <OvernightBadge /> : null
-										}
-										onPress={() => router.push(`/(app)/member/${visit.personId}`)}
-									/>
-								</View>
-							))}
-						</View>
 					) : (
-						<View className="gap-2.5">
-							{mainList.map((visit) => (
-								<PersonCard
-									key={visit.personId}
-									name={visit.name}
-									imageUrl={visit.imageUrl}
-									batch={visit.batch}
-									stintType={visit.stintType}
-									badge={
-										overnightIds.has(visit.personId) ? <OvernightBadge /> : null
-									}
-									onPress={() => router.push(`/(app)/member/${visit.personId}`)}
-								/>
-							))}
+						<View className="gap-6">
+							{sortKey === "batch"
+								? batchGroups.map((group) => (
+										<View key={group.label} className="gap-3">
+											<View className="flex-row items-baseline gap-2">
+												<Text className="text-sm font-semibold">
+													{group.label}
+												</Text>
+												<Text className="text-xs text-text-tertiary">
+													{group.people.length}
+												</Text>
+											</View>
+											{renderPeople(group.people)}
+										</View>
+									))
+								: renderPeople(mainList)}
 						</View>
 					)}
 				</View>

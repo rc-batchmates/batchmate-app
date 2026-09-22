@@ -127,7 +127,7 @@ function ProgressBar({
 	return (
 		<View
 			pointerEvents="none"
-			className="absolute right-0 bottom-0 left-0 h-1 overflow-hidden rounded-b-xl bg-surface-inset"
+			className="absolute right-0 bottom-0 left-0 h-1 overflow-hidden rounded-b-xl bg-card"
 		>
 			<Animated.View style={{ width, height: "100%" }} className="bg-primary" />
 		</View>

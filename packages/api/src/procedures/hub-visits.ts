@@ -112,15 +112,40 @@ export const hubVisits = server.hubVisits.handler(async ({ context }) => {
 						{ params: { path: { person_id_or_email: String(id) } } },
 					)
 					if (!profile) return null
-					const lastStint = profile.stints?.[profile.stints.length - 1]
+					const stints = profile.stints ?? []
+					const latestStint = stints.reduce<(typeof stints)[number] | null>(
+						(latest, stint) =>
+							!latest || stint.start_date > latest.start_date ? stint : latest,
+						null,
+					)
+					const latestBatchStint = stints.reduce<
+						(typeof stints)[number] | null
+					>((latest, stint) => {
+						if (!stint.batch?.name) return latest
+						return !latest || stint.start_date > latest.start_date
+							? stint
+							: latest
+					}, null)
+					const role = getRoleFromStints(stints)
+					const roleStint =
+						role === "faculty"
+							? stints.find(
+									(stint) => stint.type === "employment" && stint.in_progress,
+								)
+							: role === "current"
+								? stints.find(
+										(stint) => stint.type === "retreat" && stint.in_progress,
+									)
+								: null
+					const displayStint = roleStint ?? latestBatchStint ?? latestStint
 					return {
 						personId: id,
 						imageUrl: profile.image_path ?? null,
-						batch: lastStint?.batch?.name ?? null,
-						stintType: lastStint?.type ?? null,
-						stintInProgress: lastStint?.in_progress ?? false,
+						batch: latestBatchStint?.batch?.name ?? null,
+						stintType: displayStint?.type ?? null,
+						stintInProgress: displayStint?.in_progress ?? false,
 						pronouns: profile.pronouns ?? null,
-						role: getRoleFromStints(profile.stints),
+						role,
 					}
 				}),
 			)
@@ -193,10 +218,7 @@ export const hubVisits = server.hubVisits.handler(async ({ context }) => {
 				stintType: profile?.stintType ?? null,
 				pronouns: profile?.pronouns ?? null,
 				role: profile
-					? getRoleFromCachedStint(
-							profile.stintType,
-							profile.stintInProgress,
-						)
+					? getRoleFromCachedStint(profile.stintType, profile.stintInProgress)
 					: null,
 				notes: visit.notes ?? "",
 				checkedInAt: visit.created_at ?? "",
