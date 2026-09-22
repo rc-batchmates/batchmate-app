@@ -38,6 +38,10 @@ export {
 	AVATAR_SIZE_PX,
 	type AvatarSize,
 } from "./lib/avatar-tokens"
+export {
+	type BatchGroup,
+	groupPeopleByBatch,
+} from "./lib/batch-groups"
 export { cn } from "./lib/cn"
 export { ROLES, SCOPES } from "./lib/directory-constants"
 export { getInitials, getSubtitle, stintTypeLabels } from "./lib/stint-labels"
