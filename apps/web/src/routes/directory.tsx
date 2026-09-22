@@ -1,4 +1,4 @@
-import { ROLES, SCOPES } from "@batchmate/ui"
+import { groupPeopleByBatch, ROLES, SCOPES } from "@batchmate/ui"
 import { useInfiniteQuery, useQuery } from "@tanstack/react-query"
 import {
 	createFileRoute,
@@ -6,8 +6,15 @@ import {
 	redirect,
 	useNavigate,
 } from "@tanstack/react-router"
-import { Briefcase, Calendar, MapPin, Search, User } from "lucide-react"
-import { useEffect, useRef, useState } from "react"
+import {
+	ArrowUpDown,
+	Briefcase,
+	Calendar,
+	MapPin,
+	Search,
+	User,
+} from "lucide-react"
+import { useEffect, useMemo, useRef, useState } from "react"
 import { z } from "zod"
 import { FilterDropdown } from "@/components/filter-dropdown"
 import { PageLayout } from "@/components/page-layout"
@@ -17,10 +24,29 @@ import { ScopeChip } from "@/components/scope-chip"
 import { ViewToggle } from "@/components/view-toggle"
 import { api } from "@/lib/api"
 import { authClient, useSession } from "@/lib/auth"
+import { useStoredPreference } from "@/lib/use-stored-preference"
 import { useStoredView } from "@/lib/use-stored-view"
 
 const PAGE_SIZE = 50
 const SEARCH_DEBOUNCE_MS = 300
+
+type SortKey = "firstName" | "lastName" | "batch"
+
+const SORT_OPTIONS: { id: number; name: string; key: SortKey }[] = [
+	{ id: 1, name: "First name", key: "firstName" },
+	{ id: 2, name: "Last name", key: "lastName" },
+	{ id: 3, name: "Batch", key: "batch" },
+]
+const SORT_KEYS = SORT_OPTIONS.map((option) => option.key)
+
+function firstName(name: string) {
+	return name.split(" ")[0] ?? ""
+}
+
+function lastName(name: string) {
+	const parts = name.split(" ")
+	return parts[parts.length - 1] ?? ""
+}
 
 const directorySearchSchema = z.object({
 	query: z.string().optional().catch(undefined),
@@ -53,10 +79,15 @@ function DirectoryPage() {
 
 	const loadMoreRef = useRef<HTMLDivElement>(null)
 	const [openDropdown, setOpenDropdown] = useState<
-		"batch" | "role" | "location" | null
+		"batch" | "role" | "location" | "sort" | null
 	>(null)
 	const [searchInput, setSearchInput] = useState(query ?? "")
 	const [view, setView] = useStoredView("directory")
+	const [sortKey, setSortKey] = useStoredPreference<SortKey>(
+		"directory-sort",
+		"firstName",
+		SORT_KEYS,
+	)
 	const debounceRef = useRef<ReturnType<typeof setTimeout>>(null)
 
 	// Sync local input when URL query changes externally (e.g. back/forward)
@@ -85,7 +116,7 @@ function DirectoryPage() {
 		}, SEARCH_DEBOUNCE_MS)
 	}
 
-	function toggleDropdown(name: "batch" | "role" | "location") {
+	function toggleDropdown(name: "batch" | "role" | "location" | "sort") {
 		setOpenDropdown((prev) => (prev === name ? null : name))
 	}
 
@@ -148,7 +179,51 @@ function DirectoryPage() {
 	}, [hasNextPage, isFetchingNextPage, fetchNextPage])
 
 	const people = results?.pages.flatMap((page) => page.people) ?? []
+	const sortedPeople = useMemo(() => {
+		if (sortKey === "batch") return people
+		const namePart = sortKey === "lastName" ? lastName : firstName
+		return [...people].sort((a, b) =>
+			namePart(a.name).localeCompare(namePart(b.name), undefined, {
+				sensitivity: "base",
+			}),
+		)
+	}, [people, sortKey])
+	const batchGroups = useMemo(
+		() => (sortKey === "batch" ? groupPeopleByBatch(people) : []),
+		[people, sortKey],
+	)
 	const hasFilters = batchId != null || role != null || locationId != null
+	const currentSortLabel =
+		SORT_OPTIONS.find((option) => option.key === sortKey)?.name ?? "Sort"
+
+	const renderPeople = (members: typeof people) =>
+		view === "grid" ? (
+			<div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
+				{members.map((person) => (
+					<PersonGridCard
+						key={person.id}
+						personId={person.id}
+						name={person.name}
+						imageUrl={person.imageUrl}
+						batch={person.batch}
+						stintType={person.stintType}
+					/>
+				))}
+			</div>
+		) : (
+			<div className="flex flex-col gap-2.5 md:grid md:grid-cols-2 md:gap-3">
+				{members.map((person) => (
+					<PersonCard
+						key={person.id}
+						personId={person.id}
+						name={person.name}
+						imageUrl={person.imageUrl}
+						batch={person.batch}
+						stintType={person.stintType}
+					/>
+				))}
+			</div>
+		)
 
 	return (
 		<PageLayout
@@ -256,7 +331,21 @@ function DirectoryPage() {
 			</div>
 
 			{/* Scope chips + view toggle */}
-			<div className="flex items-center gap-2">
+			<div className="flex flex-wrap items-center gap-2">
+				<FilterDropdown
+					icon={ArrowUpDown}
+					label={currentSortLabel}
+					active={false}
+					items={SORT_OPTIONS}
+					isLoading={false}
+					open={openDropdown === "sort"}
+					onToggle={() => toggleDropdown("sort")}
+					onSelect={(option) => {
+						setSortKey(option.key)
+						setOpenDropdown(null)
+					}}
+					clearable={false}
+				/>
 				{SCOPES.map((s) => (
 					<ScopeChip
 						key={s.value}
@@ -287,32 +376,24 @@ function DirectoryPage() {
 			)}
 
 			{people.length > 0 &&
-				(view === "grid" ? (
-					<div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
-						{people.map((person) => (
-							<PersonGridCard
-								key={person.id}
-								personId={person.id}
-								name={person.name}
-								imageUrl={person.imageUrl}
-								batch={person.batch}
-								stintType={person.stintType}
-							/>
+				(sortKey === "batch" ? (
+					<div className="flex flex-col gap-6">
+						{batchGroups.map((group) => (
+							<section key={group.label} className="flex flex-col gap-3">
+								<div className="flex items-baseline gap-2">
+									<h2 className="text-sm font-semibold text-foreground">
+										{group.label}
+									</h2>
+									<span className="text-xs text-text-tertiary">
+										{group.people.length}
+									</span>
+								</div>
+								{renderPeople(group.people)}
+							</section>
 						))}
 					</div>
 				) : (
-					<div className="flex flex-col gap-2.5 md:grid md:grid-cols-2 md:gap-3">
-						{people.map((person) => (
-							<PersonCard
-								key={person.id}
-								personId={person.id}
-								name={person.name}
-								imageUrl={person.imageUrl}
-								batch={person.batch}
-								stintType={person.stintType}
-							/>
-						))}
-					</div>
+					renderPeople(sortedPeople)
 				))}
 			{isFetchingNextPage && (
 				<div className="flex items-center justify-center py-4">

@@ -1,8 +1,20 @@
-import { ROLES, SCOPES, Text } from "@batchmate/ui"
+import {
+	type BatchGroup,
+	groupPeopleByBatch,
+	ROLES,
+	SCOPES,
+	Text,
+} from "@batchmate/ui"
 import { useInfiniteQuery, useQuery } from "@tanstack/react-query"
 import { useRouter } from "expo-router"
-import { Briefcase, Calendar, MapPin, Search } from "lucide-react-native"
-import { useRef, useState } from "react"
+import {
+	ArrowUpDown,
+	Briefcase,
+	Calendar,
+	MapPin,
+	Search,
+} from "lucide-react-native"
+import { useMemo, useRef, useState } from "react"
 import { FlatList, TextInput, View } from "react-native"
 import { DropdownList } from "../../../src/components/dropdown-list"
 import { FilterChip } from "../../../src/components/filter-chip"
@@ -11,6 +23,7 @@ import { PersonGridCard } from "../../../src/components/person-grid-card"
 import { ScopeChip } from "../../../src/components/scope-chip"
 import { ViewToggle } from "../../../src/components/view-toggle"
 import { api } from "../../../src/lib/api"
+import { useStoredPreference } from "../../../src/lib/use-stored-preference"
 import { useStoredView } from "../../../src/lib/use-stored-view"
 
 const PAGE_SIZE = 50
@@ -18,6 +31,23 @@ const SEARCH_DEBOUNCE_MS = 300
 
 type Scope = "current" | "overlap" | "ngw"
 type Role = "recurser" | "resident" | "faculty"
+type SortKey = "firstName" | "lastName" | "batch"
+
+const SORT_OPTIONS: { id: number; name: string; key: SortKey }[] = [
+	{ id: 1, name: "First name", key: "firstName" },
+	{ id: 2, name: "Last name", key: "lastName" },
+	{ id: 3, name: "Batch", key: "batch" },
+]
+const SORT_KEYS = SORT_OPTIONS.map((option) => option.key)
+
+function firstName(name: string) {
+	return name.split(" ")[0] ?? ""
+}
+
+function lastName(name: string) {
+	const parts = name.split(" ")
+	return parts[parts.length - 1] ?? ""
+}
 
 function DirectoryHeader({
 	query,
@@ -41,6 +71,8 @@ function DirectoryHeader({
 	batchesLoading,
 	locations,
 	locationsLoading,
+	sortKey,
+	onSelectSort,
 	view,
 	onSetView,
 }: {
@@ -52,8 +84,8 @@ function DirectoryHeader({
 	locationId: number | undefined
 	locationName: string | undefined
 	scope: Scope | undefined
-	openDropdown: "batch" | "role" | "location" | null
-	onToggleDropdown: (name: "batch" | "role" | "location") => void
+	openDropdown: "batch" | "role" | "location" | "sort" | null
+	onToggleDropdown: (name: "batch" | "role" | "location" | "sort") => void
 	onClearBatch: () => void
 	onClearRole: () => void
 	onClearLocation: () => void
@@ -65,6 +97,8 @@ function DirectoryHeader({
 	batchesLoading: boolean
 	locations: { id: number; name: string }[]
 	locationsLoading: boolean
+	sortKey: SortKey
+	onSelectSort: (sort: SortKey) => void
 	view: "grid" | "list"
 	onSetView: (v: "grid" | "list") => void
 }) {
@@ -90,6 +124,15 @@ function DirectoryHeader({
 			</View>
 
 			<View className="flex-row flex-wrap gap-2">
+				<FilterChip
+					icon={ArrowUpDown}
+					label={
+						SORT_OPTIONS.find((option) => option.key === sortKey)?.name ??
+						"Sort"
+					}
+					active={false}
+					onPress={() => onToggleDropdown("sort")}
+				/>
 				<FilterChip
 					icon={Calendar}
 					label={batchName ?? "Batch"}
@@ -146,6 +189,16 @@ function DirectoryHeader({
 					activeValue={locationName}
 				/>
 			)}
+			{openDropdown === "sort" && (
+				<DropdownList
+					items={SORT_OPTIONS}
+					isLoading={false}
+					onSelect={(option) => onSelectSort(option.key)}
+					activeValue={
+						SORT_OPTIONS.find((option) => option.key === sortKey)?.name
+					}
+				/>
+			)}
 
 			<View className="flex-row items-center gap-2">
 				{SCOPES.map((s) => (
@@ -175,9 +228,14 @@ export default function DirectoryScreen() {
 	const [role, setRole] = useState<Role | undefined>()
 	const [scope, setScope] = useState<Scope | undefined>()
 	const [openDropdown, setOpenDropdown] = useState<
-		"batch" | "role" | "location" | null
+		"batch" | "role" | "location" | "sort" | null
 	>(null)
 	const [view, setView] = useStoredView("directory")
+	const [sortKey, setSortKey] = useStoredPreference<SortKey>(
+		"directory-sort",
+		"firstName",
+		SORT_KEYS,
+	)
 	const debounceRef = useRef<ReturnType<typeof setTimeout>>(null)
 
 	function handleSearchInput(value: string) {
@@ -188,7 +246,7 @@ export default function DirectoryScreen() {
 		}, SEARCH_DEBOUNCE_MS)
 	}
 
-	function toggleDropdown(name: "batch" | "role" | "location") {
+	function toggleDropdown(name: "batch" | "role" | "location" | "sort") {
 		setOpenDropdown((prev) => (prev === name ? null : name))
 	}
 
@@ -235,17 +293,68 @@ export default function DirectoryScreen() {
 	})
 
 	const people = results?.pages.flatMap((page) => page.people) ?? []
+	const sortedPeople = useMemo(() => {
+		if (sortKey === "batch") return people
+		const namePart = sortKey === "lastName" ? lastName : firstName
+		return [...people].sort((a, b) =>
+			namePart(a.name).localeCompare(namePart(b.name), undefined, {
+				sensitivity: "base",
+			}),
+		)
+	}, [people, sortKey])
+	const batchGroups = useMemo(
+		() => (sortKey === "batch" ? groupPeopleByBatch(people) : []),
+		[people, sortKey],
+	)
+	type DirectoryPerson = (typeof people)[number]
+	type DirectoryListItem = DirectoryPerson | BatchGroup<DirectoryPerson>
+	const listData: DirectoryListItem[] =
+		sortKey === "batch" ? batchGroups : sortedPeople
+
+	const renderPeople = (members: DirectoryPerson[]) =>
+		view === "grid" ? (
+			<View className="flex-row flex-wrap -mx-1">
+				{members.map((person) => (
+					<View key={person.id} className="w-1/2 px-1 pb-2">
+						<PersonGridCard
+							name={person.name}
+							imageUrl={person.imageUrl}
+							batch={person.batch}
+							stintType={person.stintType}
+							onPress={() => router.push(`/(app)/member/${person.id}`)}
+						/>
+					</View>
+				))}
+			</View>
+		) : (
+			<View className="gap-2.5">
+				{members.map((person) => (
+					<PersonCard
+						key={person.id}
+						name={person.name}
+						imageUrl={person.imageUrl}
+						batch={person.batch}
+						stintType={person.stintType}
+						onPress={() => router.push(`/(app)/member/${person.id}`)}
+					/>
+				))}
+			</View>
+		)
 
 	return (
-		<FlatList
-			key={view}
+		<FlatList<DirectoryListItem>
+			key={`${sortKey}:${view}`}
 			className="flex-1 bg-background"
 			contentContainerClassName="px-6 py-4"
-			data={people}
-			keyExtractor={(item) => String(item.id)}
+			data={listData}
+			keyExtractor={(item) =>
+				"people" in item ? `group:${item.label}` : String(item.id)
+			}
 			keyboardShouldPersistTaps="handled"
-			numColumns={view === "grid" ? 2 : 1}
-			columnWrapperClassName={view === "grid" ? "gap-2" : undefined}
+			numColumns={sortKey !== "batch" && view === "grid" ? 2 : 1}
+			columnWrapperClassName={
+				sortKey !== "batch" && view === "grid" ? "gap-2" : undefined
+			}
 			ListHeaderComponent={
 				<DirectoryHeader
 					query={query}
@@ -286,12 +395,31 @@ export default function DirectoryScreen() {
 					batchesLoading={batchesLoading}
 					locations={locations ?? []}
 					locationsLoading={locationsLoading}
+					sortKey={sortKey}
+					onSelectSort={(sort) => {
+						setSortKey(sort)
+						setOpenDropdown(null)
+					}}
 					view={view}
 					onSetView={setView}
 				/>
 			}
-			renderItem={({ item }) =>
-				view === "grid" ? (
+			renderItem={({ item }) => {
+				if ("people" in item) {
+					return (
+						<View className="gap-3 pb-6">
+							<View className="flex-row items-baseline gap-2">
+								<Text className="text-sm font-semibold">{item.label}</Text>
+								<Text className="text-xs text-text-tertiary">
+									{item.people.length}
+								</Text>
+							</View>
+							{renderPeople(item.people)}
+						</View>
+					)
+				}
+
+				return view === "grid" ? (
 					<View className="flex-1 pb-2">
 						<PersonGridCard
 							name={item.name}
@@ -312,7 +440,7 @@ export default function DirectoryScreen() {
 						/>
 					</View>
 				)
-			}
+			}}
 			ListEmptyComponent={
 				isLoading ? (
 					<View className="items-center py-20">
