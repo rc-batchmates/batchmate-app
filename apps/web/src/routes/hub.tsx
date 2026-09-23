@@ -1,14 +1,23 @@
+import { formatHubDate, hubToday, shiftHubDate } from "@batchmate/ui"
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
-import { createFileRoute, Link, redirect } from "@tanstack/react-router"
+import {
+	createFileRoute,
+	Link,
+	redirect,
+	useNavigate,
+} from "@tanstack/react-router"
 import {
 	ArrowUpDown,
 	CheckCircle,
+	ChevronLeft,
+	ChevronRight,
 	MapPin,
 	Moon,
 	User,
 	Users,
 } from "lucide-react"
-import { useMemo, useState } from "react"
+import { useMemo, useRef, useState } from "react"
+import { z } from "zod"
 import { FilterDropdown } from "@/components/filter-dropdown"
 import { PageLayout } from "@/components/page-layout"
 import { PersonCard } from "@/components/person-card"
@@ -65,7 +74,78 @@ function OvernightBadge() {
 	)
 }
 
+const hubSearchSchema = z.object({
+	date: z
+		.string()
+		.regex(/^\d{4}-\d{2}-\d{2}$/)
+		.optional()
+		.catch(undefined),
+})
+
+function HubDatePicker({
+	date,
+	today,
+	onChange,
+}: {
+	date: string
+	today: string
+	onChange: (date: string) => void
+}) {
+	const inputRef = useRef<HTMLInputElement>(null)
+	const isToday = date === today
+
+	return (
+		<span className="-ml-2 flex items-center gap-1 whitespace-nowrap">
+			<button
+				type="button"
+				aria-label="Previous day"
+				onClick={() => onChange(shiftHubDate(date, -1))}
+				className="flex h-8 w-8 shrink-0 cursor-pointer items-center justify-center rounded-full text-text-tertiary hover:bg-card hover:text-foreground"
+			>
+				<ChevronLeft size={20} />
+			</button>
+			<span className="relative">
+				<button
+					type="button"
+					onClick={() => {
+						const input = inputRef.current
+						if (!input) return
+						if (typeof input.showPicker === "function") input.showPicker()
+						else input.focus()
+					}}
+					className="cursor-pointer rounded-md px-1 hover:bg-card"
+				>
+					{formatHubDate(date)}
+				</button>
+				<input
+					ref={inputRef}
+					type="date"
+					tabIndex={-1}
+					aria-hidden
+					max={today}
+					value={date}
+					onChange={(e) => {
+						const next = e.target.value
+						if (next && next <= today) onChange(next)
+					}}
+					className="pointer-events-none absolute inset-0 opacity-0"
+				/>
+			</span>
+			<button
+				type="button"
+				aria-label="Next day"
+				disabled={isToday}
+				onClick={() => onChange(shiftHubDate(date, 1))}
+				className="flex h-8 w-8 shrink-0 cursor-pointer items-center justify-center rounded-full text-text-tertiary hover:bg-card hover:text-foreground disabled:cursor-default disabled:opacity-30 disabled:hover:bg-transparent"
+			>
+				<ChevronRight size={20} />
+			</button>
+		</span>
+	)
+}
+
 export const Route = createFileRoute("/hub")({
+	validateSearch: hubSearchSchema,
 	beforeLoad: async () => {
 		const { data: session } = await authClient.getSession()
 		if (!session) {
@@ -78,20 +158,26 @@ export const Route = createFileRoute("/hub")({
 function HubPage() {
 	const { data: session } = useSession()
 	const queryClient = useQueryClient()
-	const {
-		data: hub,
-		isLoading,
-		error,
-	} = useQuery(api.hubVisits.queryOptions({}))
+	const navigate = useNavigate({ from: "/hub" })
+	const search = Route.useSearch()
+	const today = hubToday()
+	// Treat today and anything later as "today" so the URL stays clean.
+	const selectedDate = search.date && search.date < today ? search.date : today
+	const isToday = selectedDate === today
+	const setSelectedDate = (date: string) =>
+		navigate({ search: { date: date < today ? date : undefined } })
 
-	const hubQueryKey = api.hubVisits.queryOptions({}).queryKey
+	const hubQueryOptions = api.hubVisits.queryOptions({
+		input: isToday ? {} : { date: selectedDate },
+	})
+	const { data: hub, isLoading, error } = useQuery(hubQueryOptions)
+
+	const hubQueryKey = hubQueryOptions.queryKey
 	const checkin = useMutation({
 		...api.hubCheckin.mutationOptions({}),
 		onSuccess: () => {
-			queryClient.setQueryData(
-				hubQueryKey,
-				(old: typeof hub | undefined) =>
-					old ? { ...old, isCheckedIn: true } : old,
+			queryClient.setQueryData(hubQueryKey, (old: typeof hub | undefined) =>
+				old ? { ...old, isCheckedIn: true } : old,
 			)
 			queryClient.invalidateQueries({ queryKey: hubQueryKey })
 		},
@@ -148,12 +234,18 @@ function HubPage() {
 	return (
 		<PageLayout
 			className="gap-6"
-			subtitle="Currently at RC"
-			title="In the Hub"
+			subtitle={isToday ? "Currently at RC" : "Hub visits"}
+			title={
+				<HubDatePicker
+					date={selectedDate}
+					today={today}
+					onChange={setSelectedDate}
+				/>
+			}
 			headerRight={
 				<div className="flex items-center gap-4">
 					{visitors && (
-						<div className="flex items-center gap-1.5 rounded-full bg-cyan/10 px-3.5 py-1.5">
+						<div className="flex shrink-0 items-center gap-1.5 whitespace-nowrap rounded-full bg-cyan/10 px-3.5 py-1.5">
 							<div className="h-2 w-2 rounded-full bg-cyan" />
 							<span className="text-[13px] font-medium text-cyan">
 								{mainList.length} {mainList.length === 1 ? "person" : "people"}
@@ -178,7 +270,7 @@ function HubPage() {
 			}
 		>
 			{/* Check in */}
-			{hub && !isCheckedIn && (
+			{hub && isToday && !isCheckedIn && (
 				<button
 					type="button"
 					onClick={() => checkin.mutate({})}
@@ -192,7 +284,7 @@ function HubPage() {
 				</button>
 			)}
 
-			{hub && isCheckedIn && (
+			{hub && isToday && isCheckedIn && (
 				<div className="flex h-12 w-full items-center justify-center gap-2 rounded-xl border border-cyan/20 bg-cyan/10">
 					<CheckCircle size={18} color="#22D3EE" />
 					<span className="text-sm font-medium text-cyan">
@@ -220,7 +312,9 @@ function HubPage() {
 				<div className="flex flex-1 flex-col items-center justify-center gap-3">
 					<Users size={48} color="#475569" />
 					<span className="text-sm text-text-tertiary">
-						Nobody is in the hub right now
+						{isToday
+							? "Nobody is in the hub right now"
+							: "Nobody checked in that day"}
 					</span>
 				</div>
 			)}
@@ -259,7 +353,9 @@ function HubPage() {
 						<div className="flex flex-1 flex-col items-center justify-center gap-3">
 							<Moon size={48} color="#475569" />
 							<span className="text-sm text-text-tertiary">
-								Only overnight check-ins so far
+								{isToday
+									? "Only overnight check-ins so far"
+									: "Only overnight check-ins that day"}
 							</span>
 						</div>
 					) : view === "grid" ? (

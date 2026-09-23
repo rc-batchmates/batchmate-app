@@ -165,6 +165,14 @@ export const contract = oc.router({
 	),
 	hubVisits: oc
 		.route({ method: "GET", path: "/hub" })
+		.input(
+			z.object({
+				date: z
+					.string()
+					.regex(/^\d{4}-\d{2}-\d{2}$/)
+					.optional(),
+			}),
+		)
 		.output(HubResponseSchema),
 	hubCheckin: oc
 		.route({ method: "POST", path: "/hub/checkin" })
