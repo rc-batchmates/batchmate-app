@@ -1,4 +1,4 @@
-import { Text } from "@batchmate/ui"
+import { hubToday, Text } from "@batchmate/ui"
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 import { useRouter } from "expo-router"
 import {
@@ -12,6 +12,7 @@ import { useMemo, useState } from "react"
 import { Alert, Pressable, ScrollView, View } from "react-native"
 import { DropdownList } from "../../../src/components/dropdown-list"
 import { FilterChip } from "../../../src/components/filter-chip"
+import { HubDateHeader } from "../../../src/components/hub-date-header"
 import { PersonCard } from "../../../src/components/person-card"
 import { PersonGridCard } from "../../../src/components/person-grid-card"
 import { ScopeChip } from "../../../src/components/scope-chip"
@@ -70,20 +71,25 @@ function OvernightBadge() {
 export default function HubScreen() {
 	const router = useRouter()
 	const queryClient = useQueryClient()
-	const {
-		data: hub,
-		isLoading,
-		error,
-	} = useQuery(api.hubVisits.queryOptions({}))
+	const today = hubToday()
+	const [pickedDate, setPickedDate] = useState<string | null>(null)
+	// Null means "today", so the screen rolls over at midnight on its own.
+	const selectedDate = pickedDate && pickedDate < today ? pickedDate : today
+	const isToday = selectedDate === today
+	const setSelectedDate = (date: string) =>
+		setPickedDate(date < today ? date : null)
 
-	const hubQueryKey = api.hubVisits.queryOptions({}).queryKey
+	const hubQueryOptions = api.hubVisits.queryOptions({
+		input: isToday ? {} : { date: selectedDate },
+	})
+	const { data: hub, isLoading, error } = useQuery(hubQueryOptions)
+
+	const hubQueryKey = hubQueryOptions.queryKey
 	const checkin = useMutation({
 		...api.hubCheckin.mutationOptions({}),
 		onSuccess: () => {
-			queryClient.setQueryData(
-				hubQueryKey,
-				(old: typeof hub | undefined) =>
-					old ? { ...old, isCheckedIn: true } : old,
+			queryClient.setQueryData(hubQueryKey, (old: typeof hub | undefined) =>
+				old ? { ...old, isCheckedIn: true } : old,
 			)
 			queryClient.invalidateQueries({ queryKey: hubQueryKey })
 		},
@@ -144,8 +150,14 @@ export default function HubScreen() {
 		>
 			<View className="flex-row items-center justify-between">
 				<View className="gap-1">
-					<Text className="text-sm text-text-tertiary">Currently at RC</Text>
-					<Text className="text-2xl font-semibold">In the Hub</Text>
+					<Text className="text-sm text-text-tertiary">
+						{isToday ? "Currently at RC" : "Hub visits"}
+					</Text>
+					<HubDateHeader
+						date={selectedDate}
+						today={today}
+						onChange={setSelectedDate}
+					/>
 				</View>
 				{visitors && (
 					<View className="flex-row items-center gap-1.5 rounded-full bg-cyan/10 px-3.5 py-1.5">
@@ -157,7 +169,7 @@ export default function HubScreen() {
 				)}
 			</View>
 
-			{hub && !isCheckedIn && (
+			{hub && isToday && !isCheckedIn && (
 				<Pressable
 					className="h-12 flex-row items-center justify-center gap-2 rounded-xl bg-cyan"
 					onPress={() => checkin.mutate({})}
@@ -170,7 +182,7 @@ export default function HubScreen() {
 				</Pressable>
 			)}
 
-			{hub && isCheckedIn && (
+			{hub && isToday && isCheckedIn && (
 				<View className="h-12 flex-row items-center justify-center gap-2 rounded-xl border border-cyan/20 bg-cyan/10">
 					<CheckCircle size={18} color="#22D3EE" />
 					<Text className="text-sm font-medium text-primary">
@@ -197,7 +209,9 @@ export default function HubScreen() {
 				<View className="flex-1 items-center justify-center gap-3 py-20">
 					<Users size={48} color="#475569" />
 					<Text className="text-sm text-text-tertiary">
-						Nobody is in the hub right now
+						{isToday
+							? "Nobody is in the hub right now"
+							: "Nobody checked in that day"}
 					</Text>
 				</View>
 			)}
@@ -239,25 +253,28 @@ export default function HubScreen() {
 						<View className="flex-1 items-center justify-center gap-3 py-20">
 							<Moon size={48} color="#475569" />
 							<Text className="text-sm text-text-tertiary">
-								Only overnight check-ins so far
+								{isToday
+									? "Only overnight check-ins so far"
+									: "Only overnight check-ins that day"}
 							</Text>
 						</View>
 					) : view === "grid" ? (
 						<View className="flex-row flex-wrap -mx-1">
 							{mainList.map((visit) => (
-								<View
-									key={visit.personId}
-									className="w-1/2 px-1 pb-2"
-								>
+								<View key={visit.personId} className="w-1/2 px-1 pb-2">
 									<PersonGridCard
 										name={visit.name}
 										imageUrl={visit.imageUrl}
 										batch={visit.batch}
 										stintType={visit.stintType}
 										badge={
-											overnightIds.has(visit.personId) ? <OvernightBadge /> : null
+											overnightIds.has(visit.personId) ? (
+												<OvernightBadge />
+											) : null
 										}
-										onPress={() => router.push(`/(app)/member/${visit.personId}`)}
+										onPress={() =>
+											router.push(`/(app)/member/${visit.personId}`)
+										}
 									/>
 								</View>
 							))}
