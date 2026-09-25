@@ -1,4 +1,10 @@
-import { getInitials, getSubtitle, SCOPES, Text } from "@batchmate/ui"
+import {
+	getInitials,
+	getSubtitle,
+	SCOPES,
+	Text,
+	useThemeColors,
+} from "@batchmate/ui"
 import { useRouter } from "expo-router"
 import { ChevronRight, Search } from "lucide-react-native"
 import { useState } from "react"
@@ -76,6 +82,7 @@ function PersonCard({
 	stintType: string | null
 	onPress: () => void
 }) {
+	const c = useThemeColors()
 	return (
 		<Pressable
 			className="flex-row items-center gap-3 rounded-xl bg-card px-4 py-3.5"
@@ -96,7 +103,7 @@ function PersonCard({
 					{getSubtitle(batch, stintType)}
 				</Text>
 			</View>
-			<ChevronRight size={20} color="#475569" />
+			<ChevronRight size={20} color={c.textMuted} />
 		</Pressable>
 	)
 }
@@ -130,6 +137,7 @@ function ScopeChip({
 type Scope = "current" | "overlap" | "ngw"
 
 export default function DemoDirectoryScreen() {
+	const c = useThemeColors()
 	const router = useRouter()
 	const [query, setQuery] = useState("")
 	const [scope, setScope] = useState<Scope | undefined>()
@@ -155,10 +163,10 @@ export default function DemoDirectoryScreen() {
 					</View>
 
 					<View className="flex-row items-center gap-2 rounded-[10px] border border-border bg-card px-3.5 py-2.5">
-						<Search size={18} color="#64748B" />
+						<Search size={18} color={c.textTertiary} />
 						<TextInput
 							placeholder="Search by name, interests..."
-							placeholderTextColor="#64748B"
+							placeholderTextColor={c.textTertiary}
 							value={query}
 							onChangeText={setQuery}
 							className="flex-1 text-sm text-foreground"
@@ -193,7 +201,7 @@ export default function DemoDirectoryScreen() {
 			)}
 			ListEmptyComponent={
 				<View className="items-center gap-3 py-20">
-					<Search size={48} color="#475569" />
+					<Search size={48} color={c.textMuted} />
 					<Text className="text-sm text-text-tertiary">No results found</Text>
 				</View>
 			}

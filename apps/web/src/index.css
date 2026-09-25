@@ -1,6 +1,37 @@
 @import "@batchmate/ui/theme.css";
 @source "../../../packages/ui/src";
 
+:root {
+	--radius: 0.75rem;
+	--background: #0a0f1c;
+	--foreground: #ffffff;
+	--card: #1e293b;
+	--card-foreground: #ffffff;
+	--popover: #1e293b;
+	--popover-foreground: #ffffff;
+	--primary: #22d3ee;
+	--primary-foreground: #0a0f1c;
+	--secondary: #1e293b;
+	--secondary-foreground: #ffffff;
+	--muted: #0f172a;
+	--muted-foreground: #64748b;
+	--accent: #1e293b;
+	--accent-foreground: #ffffff;
+	--destructive: #ef4444;
+	--destructive-foreground: #ffffff;
+	--border: #1e293b;
+	--input: #1e293b;
+	--ring: #22d3ee;
+	--brand: #22d3ee;
+	--brand-foreground: #0a0f1c;
+	--surface-inset: #0f172a;
+	--text-secondary: #94a3b8;
+	--text-tertiary: #64748b;
+	--text-muted: #475569;
+	--divider: #0f172a;
+	--cyan: #22d3ee;
+}
+
 /* react-native-web reset: ensure RN primitives work with Tailwind classes */
 html {
 	height: 100%;

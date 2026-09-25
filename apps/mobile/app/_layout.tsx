@@ -6,6 +6,9 @@ import { Slot } from "expo-router"
 import { StatusBar } from "expo-status-bar"
 import { View } from "react-native"
 import { SafeAreaProvider } from "react-native-css/components/react-native-safe-area-context"
+import { applyStoredThemePreference } from "../src/lib/theme-preference"
+
+applyStoredThemePreference()
 
 const queryClient = new QueryClient()
 
@@ -19,7 +22,7 @@ export default function RootLayout() {
 		<View className="flex-1 bg-background">
 			<SafeAreaProvider>
 				<QueryClientProvider client={queryClient}>
-					<StatusBar style="light" />
+					<StatusBar style="auto" />
 					<Slot />
 				</QueryClientProvider>
 			</SafeAreaProvider>

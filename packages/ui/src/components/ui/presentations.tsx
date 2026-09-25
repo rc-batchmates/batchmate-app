@@ -1,6 +1,7 @@
 import { Calendar, Pencil, Plus, Trash2 } from "lucide-react-native"
 import { useState } from "react"
 import { Pressable, View } from "react-native"
+import { useThemeColors } from "../../lib/theme-colors"
 import { Input } from "./input"
 import { Text } from "./text"
 
@@ -50,6 +51,7 @@ function PresentationsList({
 	isCreating,
 	isUpdating,
 }: PresentationsListProps) {
+	const c = useThemeColors()
 	const isFull = maxSignUps != null && presentations.length >= maxSignUps
 	// `null` = untouched (show default); any string = user-controlled (even "")
 	const [presenterInput, setPresenterInput] = useState<string | null>(null)
@@ -89,7 +91,7 @@ function PresentationsList({
 		<View className="w-full gap-6">
 			{sessionLabel && (
 				<View className="flex-row items-center gap-1.5">
-					<Calendar size={14} color="#22D3EE" />
+					<Calendar size={14} color={c.primary} />
 					<Text className="text-sm font-medium text-primary">
 						{sessionLabel}
 					</Text>
@@ -131,7 +133,7 @@ function PresentationsList({
 						onPress={submitCreate}
 						disabled={!!isCreating || !presenterValue.trim()}
 					>
-						<Plus size={16} color="#0A0F1C" />
+						<Plus size={16} color={c.primaryForeground} />
 						<Text className="text-sm font-semibold text-background">
 							{isCreating ? "Adding..." : "Sign up"}
 						</Text>
@@ -219,14 +221,14 @@ function PresentationsList({
 									onPress={() => startEdit(p)}
 									className="h-9 w-9 items-center justify-center rounded-md border border-primary/30 bg-surface-inset"
 								>
-									<Pencil size={16} color="#22D3EE" />
+									<Pencil size={16} color={c.primary} />
 								</Pressable>
 								<Pressable
 									hitSlop={8}
 									onPress={() => onDelete(p)}
 									className="h-9 w-9 items-center justify-center rounded-md border border-destructive/30 bg-surface-inset"
 								>
-									<Trash2 size={16} color="#F87171" />
+									<Trash2 size={16} color={c.danger} />
 								</Pressable>
 							</View>
 						),

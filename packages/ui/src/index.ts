@@ -76,3 +76,4 @@ export {
 	studyFacesScheduleIncorrect,
 	studyFacesStreakProgress,
 } from "./lib/study-faces"
+export { type ThemeColors, useThemeColors } from "./lib/theme-colors"

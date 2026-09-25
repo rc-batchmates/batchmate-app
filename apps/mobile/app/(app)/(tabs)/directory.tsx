@@ -1,4 +1,4 @@
-import { ROLES, SCOPES, Text } from "@batchmate/ui"
+import { ROLES, SCOPES, Text, useThemeColors } from "@batchmate/ui"
 import { useInfiniteQuery, useQuery } from "@tanstack/react-query"
 import { useRouter } from "expo-router"
 import { Briefcase, Calendar, MapPin, Search } from "lucide-react-native"
@@ -68,6 +68,7 @@ function DirectoryHeader({
 	view: "grid" | "list"
 	onSetView: (v: "grid" | "list") => void
 }) {
+	const c = useThemeColors()
 	return (
 		<View className="gap-5 pb-2">
 			<View className="gap-1">
@@ -78,10 +79,10 @@ function DirectoryHeader({
 			</View>
 
 			<View className="flex-row items-center gap-2 rounded-[10px] border border-border bg-card px-3.5 py-2.5">
-				<Search size={18} color="#64748B" />
+				<Search size={18} color={c.textTertiary} />
 				<TextInput
 					placeholder="Search by name, interests..."
-					placeholderTextColor="#64748B"
+					placeholderTextColor={c.textTertiary}
 					value={query}
 					onChangeText={onSearchChange}
 					className="flex-1 text-sm text-foreground"
@@ -165,6 +166,7 @@ function DirectoryHeader({
 // --- Screen ---
 
 export default function DirectoryScreen() {
+	const c = useThemeColors()
 	const router = useRouter()
 	const [query, setQuery] = useState("")
 	const [debouncedQuery, setDebouncedQuery] = useState("")
@@ -320,7 +322,7 @@ export default function DirectoryScreen() {
 					</View>
 				) : (
 					<View className="items-center gap-3 py-20">
-						<Search size={48} color="#475569" />
+						<Search size={48} color={c.textMuted} />
 						<Text className="text-sm text-text-tertiary">No results found</Text>
 					</View>
 				)

@@ -1,4 +1,10 @@
-import { ExternalLink, InfoRow, SocialRow, Text } from "@batchmate/ui"
+import {
+	ExternalLink,
+	InfoRow,
+	SocialRow,
+	Text,
+	useThemeColors,
+} from "@batchmate/ui"
 import { useRouter } from "expo-router"
 import {
 	Github,
@@ -11,9 +17,11 @@ import {
 	User,
 } from "lucide-react-native"
 import { Pressable, ScrollView, View } from "react-native"
+import { ThemePicker } from "../../../src/components/theme-picker"
 import { exitDemoMode } from "../../../src/lib/demo"
 
 export default function DemoProfileScreen() {
+	const c = useThemeColors()
 	const router = useRouter()
 
 	return (
@@ -32,7 +40,7 @@ export default function DemoProfileScreen() {
 			{/* Avatar */}
 			<View className="items-center gap-3">
 				<View className="h-24 w-24 items-center justify-center overflow-hidden rounded-full bg-card">
-					<User size={44} color="#22D3EE" />
+					<User size={44} color={c.primary} />
 				</View>
 				<Text className="text-[22px] font-semibold">Demo User</Text>
 				<View className="flex-row items-center gap-1.5">
@@ -76,6 +84,8 @@ export default function DemoProfileScreen() {
 				</View>
 			</View>
 
+			<ThemePicker />
+
 			{/* Sign Out */}
 			<Pressable
 				className="flex-row items-center justify-center gap-2 rounded-xl border border-cyan/20 bg-card px-4 py-3"
@@ -84,7 +94,7 @@ export default function DemoProfileScreen() {
 					router.replace("/(auth)/login")
 				}}
 			>
-				<LogOut size={18} color="#94A3B8" />
+				<LogOut size={18} color={c.textSecondary} />
 				<Text className="text-sm font-medium text-text-secondary">
 					Sign Out
 				</Text>

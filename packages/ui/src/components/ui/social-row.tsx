@@ -1,6 +1,7 @@
 import { ExternalLink as ExternalLinkIcon } from "lucide-react-native"
 import type { ComponentType } from "react"
 import { View } from "react-native"
+import { useThemeColors } from "../../lib/theme-colors"
 import { ExternalLink } from "./external-link"
 import { Text } from "./text"
 
@@ -15,16 +16,17 @@ export function SocialRow({
 	value?: string | null
 	href?: string
 }) {
+	const c = useThemeColors()
 	const content = (
 		<>
-			<Icon size={18} color="#64748B" />
+			<Icon size={18} color={c.textTertiary} />
 			<View className="flex-1 gap-0.5">
 				<Text className="text-xs text-text-tertiary">{label}</Text>
 				<Text className="font-mono text-sm font-medium text-primary">
 					{value || "—"}
 				</Text>
 			</View>
-			{value && <ExternalLinkIcon size={16} color="#475569" />}
+			{value && <ExternalLinkIcon size={16} color={c.textMuted} />}
 		</>
 	)
 

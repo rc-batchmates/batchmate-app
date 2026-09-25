@@ -1,4 +1,10 @@
-import { ExternalLink, InfoRow, SocialRow, Text } from "@batchmate/ui"
+import {
+	ExternalLink,
+	InfoRow,
+	SocialRow,
+	Text,
+	useThemeColors,
+} from "@batchmate/ui"
 import { useRouter } from "expo-router"
 import {
 	Github,
@@ -11,9 +17,11 @@ import {
 } from "lucide-react-native"
 import { Pressable, ScrollView, View } from "react-native"
 import { Avatar } from "../../../src/components/avatar"
+import { ThemePicker } from "../../../src/components/theme-picker"
 import { signOut, useSession } from "../../../src/lib/auth"
 
 export default function ProfileScreen() {
+	const c = useThemeColors()
 	const router = useRouter()
 	const { data: session } = useSession()
 	const user = session?.user as
@@ -121,12 +129,14 @@ export default function ProfileScreen() {
 				</View>
 			</View>
 
+			<ThemePicker />
+
 			{/* Sign Out */}
 			<Pressable
 				className="flex-row items-center justify-center gap-2 rounded-xl border border-cyan/20 bg-card px-4 py-3"
 				onPress={handleSignOut}
 			>
-				<LogOut size={18} color="#94A3B8" />
+				<LogOut size={18} color={c.textSecondary} />
 				<Text className="text-sm font-medium text-text-secondary">
 					Sign Out
 				</Text>

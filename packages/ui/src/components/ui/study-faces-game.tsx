@@ -32,6 +32,7 @@ import {
 	studyFacesScheduleIncorrect,
 	studyFacesStreakProgress,
 } from "../../lib/study-faces"
+import { useThemeColors } from "../../lib/theme-colors"
 import { ExternalLink } from "./external-link"
 import { Text } from "./text"
 
@@ -184,6 +185,7 @@ export function StudyFacesGame({
 	userRcId,
 	storage,
 }: StudyFacesGameProps) {
+	const c = useThemeColors()
 	const [mode, setMode] = useState<StudyFacesMode>("hub")
 
 	const { data: hub, isLoading: hubLoading } = useQuery({
@@ -529,7 +531,7 @@ export function StudyFacesGame({
 							<Text
 								className="font-mono text-lg font-semibold"
 								style={{
-									color: streak > 0 ? progress.nextColor : "#64748B",
+									color: streak > 0 ? progress.nextColor : c.textTertiary,
 								}}
 							>
 								{streak}
@@ -556,7 +558,8 @@ export function StudyFacesGame({
 					<View
 						className="h-1 w-full overflow-hidden rounded-full"
 						style={{
-							backgroundColor: streak > 0 ? progress.prevColor : "#1e293b",
+							backgroundColor:
+								progress.prev > 0 ? progress.prevColor : c.border,
 						}}
 					>
 						<View

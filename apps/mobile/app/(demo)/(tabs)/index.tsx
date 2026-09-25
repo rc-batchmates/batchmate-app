@@ -1,9 +1,16 @@
-import { type DoorAction, DoorControls, Text, ZoomLinks } from "@batchmate/ui"
+import {
+	type DoorAction,
+	DoorControls,
+	Text,
+	useThemeColors,
+	ZoomLinks,
+} from "@batchmate/ui"
 import { User } from "lucide-react-native"
 import { useState } from "react"
 import { ScrollView, View } from "react-native"
 
 export default function DemoHomeScreen() {
+	const c = useThemeColors()
 	const [pendingAction, setPendingAction] = useState<DoorAction | null>(null)
 	const [justUnlocked, setJustUnlocked] = useState<DoorAction | null>(null)
 
@@ -27,7 +34,7 @@ export default function DemoHomeScreen() {
 					<Text className="text-2xl font-semibold">Demo</Text>
 				</View>
 				<View className="h-11 w-11 items-center justify-center overflow-hidden rounded-full bg-card">
-					<User size={22} color="#22D3EE" />
+					<User size={22} color={c.primary} />
 				</View>
 			</View>
 

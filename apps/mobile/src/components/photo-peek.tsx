@@ -1,4 +1,4 @@
-import { getSubtitle, Text } from "@batchmate/ui"
+import { getSubtitle, Text, useThemeColors } from "@batchmate/ui"
 import { User, X } from "lucide-react-native"
 import { Image, Modal, Pressable, View } from "react-native"
 
@@ -17,6 +17,7 @@ export function PhotoPeek({
 	batch: string | null
 	stintType?: string | null
 }) {
+	const c = useThemeColors()
 	return (
 		<Modal
 			visible={visible}
@@ -46,7 +47,7 @@ export function PhotoPeek({
 							resizeMode="cover"
 						/>
 					) : (
-						<User size={120} color="#22D3EE" />
+						<User size={120} color={c.primary} />
 					)}
 				</View>
 				<View className="mt-6 items-center gap-1.5">
