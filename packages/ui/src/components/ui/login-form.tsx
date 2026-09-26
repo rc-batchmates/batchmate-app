@@ -78,12 +78,12 @@ export function LoginForm({
 					<Text className="text-center text-sm text-destructive">{error}</Text>
 				) : null}
 				<Pressable
-					className="h-14 w-full flex-row items-center justify-center gap-2.5 rounded-xl bg-primary"
+					className="min-h-14 w-full flex-row items-center justify-center gap-2.5 rounded-xl bg-primary px-4 py-3"
 					onPress={loading ? undefined : handleSubmit}
 					disabled={loading}
 				>
 					<LogIn size={20} color="#0A0F1C" />
-					<Text className="text-base font-semibold text-primary-foreground">
+					<Text className="shrink text-center text-base font-semibold text-primary-foreground">
 						{loading ? "Redirecting..." : "Sign in with Recurse Center"}
 					</Text>
 				</Pressable>

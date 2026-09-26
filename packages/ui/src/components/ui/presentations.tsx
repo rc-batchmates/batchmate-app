@@ -127,7 +127,7 @@ function PresentationsList({
 						/>
 					</View>
 					<Pressable
-						className="h-10 flex-row items-center justify-center gap-2 rounded-md bg-cyan disabled:opacity-50"
+						className="min-h-10 flex-row py-2 items-center justify-center gap-2 rounded-md bg-cyan disabled:opacity-50"
 						onPress={submitCreate}
 						disabled={!!isCreating || !presenterValue.trim()}
 					>
@@ -183,7 +183,7 @@ function PresentationsList({
 								/>
 								<View className="flex-row gap-2">
 									<Pressable
-										className="h-9 flex-1 items-center justify-center rounded-md bg-cyan disabled:opacity-50"
+										className="min-h-9 flex-1 py-2 items-center justify-center rounded-md bg-cyan disabled:opacity-50"
 										onPress={() => submitEdit(p.id)}
 										disabled={!!isUpdating || !editPresenter.trim()}
 									>
@@ -192,7 +192,7 @@ function PresentationsList({
 										</Text>
 									</Pressable>
 									<Pressable
-										className="h-9 flex-1 items-center justify-center rounded-md border border-primary/40 bg-surface-inset"
+										className="min-h-9 flex-1 py-2 items-center justify-center rounded-md border border-primary/40 bg-surface-inset"
 										onPress={() => setEditingId(null)}
 									>
 										<Text className="text-sm font-semibold text-primary">

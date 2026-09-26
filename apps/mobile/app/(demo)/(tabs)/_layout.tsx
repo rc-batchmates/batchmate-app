@@ -16,6 +16,8 @@ export default function DemoTabsLayout() {
 					paddingBottom: insets.bottom,
 					height: 56 + insets.bottom,
 				},
+				// Native iOS tab labels do not scale; long-press shows a large label.
+				tabBarAllowFontScaling: false,
 				tabBarActiveTintColor: "#22D3EE",
 				tabBarInactiveTintColor: "#64748B",
 				tabBarLabelStyle: {
