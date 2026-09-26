@@ -3,6 +3,7 @@ import {
 	type AvatarSize,
 	getInitials,
 	Text,
+	useThemeColors,
 } from "@batchmate/ui"
 import { User } from "lucide-react-native"
 import { Image, View } from "react-native"
@@ -39,6 +40,7 @@ export function Avatar({
 	size?: AvatarSize
 	fallback?: "initials" | "icon"
 }) {
+	const c = useThemeColors()
 	const px = AVATAR_SIZE_PX[size]
 	const radius = RADIUS_FOR_SIZE[size]
 	return (
@@ -53,7 +55,7 @@ export function Avatar({
 					resizeMode="cover"
 				/>
 			) : fallback === "icon" ? (
-				<User size={ICON_SIZE[size]} color="#22D3EE" />
+				<User size={ICON_SIZE[size]} color={c.primary} />
 			) : (
 				<Text
 					className={`${INITIALS_TEXT_CLASS[size]} font-semibold text-primary`}

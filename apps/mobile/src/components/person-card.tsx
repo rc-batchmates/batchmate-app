@@ -1,4 +1,4 @@
-import { getSubtitle, Text } from "@batchmate/ui"
+import { getSubtitle, Text, useThemeColors } from "@batchmate/ui"
 import { ChevronRight } from "lucide-react-native"
 import type { ReactNode } from "react"
 import { Pressable, View } from "react-native"
@@ -19,6 +19,7 @@ export function PersonCard({
 	badge?: ReactNode
 	onPress: () => void
 }) {
+	const c = useThemeColors()
 	return (
 		<Pressable
 			className="flex-row items-center gap-3.5 rounded-xl bg-card px-4 py-3"
@@ -32,7 +33,7 @@ export function PersonCard({
 				</Text>
 			</View>
 			{badge}
-			<ChevronRight size={20} color="#475569" />
+			<ChevronRight size={20} color={c.textMuted} />
 		</Pressable>
 	)
 }

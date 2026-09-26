@@ -1,4 +1,4 @@
-import { InfoRow, SocialRow, Text } from "@batchmate/ui"
+import { InfoRow, SocialRow, Text, useThemeColors } from "@batchmate/ui"
 import { useQuery } from "@tanstack/react-query"
 import { useLocalSearchParams, useRouter } from "expo-router"
 import {
@@ -17,6 +17,7 @@ import { PhotoPeek } from "../../../src/components/photo-peek"
 import { api } from "../../../src/lib/api"
 
 export default function MemberProfileScreen() {
+	const c = useThemeColors()
 	const { id } = useLocalSearchParams<{ id: string }>()
 	const router = useRouter()
 	const [peeking, setPeeking] = useState(false)
@@ -53,7 +54,7 @@ export default function MemberProfileScreen() {
 					className="flex-row items-center gap-1.5"
 					onPress={() => router.back()}
 				>
-					<ChevronLeft size={20} color="#94A3B8" />
+					<ChevronLeft size={20} color={c.textSecondary} />
 					<Text className="text-sm font-medium text-text-secondary">Back</Text>
 				</Pressable>
 				<Text className="text-[17px] font-semibold">Profile</Text>

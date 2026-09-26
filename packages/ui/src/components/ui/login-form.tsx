@@ -1,6 +1,7 @@
 import { Calendar, DoorOpen, LogIn, Users } from "lucide-react-native"
 import { useState } from "react"
 import { Image, type ImageSourcePropType, Pressable, View } from "react-native"
+import { useThemeColors } from "../../lib/theme-colors"
 import { ExternalLink } from "./external-link"
 import { Text } from "./text"
 
@@ -17,9 +18,10 @@ function FeatureRow({
 	icon: typeof DoorOpen
 	label: string
 }) {
+	const c = useThemeColors()
 	return (
 		<View className="flex-row items-center gap-2.5">
-			<Icon size={16} color="#22D3EE" />
+			<Icon size={16} color={c.primary} />
 			<Text className="text-[13px] text-text-secondary">{label}</Text>
 		</View>
 	)
@@ -30,6 +32,7 @@ export function LoginForm({
 	logoSource,
 	onLogoPress,
 }: LoginFormProps) {
+	const c = useThemeColors()
 	const [error, setError] = useState("")
 	const [loading, setLoading] = useState(false)
 
@@ -82,7 +85,7 @@ export function LoginForm({
 					onPress={loading ? undefined : handleSubmit}
 					disabled={loading}
 				>
-					<LogIn size={20} color="#0A0F1C" />
+					<LogIn size={20} color={c.primaryForeground} />
 					<Text className="text-base font-semibold text-primary-foreground">
 						{loading ? "Redirecting..." : "Sign in with Recurse Center"}
 					</Text>
