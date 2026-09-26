@@ -58,7 +58,12 @@ function PersonCard({
 				{imageUrl ? (
 					<Image source={{ uri: imageUrl }} className="h-full w-full" />
 				) : (
-					<Text className="text-sm font-semibold text-primary">{initials}</Text>
+					<Text
+						className="text-sm font-semibold text-primary"
+						maxFontSizeMultiplier={1.2}
+					>
+						{initials}
+					</Text>
 				)}
 			</View>
 			<View className="flex-1 gap-0.5">
@@ -97,7 +102,7 @@ export default function DemoHubScreen() {
 
 			{/* Check in */}
 			{checkedIn ? (
-				<View className="h-12 flex-row items-center justify-center gap-2 rounded-xl border border-cyan/20 bg-cyan/10">
+				<View className="min-h-12 flex-row py-3 items-center justify-center gap-2 rounded-xl border border-cyan/20 bg-cyan/10">
 					<CheckCircle size={18} color="#22D3EE" />
 					<Text className="text-sm font-medium text-primary">
 						You're checked in
@@ -105,7 +110,7 @@ export default function DemoHubScreen() {
 				</View>
 			) : (
 				<Pressable
-					className="h-12 flex-row items-center justify-center gap-2 rounded-xl bg-cyan"
+					className="min-h-12 flex-row py-3 items-center justify-center gap-2 rounded-xl bg-cyan"
 					onPress={() => setCheckedIn(true)}
 				>
 					<Text className="text-[15px] font-semibold text-background">
