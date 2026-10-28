@@ -4,13 +4,14 @@ import {
 	localDateToHubDate,
 	shiftHubDate,
 	Text,
+	useThemeColors,
 } from "@batchmate/ui"
 import DateTimePicker, {
 	DateTimePickerAndroid,
 } from "@react-native-community/datetimepicker"
 import { ChevronLeft, ChevronRight } from "lucide-react-native"
 import { useState } from "react"
-import { Modal, Platform, Pressable, View } from "react-native"
+import { Modal, Platform, Pressable, useColorScheme, View } from "react-native"
 
 export function HubDateHeader({
 	date,
@@ -21,6 +22,8 @@ export function HubDateHeader({
 	today: string
 	onChange: (date: string) => void
 }) {
+	const c = useThemeColors()
+	const scheme = useColorScheme()
 	const [iosPickerOpen, setIosPickerOpen] = useState(false)
 	const isToday = date === today
 	const maximumDate = hubDateToLocalDate(today)
@@ -54,7 +57,7 @@ export function HubDateHeader({
 				className="h-8 w-8 items-center justify-center rounded-full"
 				hitSlop={6}
 			>
-				<ChevronLeft size={22} color="#64748B" />
+				<ChevronLeft size={22} color={c.textTertiary} />
 			</Pressable>
 			<Pressable onPress={openPicker} hitSlop={6}>
 				<Text className="text-2xl font-semibold" numberOfLines={1}>
@@ -70,7 +73,7 @@ export function HubDateHeader({
 				}`}
 				hitSlop={6}
 			>
-				<ChevronRight size={22} color="#64748B" />
+				<ChevronRight size={22} color={c.textTertiary} />
 			</Pressable>
 
 			{Platform.OS === "ios" && (
@@ -88,8 +91,8 @@ export function HubDateHeader({
 							<DateTimePicker
 								mode="date"
 								display="inline"
-								themeVariant="dark"
-								accentColor="#22D3EE"
+								themeVariant={scheme === "light" ? "light" : "dark"}
+								accentColor={c.primary}
 								value={hubDateToLocalDate(date)}
 								maximumDate={maximumDate}
 								onChange={(event, picked) => {
