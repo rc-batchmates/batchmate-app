@@ -56,14 +56,14 @@ export function PhotoPeek({
 						style={{ objectPosition: AVATAR_FACE_OBJECT_POSITION }}
 					/>
 				) : (
-					<User size={120} color="#22D3EE" />
+					<User size={120} className="text-cyan" />
 				)}
 			</div>
 			<div className="flex flex-col items-center gap-1.5">
 				<span className="text-center text-2xl font-semibold text-white">
 					{name}
 				</span>
-				<span className="text-center font-mono text-sm text-text-tertiary">
+				<span className="text-center font-mono text-sm text-white/60">
 					{getSubtitle(batch, stintType ?? null)}
 				</span>
 			</div>

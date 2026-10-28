@@ -1,4 +1,4 @@
-import { Text } from "@batchmate/ui"
+import { groupPeopleByBatch, Text, useThemeColors } from "@batchmate/ui"
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 import { useRouter } from "expo-router"
 import {
@@ -17,15 +17,18 @@ import { PersonGridCard } from "../../../src/components/person-grid-card"
 import { ScopeChip } from "../../../src/components/scope-chip"
 import { ViewToggle } from "../../../src/components/view-toggle"
 import { api } from "../../../src/lib/api"
+import { useStoredPreference } from "../../../src/lib/use-stored-preference"
 import { useStoredView } from "../../../src/lib/use-stored-view"
 
-type SortKey = "firstName" | "lastName" | "checkInTime"
+type SortKey = "firstName" | "lastName" | "checkInTime" | "batch"
 
 const SORT_OPTIONS: { id: number; name: string; key: SortKey }[] = [
 	{ id: 1, name: "First name", key: "firstName" },
 	{ id: 2, name: "Last name", key: "lastName" },
 	{ id: 3, name: "Check-in time", key: "checkInTime" },
+	{ id: 4, name: "Batch", key: "batch" },
 ]
+const SORT_KEYS = SORT_OPTIONS.map((option) => option.key)
 
 function hourInNYT(iso: string): number | null {
 	if (!iso) return null
@@ -50,6 +53,7 @@ function lastName(name: string) {
 }
 
 function OvernightBadge() {
+	const c = useThemeColors()
 	return (
 		<Pressable
 			onPress={() =>
@@ -61,38 +65,52 @@ function OvernightBadge() {
 			className="flex-row items-center gap-1 rounded-full bg-indigo-500/10 px-2 py-0.5"
 			hitSlop={6}
 		>
-			<Moon size={11} color="#A5B4FC" />
-			<Text className="text-[11px] font-medium text-indigo-300">Overnight</Text>
+			<Moon size={11} color={c.moon} />
+			<Text className="text-[11px] font-medium text-moon">Overnight</Text>
 		</Pressable>
 	)
 }
 
 export default function HubScreen() {
+	const c = useThemeColors()
 	const router = useRouter()
 	const queryClient = useQueryClient()
+
+	const {
+		data: checkInStatus,
+		isLoading: checkInStatusIsLoading,
+		error: checkInStatusError,
+	} = useQuery(api.isCheckedIn.queryOptions({}))
+
 	const {
 		data: hub,
-		isLoading,
-		error,
+		isLoading: hubIsLoading,
+		error: hubError,
 	} = useQuery(api.hubVisits.queryOptions({}))
 
+	const isCheckedInQueryKey = api.isCheckedIn.queryOptions({}).queryKey
 	const hubQueryKey = api.hubVisits.queryOptions({}).queryKey
 	const checkin = useMutation({
 		...api.hubCheckin.mutationOptions({}),
 		onSuccess: () => {
 			queryClient.setQueryData(
-				hubQueryKey,
-				(old: typeof hub | undefined) =>
+				isCheckedInQueryKey,
+				(old: typeof checkInStatus | undefined) =>
 					old ? { ...old, isCheckedIn: true } : old,
 			)
+			queryClient.invalidateQueries({ queryKey: isCheckedInQueryKey })
 			queryClient.invalidateQueries({ queryKey: hubQueryKey })
 		},
 	})
 
 	const visitors = hub?.visitors
-	const isCheckedIn = hub?.isCheckedIn ?? false
+	const isCheckedIn = checkInStatus?.isCheckedIn ?? false
 
-	const [sortKey, setSortKey] = useState<SortKey>("firstName")
+	const [sortKey, setSortKey] = useStoredPreference<SortKey>(
+		"hub-sort",
+		"firstName",
+		SORT_KEYS,
+	)
 	const [showOvernight, setShowOvernight] = useState(false)
 	const [sortOpen, setSortOpen] = useState(false)
 	const [view, setView] = useStoredView("hub")
@@ -136,6 +154,44 @@ export default function HubScreen() {
 
 	const currentSortLabel =
 		SORT_OPTIONS.find((s) => s.key === sortKey)?.name ?? "Sort"
+	const batchGroups = useMemo(
+		() => (sortKey === "batch" ? groupPeopleByBatch(mainList) : []),
+		[mainList, sortKey],
+	)
+
+	const renderPeople = (people: typeof mainList) =>
+		view === "grid" ? (
+			<View className="flex-row flex-wrap -mx-1">
+				{people.map((visit) => (
+					<View key={visit.personId} className="w-1/2 px-1 pb-2">
+						<PersonGridCard
+							name={visit.name}
+							imageUrl={visit.imageUrl}
+							batch={visit.batch}
+							stintType={visit.stintType}
+							badge={
+								overnightIds.has(visit.personId) ? <OvernightBadge /> : null
+							}
+							onPress={() => router.push(`/(app)/member/${visit.personId}`)}
+						/>
+					</View>
+				))}
+			</View>
+		) : (
+			<View className="gap-2.5">
+				{people.map((visit) => (
+					<PersonCard
+						key={visit.personId}
+						name={visit.name}
+						imageUrl={visit.imageUrl}
+						batch={visit.batch}
+						stintType={visit.stintType}
+						badge={overnightIds.has(visit.personId) ? <OvernightBadge /> : null}
+						onPress={() => router.push(`/(app)/member/${visit.personId}`)}
+					/>
+				))}
+			</View>
+		)
 
 	return (
 		<ScrollView
@@ -157,35 +213,53 @@ export default function HubScreen() {
 				)}
 			</View>
 
-			{hub && !isCheckedIn && (
+			{checkInStatusIsLoading && (
+				<View className="min-h-12 flex-row py-3 items-center justify-center gap-2 rounded-xl bg-primary opacity-50">
+					<MapPin size={18} color={c.primaryForeground} />
+					<Text className="text-[15px] font-semibold text-primary-foreground">
+						Loading check-in status...
+					</Text>
+				</View>
+			)}
+
+			{checkInStatusError && (
+				<View className="min-h-12 flex-row py-3 items-center justify-center gap-2 rounded-xl border border-destructive/40 opacity-60">
+					<MapPin size={18} color={c.danger} />
+					<Text className="text-[15px] font-semibold text-destructive">
+						Failed to load check-in status.
+					</Text>
+				</View>
+			)}
+
+			{checkInStatus && !isCheckedIn && (
 				<Pressable
-					className="h-12 flex-row items-center justify-center gap-2 rounded-xl bg-cyan"
+					className="min-h-12 flex-row py-3 items-center justify-center gap-2 rounded-xl bg-primary"
 					onPress={() => checkin.mutate({})}
 					disabled={checkin.isPending}
 				>
-					<MapPin size={18} color="#0A0F1C" />
-					<Text className="text-[15px] font-semibold text-background">
+					<MapPin size={18} color={c.primaryForeground} />
+					<Text className="text-[15px] font-semibold text-primary-foreground">
 						{checkin.isPending ? "Checking in..." : "Check in to the Hub"}
 					</Text>
 				</Pressable>
 			)}
 
-			{hub && isCheckedIn && (
-				<View className="h-12 flex-row items-center justify-center gap-2 rounded-xl border border-cyan/20 bg-cyan/10">
-					<CheckCircle size={18} color="#22D3EE" />
+			{checkInStatus && isCheckedIn && (
+				<View className="min-h-12 flex-row py-3 items-center justify-center gap-2 rounded-xl border border-cyan/20 bg-cyan/10">
+					<CheckCircle size={18} color={c.primary} />
 					<Text className="text-sm font-medium text-primary">
 						You're checked in
 					</Text>
 				</View>
 			)}
 
-			{isLoading && (
+			{hubIsLoading && (
 				<View className="flex-1 items-center justify-center py-20">
 					<Text className="text-sm text-text-tertiary">Loading...</Text>
 				</View>
 			)}
 
-			{error && (
+			{hubError && (
 				<View className="flex-1 items-center justify-center py-20">
 					<Text className="text-sm text-destructive">
 						Failed to load hub visits
@@ -195,7 +269,7 @@ export default function HubScreen() {
 
 			{visitors && visitors.length === 0 && (
 				<View className="flex-1 items-center justify-center gap-3 py-20">
-					<Users size={48} color="#475569" />
+					<Users size={48} color={c.textMuted} />
 					<Text className="text-sm text-text-tertiary">
 						Nobody is in the hub right now
 					</Text>
@@ -237,46 +311,28 @@ export default function HubScreen() {
 					)}
 					{mainList.length === 0 ? (
 						<View className="flex-1 items-center justify-center gap-3 py-20">
-							<Moon size={48} color="#475569" />
+							<Moon size={48} color={c.textMuted} />
 							<Text className="text-sm text-text-tertiary">
 								Only overnight check-ins so far
 							</Text>
 						</View>
-					) : view === "grid" ? (
-						<View className="flex-row flex-wrap -mx-1">
-							{mainList.map((visit) => (
-								<View
-									key={visit.personId}
-									className="w-1/2 px-1 pb-2"
-								>
-									<PersonGridCard
-										name={visit.name}
-										imageUrl={visit.imageUrl}
-										batch={visit.batch}
-										stintType={visit.stintType}
-										badge={
-											overnightIds.has(visit.personId) ? <OvernightBadge /> : null
-										}
-										onPress={() => router.push(`/(app)/member/${visit.personId}`)}
-									/>
-								</View>
-							))}
-						</View>
 					) : (
-						<View className="gap-2.5">
-							{mainList.map((visit) => (
-								<PersonCard
-									key={visit.personId}
-									name={visit.name}
-									imageUrl={visit.imageUrl}
-									batch={visit.batch}
-									stintType={visit.stintType}
-									badge={
-										overnightIds.has(visit.personId) ? <OvernightBadge /> : null
-									}
-									onPress={() => router.push(`/(app)/member/${visit.personId}`)}
-								/>
-							))}
+						<View className="gap-6">
+							{sortKey === "batch"
+								? batchGroups.map((group) => (
+										<View key={group.label} className="gap-3">
+											<View className="flex-row items-baseline gap-2">
+												<Text className="text-sm font-semibold">
+													{group.label}
+												</Text>
+												<Text className="text-xs text-text-tertiary">
+													{group.people.length}
+												</Text>
+											</View>
+											{renderPeople(group.people)}
+										</View>
+									))
+								: renderPeople(mainList)}
 						</View>
 					)}
 				</View>

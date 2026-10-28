@@ -65,7 +65,7 @@ function PresentationsPage() {
 							className="h-full w-full object-cover"
 						/>
 					) : (
-						<User size={22} color="#22D3EE" />
+						<User size={22} className="text-cyan" />
 					)}
 				</Link>
 			}

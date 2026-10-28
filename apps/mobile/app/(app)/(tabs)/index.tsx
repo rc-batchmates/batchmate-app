@@ -3,6 +3,7 @@ import {
 	DoorControls,
 	formatCents,
 	Text,
+	useThemeColors,
 	ZoomLinks,
 } from "@batchmate/ui"
 import { useMutation, useQuery } from "@tanstack/react-query"
@@ -14,6 +15,7 @@ import { api } from "../../../src/lib/api"
 import { useSession } from "../../../src/lib/auth"
 
 export default function HomeScreen() {
+	const c = useThemeColors()
 	const router = useRouter()
 	const { data: session } = useSession()
 	const health = useQuery(api.health.queryOptions({}))
@@ -62,7 +64,7 @@ export default function HomeScreen() {
 							className="h-full w-full"
 						/>
 					) : (
-						<User size={22} color="#22D3EE" />
+						<User size={22} color={c.primary} />
 					)}
 				</Pressable>
 			</View>
@@ -99,7 +101,7 @@ export default function HomeScreen() {
 				onPress={() => router.push("/snack-bar")}
 			>
 				<View className="flex-row items-center gap-2.5">
-					<Cookie size={18} color="#22D3EE" />
+					<Cookie size={18} color={c.primary} />
 					<View>
 						<Text className="text-[15px] font-semibold text-primary">
 							Snack Bar
@@ -120,7 +122,7 @@ export default function HomeScreen() {
 				onPress={() => router.push("/(app)/study-faces")}
 			>
 				<View className="flex-row items-center gap-2.5">
-					<Sparkles size={18} color="#22D3EE" />
+					<Sparkles size={18} color={c.primary} />
 					<View>
 						<Text className="text-[15px] font-semibold text-primary">
 							Study faces

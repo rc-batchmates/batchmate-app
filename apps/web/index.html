@@ -7,6 +7,26 @@
     <link rel="manifest" href="/manifest.webmanifest" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
     <meta name="theme-color" content="#0a0f1c" />
+    <script>
+      // Apply the saved theme before first paint. Dark unless the user picked
+      // light, or picked system and the OS is light. Keep in sync with
+      // src/lib/theme-preference.ts.
+      (() => {
+        var media = window.matchMedia("(prefers-color-scheme: light)")
+        function apply() {
+          var pref = null
+          try {
+            pref = localStorage.getItem("batchmate:theme")
+          } catch {}
+          var light = pref === "light" || (pref === "system" && media.matches)
+          document.documentElement.classList.toggle("light", light)
+          var meta = document.querySelector('meta[name="theme-color"]')
+          if (meta) meta.setAttribute("content", light ? "#f8fafc" : "#0a0f1c")
+        }
+        apply()
+        media.addEventListener("change", apply)
+      })()
+    </script>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />

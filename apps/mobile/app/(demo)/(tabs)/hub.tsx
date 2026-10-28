@@ -1,4 +1,4 @@
-import { Text } from "@batchmate/ui"
+import { Text, useThemeColors } from "@batchmate/ui"
 import { useRouter } from "expo-router"
 import { CheckCircle, ChevronRight } from "lucide-react-native"
 import { useState } from "react"
@@ -42,6 +42,7 @@ function PersonCard({
 	batch: string | null
 	onPress: () => void
 }) {
+	const c = useThemeColors()
 	const initials = name
 		.split(" ")
 		.map((n) => n[0])
@@ -58,7 +59,12 @@ function PersonCard({
 				{imageUrl ? (
 					<Image source={{ uri: imageUrl }} className="h-full w-full" />
 				) : (
-					<Text className="text-sm font-semibold text-primary">{initials}</Text>
+					<Text
+						className="text-sm font-semibold text-primary"
+						maxFontSizeMultiplier={1.2}
+					>
+						{initials}
+					</Text>
 				)}
 			</View>
 			<View className="flex-1 gap-0.5">
@@ -67,12 +73,13 @@ function PersonCard({
 					{batch ?? "Recurser"}
 				</Text>
 			</View>
-			<ChevronRight size={20} color="#475569" />
+			<ChevronRight size={20} color={c.textMuted} />
 		</Pressable>
 	)
 }
 
 export default function DemoHubScreen() {
+	const c = useThemeColors()
 	const router = useRouter()
 	const [checkedIn, setCheckedIn] = useState(false)
 
@@ -97,18 +104,18 @@ export default function DemoHubScreen() {
 
 			{/* Check in */}
 			{checkedIn ? (
-				<View className="h-12 flex-row items-center justify-center gap-2 rounded-xl border border-cyan/20 bg-cyan/10">
-					<CheckCircle size={18} color="#22D3EE" />
+				<View className="min-h-12 flex-row py-3 items-center justify-center gap-2 rounded-xl border border-cyan/20 bg-cyan/10">
+					<CheckCircle size={18} color={c.primary} />
 					<Text className="text-sm font-medium text-primary">
 						You're checked in
 					</Text>
 				</View>
 			) : (
 				<Pressable
-					className="h-12 flex-row items-center justify-center gap-2 rounded-xl bg-cyan"
+					className="min-h-12 flex-row py-3 items-center justify-center gap-2 rounded-xl bg-primary"
 					onPress={() => setCheckedIn(true)}
 				>
-					<Text className="text-[15px] font-semibold text-background">
+					<Text className="text-[15px] font-semibold text-primary-foreground">
 						Check in to the Hub
 					</Text>
 				</Pressable>

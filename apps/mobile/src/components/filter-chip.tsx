@@ -1,4 +1,4 @@
-import { Text } from "@batchmate/ui"
+import { Text, useThemeColors } from "@batchmate/ui"
 import { ChevronDown } from "lucide-react-native"
 import { Pressable } from "react-native"
 
@@ -13,6 +13,7 @@ export function FilterChip({
 	active: boolean
 	onPress: () => void
 }) {
+	const c = useThemeColors()
 	return (
 		<Pressable
 			className={`flex-row items-center gap-1.5 rounded-lg border px-3 py-2 ${
@@ -20,13 +21,13 @@ export function FilterChip({
 			}`}
 			onPress={onPress}
 		>
-			<Icon size={14} color={active ? "#22D3EE" : "#94A3B8"} />
+			<Icon size={14} color={active ? c.primary : c.textSecondary} />
 			<Text
 				className={`text-[13px] font-medium ${active ? "text-primary" : "text-text-secondary"}`}
 			>
 				{label}
 			</Text>
-			<ChevronDown size={14} color={active ? "#22D3EE" : "#64748B"} />
+			<ChevronDown size={14} color={active ? c.primary : c.textTertiary} />
 		</Pressable>
 	)
 }

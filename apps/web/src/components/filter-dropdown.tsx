@@ -13,7 +13,7 @@ export function FilterDropdown<T extends { id: number; name: string }>({
 	onClear,
 	clearable = true,
 }: {
-	icon: React.ComponentType<{ size: number; color: string }>
+	icon: React.ComponentType<{ size: number }>
 	label: string
 	active: boolean
 	items: T[]
@@ -58,9 +58,12 @@ export function FilterDropdown<T extends { id: number; name: string }>({
 						: "border-border bg-card text-text-secondary hover:bg-card/80"
 				}`}
 			>
-				<Icon size={14} color={active ? "#22D3EE" : "#94A3B8"} />
+				<Icon size={14} />
 				<span>{label}</span>
-				<ChevronDown size={14} color={active ? "#22D3EE" : "#64748B"} />
+				<ChevronDown
+					size={14}
+					className={active ? "text-cyan" : "text-text-tertiary"}
+				/>
 			</button>
 			{open && (
 				<div className="absolute top-full left-0 z-50 mt-1 max-h-64 w-64 overflow-hidden rounded-lg border border-border bg-background shadow-lg">

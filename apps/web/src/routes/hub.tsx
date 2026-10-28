@@ -1,3 +1,4 @@
+import { groupPeopleByBatch } from "@batchmate/ui"
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 import { createFileRoute, Link, redirect } from "@tanstack/react-router"
 import {
@@ -17,15 +18,18 @@ import { ScopeChip } from "@/components/scope-chip"
 import { ViewToggle } from "@/components/view-toggle"
 import { api } from "@/lib/api"
 import { authClient, useSession } from "@/lib/auth"
+import { useStoredPreference } from "@/lib/use-stored-preference"
 import { useStoredView } from "@/lib/use-stored-view"
 
-type SortKey = "firstName" | "lastName" | "checkInTime"
+type SortKey = "firstName" | "lastName" | "checkInTime" | "batch"
 
 const SORT_OPTIONS: { id: number; name: string; key: SortKey }[] = [
 	{ id: 1, name: "First name", key: "firstName" },
 	{ id: 2, name: "Last name", key: "lastName" },
 	{ id: 3, name: "Check-in time", key: "checkInTime" },
+	{ id: 4, name: "Batch", key: "batch" },
 ]
+const SORT_KEYS = SORT_OPTIONS.map((option) => option.key)
 
 function hourInNYT(iso: string): number | null {
 	if (!iso) return null
@@ -51,7 +55,7 @@ function lastName(name: string) {
 
 function OvernightBadge() {
 	return (
-		<span className="group/badge relative flex items-center gap-1 rounded-full bg-indigo-500/10 px-2 py-0.5 text-[11px] font-medium text-indigo-300">
+		<span className="group/badge relative flex items-center gap-1 rounded-full bg-indigo-500/10 px-2 py-0.5 text-[11px] font-medium text-moon">
 			<Moon size={11} />
 			Overnight
 			<span
@@ -78,29 +82,42 @@ export const Route = createFileRoute("/hub")({
 function HubPage() {
 	const { data: session } = useSession()
 	const queryClient = useQueryClient()
+
+	const {
+		data: checkInStatus,
+		isLoading: checkInStatusIsLoading,
+		error: checkInStatusError,
+	} = useQuery(api.isCheckedIn.queryOptions({}))
+
 	const {
 		data: hub,
-		isLoading,
-		error,
+		isLoading: hubIsLoading,
+		error: hubError,
 	} = useQuery(api.hubVisits.queryOptions({}))
 
+	const isCheckedInQueryKey = api.isCheckedIn.queryOptions({}).queryKey
 	const hubQueryKey = api.hubVisits.queryOptions({}).queryKey
 	const checkin = useMutation({
 		...api.hubCheckin.mutationOptions({}),
 		onSuccess: () => {
 			queryClient.setQueryData(
-				hubQueryKey,
-				(old: typeof hub | undefined) =>
+				isCheckedInQueryKey,
+				(old: typeof checkInStatus | undefined) =>
 					old ? { ...old, isCheckedIn: true } : old,
 			)
+			queryClient.invalidateQueries({ queryKey: isCheckedInQueryKey })
 			queryClient.invalidateQueries({ queryKey: hubQueryKey })
 		},
 	})
 
 	const visitors = hub?.visitors
-	const isCheckedIn = hub?.isCheckedIn ?? false
+	const isCheckedIn = checkInStatus?.isCheckedIn ?? false
 
-	const [sortKey, setSortKey] = useState<SortKey>("firstName")
+	const [sortKey, setSortKey] = useStoredPreference<SortKey>(
+		"hub-sort",
+		"firstName",
+		SORT_KEYS,
+	)
 	const [showOvernight, setShowOvernight] = useState(false)
 	const [sortOpen, setSortOpen] = useState(false)
 	const [view, setView] = useStoredView("hub")
@@ -144,6 +161,41 @@ function HubPage() {
 
 	const currentSortLabel =
 		SORT_OPTIONS.find((s) => s.key === sortKey)?.name ?? "Sort"
+	const batchGroups = useMemo(
+		() => (sortKey === "batch" ? groupPeopleByBatch(mainList) : []),
+		[mainList, sortKey],
+	)
+
+	const renderPeople = (people: typeof mainList) =>
+		view === "grid" ? (
+			<div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
+				{people.map((visit) => (
+					<PersonGridCard
+						key={visit.personId}
+						personId={visit.personId}
+						name={visit.name}
+						imageUrl={visit.imageUrl}
+						batch={visit.batch}
+						stintType={visit.stintType}
+						badge={overnightIds.has(visit.personId) ? <OvernightBadge /> : null}
+					/>
+				))}
+			</div>
+		) : (
+			<div className="flex flex-col gap-2.5 md:grid md:grid-cols-2 md:gap-3">
+				{people.map((visit) => (
+					<PersonCard
+						key={visit.personId}
+						personId={visit.personId}
+						name={visit.name}
+						imageUrl={visit.imageUrl}
+						batch={visit.batch}
+						stintType={visit.stintType}
+						badge={overnightIds.has(visit.personId) ? <OvernightBadge /> : null}
+					/>
+				))}
+			</div>
+		)
 
 	return (
 		<PageLayout
@@ -171,19 +223,41 @@ function HubPage() {
 								className="h-full w-full object-cover"
 							/>
 						) : (
-							<User size={22} color="#22D3EE" />
+							<User size={22} className="text-cyan" />
 						)}
 					</Link>
 				</div>
 			}
 		>
 			{/* Check in */}
-			{hub && !isCheckedIn && (
+			{checkInStatusIsLoading && (
+				<button
+					type="button"
+					disabled
+					className="flex h-12 w-full items-center justify-center gap-2 rounded-xl bg-primary text-primary-foreground disabled:opacity-50"
+				>
+					<MapPin size={18} />
+					<span className="text-[15px] font-semibold">
+						Loading check-in status...
+					</span>
+				</button>
+			)}
+
+			{checkInStatusError && (
+				<div className="flex h-12 w-full items-center justify-center gap-2 rounded-xl border border-destructive/40 opacity-60">
+					<MapPin size={18} className="text-destructive" />
+					<span className="text-[15px] font-semibold text-destructive">
+						Failed to load check-in status.
+					</span>
+				</div>
+			)}
+
+			{checkInStatus && !isCheckedIn && (
 				<button
 					type="button"
 					onClick={() => checkin.mutate({})}
 					disabled={checkin.isPending}
-					className="flex h-12 w-full cursor-pointer items-center justify-center gap-2 rounded-xl bg-cyan text-background disabled:opacity-50"
+					className="flex h-12 w-full cursor-pointer items-center justify-center gap-2 rounded-xl bg-primary text-primary-foreground disabled:opacity-50"
 				>
 					<MapPin size={18} />
 					<span className="text-[15px] font-semibold">
@@ -192,9 +266,9 @@ function HubPage() {
 				</button>
 			)}
 
-			{hub && isCheckedIn && (
+			{checkInStatus && isCheckedIn && (
 				<div className="flex h-12 w-full items-center justify-center gap-2 rounded-xl border border-cyan/20 bg-cyan/10">
-					<CheckCircle size={18} color="#22D3EE" />
+					<CheckCircle size={18} className="text-cyan" />
 					<span className="text-sm font-medium text-cyan">
 						You're checked in
 					</span>
@@ -202,13 +276,13 @@ function HubPage() {
 			)}
 
 			{/* People list */}
-			{isLoading && (
+			{hubIsLoading && (
 				<div className="flex flex-1 items-center justify-center">
 					<span className="text-sm text-text-tertiary">Loading...</span>
 				</div>
 			)}
 
-			{error && (
+			{hubError && (
 				<div className="flex flex-1 flex-col items-center justify-center gap-2">
 					<span className="text-sm text-destructive">
 						Failed to load hub visits
@@ -218,7 +292,7 @@ function HubPage() {
 
 			{visitors && visitors.length === 0 && (
 				<div className="flex flex-1 flex-col items-center justify-center gap-3">
-					<Users size={48} color="#475569" />
+					<Users size={48} className="text-text-muted" />
 					<span className="text-sm text-text-tertiary">
 						Nobody is in the hub right now
 					</span>
@@ -257,42 +331,28 @@ function HubPage() {
 					</div>
 					{mainList.length === 0 ? (
 						<div className="flex flex-1 flex-col items-center justify-center gap-3">
-							<Moon size={48} color="#475569" />
+							<Moon size={48} className="text-text-muted" />
 							<span className="text-sm text-text-tertiary">
 								Only overnight check-ins so far
 							</span>
 						</div>
-					) : view === "grid" ? (
-						<div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
-							{mainList.map((visit) => (
-								<PersonGridCard
-									key={visit.personId}
-									personId={visit.personId}
-									name={visit.name}
-									imageUrl={visit.imageUrl}
-									batch={visit.batch}
-									stintType={visit.stintType}
-									badge={
-										overnightIds.has(visit.personId) ? <OvernightBadge /> : null
-									}
-								/>
-							))}
-						</div>
 					) : (
-						<div className="flex flex-col gap-2.5 md:grid md:grid-cols-2 md:gap-3">
-							{mainList.map((visit) => (
-								<PersonCard
-									key={visit.personId}
-									personId={visit.personId}
-									name={visit.name}
-									imageUrl={visit.imageUrl}
-									batch={visit.batch}
-									stintType={visit.stintType}
-									badge={
-										overnightIds.has(visit.personId) ? <OvernightBadge /> : null
-									}
-								/>
-							))}
+						<div className="flex flex-col gap-6">
+							{sortKey === "batch"
+								? batchGroups.map((group) => (
+										<section key={group.label} className="flex flex-col gap-3">
+											<div className="flex items-baseline gap-2">
+												<h2 className="text-sm font-semibold text-foreground">
+													{group.label}
+												</h2>
+												<span className="text-xs text-text-tertiary">
+													{group.people.length}
+												</span>
+											</div>
+											{renderPeople(group.people)}
+										</section>
+									))
+								: renderPeople(mainList)}
 						</div>
 					)}
 				</>

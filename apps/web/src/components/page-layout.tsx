@@ -52,7 +52,7 @@ function MobileNav() {
 	const currentPath = matches[matches.length - 1]?.fullPath ?? "/"
 
 	return (
-		<nav className="fixed inset-x-0 bottom-0 z-50 flex items-center border-t border-[#1E293B] bg-[#0F172A] pb-[env(safe-area-inset-bottom)] md:hidden">
+		<nav className="fixed inset-x-0 bottom-0 z-50 flex items-center border-t border-border bg-surface-inset pb-[env(safe-area-inset-bottom)] md:hidden">
 			{mobileNavItems.map((item) => {
 				const isActive =
 					item.to === "/"
@@ -65,9 +65,12 @@ function MobileNav() {
 						to={item.to}
 						className="flex flex-1 flex-col items-center gap-1 py-3 no-underline"
 					>
-						<Icon size={22} color={isActive ? "#22D3EE" : "#64748B"} />
+						<Icon
+							size={22}
+							className={isActive ? "text-cyan" : "text-text-tertiary"}
+						/>
 						<span
-							className={`text-[10px] font-medium ${isActive ? "text-cyan" : "text-[#64748B]"}`}
+							className={`text-[10px] font-medium ${isActive ? "text-cyan" : "text-text-tertiary"}`}
 						>
 							{item.label}
 						</span>

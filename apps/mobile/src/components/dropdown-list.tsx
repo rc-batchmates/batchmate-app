@@ -1,4 +1,4 @@
-import { Text } from "@batchmate/ui"
+import { Text, useThemeColors } from "@batchmate/ui"
 import { useState } from "react"
 import { Pressable, ScrollView, TextInput, View } from "react-native"
 
@@ -13,6 +13,7 @@ export function DropdownList<T extends { id: number; name: string }>({
 	onSelect: (item: T) => void
 	activeValue?: string
 }) {
+	const c = useThemeColors()
 	const [search, setSearch] = useState("")
 	const filtered = items.filter((item) =>
 		item.name.toLowerCase().includes(search.toLowerCase()),
@@ -23,7 +24,7 @@ export function DropdownList<T extends { id: number; name: string }>({
 			<View className="border-b border-border p-2">
 				<TextInput
 					placeholder="Search..."
-					placeholderTextColor="#64748B"
+					placeholderTextColor={c.textTertiary}
 					value={search}
 					onChangeText={setSearch}
 					className="rounded-md bg-card px-3 py-1.5 text-sm text-foreground"

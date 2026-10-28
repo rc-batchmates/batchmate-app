@@ -7,6 +7,7 @@ import {
 } from "lucide-react-native"
 import { useCallback, useEffect, useRef, useState } from "react"
 import { Animated, Platform, Pressable, View } from "react-native"
+import { useThemeColors } from "../../lib/theme-colors"
 import { Text } from "./text"
 
 // lucide renders these nodes as a list, so each needs a key.
@@ -128,7 +129,7 @@ function ProgressBar({
 	return (
 		<View
 			pointerEvents="none"
-			className="absolute right-0 bottom-0 left-0 h-1 overflow-hidden rounded-b-xl bg-surface-inset"
+			className="absolute right-0 bottom-0 left-0 h-1 overflow-hidden rounded-b-xl bg-card"
 		>
 			<Animated.View style={{ width, height: "100%" }} className="bg-primary" />
 		</View>
@@ -192,6 +193,7 @@ function IntercomCard({
 	unlockDurationMs: number
 	holdDurationMs: number
 }) {
+	const c = useThemeColors()
 	const { isHolding, onPressIn, onPressOut } = useHoldGesture({
 		holdDurationMs,
 		disabled: !!isPending,
@@ -219,7 +221,7 @@ function IntercomCard({
 			{...webHoldGuards}
 		>
 			<View className="h-12 w-12 items-center justify-center rounded-[12px] bg-surface-inset">
-				<Building2 size={24} color="#22D3EE" />
+				<Building2 size={24} color={c.primary} />
 			</View>
 			<View className="flex-1 gap-1.5">
 				<Text className="text-base font-semibold">{label}</Text>
@@ -256,6 +258,7 @@ function ElevatorCard({
 	unlockDurationMs: number
 	holdDurationMs: number
 }) {
+	const c = useThemeColors()
 	const { isHolding, onPressIn, onPressOut } = useHoldGesture({
 		holdDurationMs,
 		disabled: !!isPending,
@@ -284,7 +287,7 @@ function ElevatorCard({
 		>
 			<View className="gap-3">
 				<View className="h-12 w-12 items-center justify-center rounded-[12px] bg-surface-inset">
-					<ElevatorIcon size={24} color="#22D3EE" />
+					<ElevatorIcon size={24} color={c.primary} />
 				</View>
 				<View className="gap-0.5">
 					<Text className="text-base font-semibold">{label}</Text>
@@ -295,7 +298,7 @@ function ElevatorCard({
 			</View>
 			<View className="flex-row items-start gap-2 rounded-lg bg-surface-inset/60 px-3 py-2">
 				<View className="pt-px">
-					<Info size={14} color="#94a3b8" />
+					<Info size={14} color={c.textSecondary} />
 				</View>
 				<Text className="flex-1 text-xs text-text-secondary">
 					After unlocking, press your floor button inside the elevator
@@ -327,6 +330,7 @@ function StairsCard({
 	unlockDurationMs: number
 	holdDurationMs: number
 }) {
+	const c = useThemeColors()
 	const { isHolding, onPressIn, onPressOut } = useHoldGesture({
 		holdDurationMs,
 		disabled: !!isPending,
@@ -355,7 +359,7 @@ function StairsCard({
 		>
 			<View className="flex-row items-start justify-between">
 				<View className="h-10 w-10 items-center justify-center rounded-[10px] bg-surface-inset">
-					<StairsIcon size={20} color="#22D3EE" />
+					<StairsIcon size={20} color={c.primary} />
 				</View>
 				<Text className="text-3xl font-bold leading-none">{floor}</Text>
 			</View>
@@ -378,6 +382,7 @@ function DoorControls({
 	holdDurationMs = 200,
 	onUnlockEnd,
 }: DoorControlsProps) {
+	const c = useThemeColors()
 	const intercomAction: DoorAction = { entry: "intercom" }
 	const elevatorAction: DoorAction = { entry: "elevator", floor: "all" }
 	const stairs4Action: DoorAction = { entry: "stairs", floor: "4" }
@@ -392,7 +397,7 @@ function DoorControls({
 	return (
 		<View className="w-full gap-4">
 			<View className="flex-row items-center gap-1.5">
-				<DoorOpen size={14} color="#22D3EE" />
+				<DoorOpen size={14} color={c.primary} />
 				<Text className="font-mono text-[11px] font-semibold tracking-widest text-text-tertiary">
 					DOOR CONTROLS
 				</Text>
