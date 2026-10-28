@@ -2,7 +2,10 @@
 // manage the Snack Bar: SKUs, NFC tags, balances, payments and exports.
 // RC IDs are used rather than auth user IDs because they're the same in
 // every environment.
-export const SNACK_BAR_ADMIN_RC_IDS: readonly number[] = [7212]
+export const SNACK_BAR_ADMIN_RC_IDS: readonly number[] = [
+	7212, // Walter Min
+	6834, // Rose Hall: accounting and collecting payments
+]
 
 export function isSnackBarAdmin(rcId: string | null | undefined): boolean {
 	if (!rcId) return false
