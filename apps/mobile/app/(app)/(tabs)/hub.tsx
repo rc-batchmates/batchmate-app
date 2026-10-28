@@ -75,25 +75,36 @@ export default function HubScreen() {
 	const c = useThemeColors()
 	const router = useRouter()
 	const queryClient = useQueryClient()
+
+	const {
+		data: checkInStatus,
+		isLoading: checkInStatusIsLoading,
+		error: checkInStatusError,
+	} = useQuery(api.isCheckedIn.queryOptions({}))
+
 	const {
 		data: hub,
-		isLoading,
-		error,
+		isLoading: hubIsLoading,
+		error: hubError,
 	} = useQuery(api.hubVisits.queryOptions({}))
 
+	const isCheckedInQueryKey = api.isCheckedIn.queryOptions({}).queryKey
 	const hubQueryKey = api.hubVisits.queryOptions({}).queryKey
 	const checkin = useMutation({
 		...api.hubCheckin.mutationOptions({}),
 		onSuccess: () => {
-			queryClient.setQueryData(hubQueryKey, (old: typeof hub | undefined) =>
-				old ? { ...old, isCheckedIn: true } : old,
+			queryClient.setQueryData(
+				isCheckedInQueryKey,
+				(old: typeof checkInStatus | undefined) =>
+					old ? { ...old, isCheckedIn: true } : old,
 			)
+			queryClient.invalidateQueries({ queryKey: isCheckedInQueryKey })
 			queryClient.invalidateQueries({ queryKey: hubQueryKey })
 		},
 	})
 
 	const visitors = hub?.visitors
-	const isCheckedIn = hub?.isCheckedIn ?? false
+	const isCheckedIn = checkInStatus?.isCheckedIn ?? false
 
 	const [sortKey, setSortKey] = useStoredPreference<SortKey>(
 		"hub-sort",
@@ -202,7 +213,25 @@ export default function HubScreen() {
 				)}
 			</View>
 
-			{hub && !isCheckedIn && (
+			{checkInStatusIsLoading && (
+				<View className="min-h-12 flex-row py-3 items-center justify-center gap-2 rounded-xl bg-primary opacity-50">
+					<MapPin size={18} color={c.primaryForeground} />
+					<Text className="text-[15px] font-semibold text-primary-foreground">
+						Loading check-in status...
+					</Text>
+				</View>
+			)}
+
+			{checkInStatusError && (
+				<View className="min-h-12 flex-row py-3 items-center justify-center gap-2 rounded-xl border border-destructive/40 opacity-60">
+					<MapPin size={18} color={c.danger} />
+					<Text className="text-[15px] font-semibold text-destructive">
+						Failed to load check-in status.
+					</Text>
+				</View>
+			)}
+
+			{checkInStatus && !isCheckedIn && (
 				<Pressable
 					className="min-h-12 flex-row py-3 items-center justify-center gap-2 rounded-xl bg-primary"
 					onPress={() => checkin.mutate({})}
@@ -215,7 +244,7 @@ export default function HubScreen() {
 				</Pressable>
 			)}
 
-			{hub && isCheckedIn && (
+			{checkInStatus && isCheckedIn && (
 				<View className="min-h-12 flex-row py-3 items-center justify-center gap-2 rounded-xl border border-cyan/20 bg-cyan/10">
 					<CheckCircle size={18} color={c.primary} />
 					<Text className="text-sm font-medium text-primary">
@@ -224,13 +253,13 @@ export default function HubScreen() {
 				</View>
 			)}
 
-			{isLoading && (
+			{hubIsLoading && (
 				<View className="flex-1 items-center justify-center py-20">
 					<Text className="text-sm text-text-tertiary">Loading...</Text>
 				</View>
 			)}
 
-			{error && (
+			{hubError && (
 				<View className="flex-1 items-center justify-center py-20">
 					<Text className="text-sm text-destructive">
 						Failed to load hub visits
