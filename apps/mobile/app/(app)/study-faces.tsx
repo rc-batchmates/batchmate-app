@@ -3,6 +3,7 @@ import {
 	StudyFacesGame,
 	type StudyFacesStorage,
 	Text,
+	useThemeColors,
 } from "@batchmate/ui"
 import { useRouter } from "expo-router"
 import { ChevronLeft } from "lucide-react-native"
@@ -26,6 +27,7 @@ const STORAGE_KEYS = [
 ]
 
 export default function StudyFacesScreen() {
+	const c = useThemeColors()
 	const router = useRouter()
 	const { data: session } = useSession()
 	const sessionUser = session?.user as { rcId?: string } | undefined
@@ -55,7 +57,7 @@ export default function StudyFacesScreen() {
 					className="flex-row items-center gap-1.5"
 					onPress={() => router.back()}
 				>
-					<ChevronLeft size={20} color="#94A3B8" />
+					<ChevronLeft size={20} color={c.textSecondary} />
 					<Text className="text-sm font-medium text-text-secondary">Back</Text>
 				</Pressable>
 				<Text className="text-[15px] font-semibold">Study faces</Text>

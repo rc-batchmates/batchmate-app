@@ -67,7 +67,7 @@ function StudyFacesPage() {
 					onClick={() => router.history.back()}
 					className="flex cursor-pointer items-center gap-1 text-sm text-text-tertiary hover:text-foreground"
 				>
-					<ChevronLeft size={14} color="#64748B" />
+					<ChevronLeft size={14} className="text-text-tertiary" />
 					Back
 				</button>
 			}
@@ -83,7 +83,7 @@ function StudyFacesPage() {
 							className="h-full w-full object-cover"
 						/>
 					) : (
-						<User size={22} color="#22D3EE" />
+						<User size={22} className="text-cyan" />
 					)}
 				</Link>
 			}

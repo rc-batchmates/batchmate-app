@@ -242,14 +242,14 @@ function DirectoryPage() {
 							className="h-full w-full object-cover"
 						/>
 					) : (
-						<User size={22} color="#22D3EE" />
+						<User size={22} className="text-cyan" />
 					)}
 				</Link>
 			}
 		>
 			{/* Search bar */}
 			<div className="flex items-center gap-2 rounded-[10px] border border-border bg-card px-3.5 py-2.5">
-				<Search size={18} color="#64748B" />
+				<Search size={18} className="text-text-tertiary" />
 				<input
 					type="text"
 					placeholder="Search by name, interests..."
@@ -370,7 +370,7 @@ function DirectoryPage() {
 
 			{!isLoading && people.length === 0 && (
 				<div className="flex flex-1 flex-col items-center justify-center gap-3">
-					<Search size={48} color="#475569" />
+					<Search size={48} className="text-text-muted" />
 					<span className="text-sm text-text-tertiary">No results found</span>
 				</div>
 			)}

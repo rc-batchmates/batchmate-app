@@ -2,6 +2,7 @@ import type * as React from "react"
 import { TextInput } from "react-native"
 
 import { cn } from "../../lib/cn"
+import { useThemeColors } from "../../lib/theme-colors"
 
 function Input({
 	className,
@@ -11,6 +12,7 @@ function Input({
 }: React.ComponentPropsWithoutRef<typeof TextInput> & {
 	placeholderClassName?: string
 }) {
+	const c = useThemeColors()
 	return (
 		<TextInput
 			// Height comes from the text itself plus padding. No fixed height and
@@ -22,7 +24,7 @@ function Input({
 				editable === false && "opacity-50",
 				className,
 			)}
-			placeholderTextColor="#78716c"
+			placeholderTextColor={c.textTertiary}
 			editable={editable}
 			{...props}
 		/>

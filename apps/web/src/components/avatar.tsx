@@ -55,7 +55,7 @@ export function Avatar({
 					style={{ objectPosition: AVATAR_FACE_OBJECT_POSITION }}
 				/>
 			) : fallback === "icon" ? (
-				<User size={ICON_SIZE[size]} color="#22D3EE" />
+				<User size={ICON_SIZE[size]} className="text-cyan" />
 			) : (
 				<span
 					className={`${INITIALS_TEXT_CLASS[size]} font-semibold text-cyan`}

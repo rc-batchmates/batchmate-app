@@ -1,5 +1,6 @@
 import { Monitor, Video } from "lucide-react-native"
 import { Linking, Platform, Pressable, View } from "react-native"
+import { useThemeColors } from "../../lib/theme-colors"
 import { Text } from "./text"
 
 const pairingStations = [1, 2, 3, 4, 5] as const
@@ -17,12 +18,13 @@ function RoomChip({
 	fullWidth?: boolean
 	directUrl?: string
 }) {
+	const c = useThemeColors()
 	const href = directUrl ?? `https://www.recurse.com/zoom/${slug}`
 
 	const content = (
 		<>
 			<View className="h-8 w-8 items-center justify-center rounded-lg bg-surface-inset md:h-7 md:w-7">
-				<Icon size={14} color="#22D3EE" />
+				<Icon size={14} color={c.primary} />
 			</View>
 			<Text className="text-[13px] font-medium text-foreground md:text-sm">
 				{label}
@@ -88,12 +90,13 @@ function PairingButton({ n, directUrl }: { n: number; directUrl?: string }) {
 }
 
 function ZoomLinks({ directUrls }: { directUrls?: Record<string, string> }) {
+	const c = useThemeColors()
 	const url = (slug: string) => directUrls?.[slug]
 	return (
 		<View className="w-full gap-4">
 			{/* Header */}
 			<View className="flex-row items-center gap-1.5">
-				<Video size={14} color="#22D3EE" />
+				<Video size={14} color={c.primary} />
 				<Text className="font-mono text-[11px] font-semibold tracking-widest text-text-tertiary">
 					ZOOM ROOMS
 				</Text>

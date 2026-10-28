@@ -33,7 +33,7 @@ export function PersonCard({
 				</span>
 			</div>
 			{badge}
-			<ChevronRight size={20} color="#475569" />
+			<ChevronRight size={20} className="text-text-muted" />
 		</Link>
 	)
 }

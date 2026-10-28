@@ -11,6 +11,7 @@ import {
 } from "lucide-react"
 import { Avatar } from "@/components/avatar"
 import { PageLayout } from "@/components/page-layout"
+import { ThemePicker } from "@/components/theme-picker"
 import { authClient, signOut, useSession } from "@/lib/auth"
 
 export const Route = createFileRoute("/profile")({
@@ -136,13 +137,15 @@ function ProfilePage() {
 				</div>
 			</div>
 
+			<ThemePicker />
+
 			{/* Sign Out */}
 			<button
 				type="button"
 				onClick={handleSignOut}
 				className="flex w-full items-center justify-center gap-2 rounded-xl border border-cyan/20 bg-card px-4 py-3 cursor-pointer md:w-48"
 			>
-				<LogOut size={18} color="#94A3B8" />
+				<LogOut size={18} className="text-text-secondary" />
 				<span className="text-sm font-medium text-text-secondary">
 					Sign Out
 				</span>

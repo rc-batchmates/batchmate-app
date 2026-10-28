@@ -272,8 +272,8 @@ export type StudyFacesStreakProgress = {
 	prev: number
 	next: number
 	progress: number
-	prevColor: string
-	nextColor: string
+	prevColor: string | null
+	nextColor: string | null
 	shakeIntensity: number
 }
 
@@ -285,8 +285,8 @@ export function studyFacesStreakProgress(
 			prev: 0,
 			next: MILESTONE_KEYS[0] ?? 1,
 			progress: 0,
-			prevColor: "#1e293b",
-			nextColor: "#22d3ee",
+			prevColor: null,
+			nextColor: null,
 			shakeIntensity: 0,
 		}
 	}
@@ -299,8 +299,8 @@ export function studyFacesStreakProgress(
 		prev,
 		next,
 		progress,
-		prevColor: STUDY_FACES_STREAK_MILESTONES[prev]?.color ?? "#1e293b",
-		nextColor: STUDY_FACES_STREAK_MILESTONES[next]?.color ?? "#22d3ee",
+		prevColor: STUDY_FACES_STREAK_MILESTONES[prev]?.color ?? null,
+		nextColor: STUDY_FACES_STREAK_MILESTONES[next]?.color ?? null,
 		shakeIntensity: Math.min(Math.floor(streak / 5), 5),
 	}
 }

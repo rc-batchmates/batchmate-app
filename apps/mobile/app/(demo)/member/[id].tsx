@@ -1,4 +1,4 @@
-import { InfoRow, SocialRow, Text } from "@batchmate/ui"
+import { InfoRow, SocialRow, Text, useThemeColors } from "@batchmate/ui"
 import { useLocalSearchParams, useRouter } from "expo-router"
 import {
 	ChevronLeft,
@@ -85,6 +85,7 @@ const DEFAULT_MEMBER = {
 }
 
 export default function DemoMemberProfileScreen() {
+	const c = useThemeColors()
 	const { id } = useLocalSearchParams<{ id: string }>()
 	const router = useRouter()
 	const member = MEMBERS[id] ?? DEFAULT_MEMBER
@@ -100,7 +101,7 @@ export default function DemoMemberProfileScreen() {
 					className="flex-row items-center gap-1.5"
 					onPress={() => router.back()}
 				>
-					<ChevronLeft size={20} color="#94A3B8" />
+					<ChevronLeft size={20} color={c.textSecondary} />
 					<Text className="text-sm font-medium text-text-secondary">Back</Text>
 				</Pressable>
 				<Text className="text-[17px] font-semibold">Profile</Text>
@@ -110,7 +111,7 @@ export default function DemoMemberProfileScreen() {
 			{/* Avatar */}
 			<View className="items-center gap-3">
 				<View className="h-24 w-24 items-center justify-center overflow-hidden rounded-full bg-card">
-					<User size={44} color="#22D3EE" />
+					<User size={44} color={c.primary} />
 				</View>
 				<Text className="text-[22px] font-semibold">{member.name}</Text>
 				{member.pronouns && (

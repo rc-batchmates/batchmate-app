@@ -1,4 +1,9 @@
-import { groupPeopleByBatch, hubToday, Text } from "@batchmate/ui"
+import {
+	groupPeopleByBatch,
+	hubToday,
+	Text,
+	useThemeColors,
+} from "@batchmate/ui"
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 import { useRouter } from "expo-router"
 import {
@@ -54,6 +59,7 @@ function lastName(name: string) {
 }
 
 function OvernightBadge() {
+	const c = useThemeColors()
 	return (
 		<Pressable
 			onPress={() =>
@@ -65,13 +71,14 @@ function OvernightBadge() {
 			className="flex-row items-center gap-1 rounded-full bg-indigo-500/10 px-2 py-0.5"
 			hitSlop={6}
 		>
-			<Moon size={11} color="#A5B4FC" />
-			<Text className="text-[11px] font-medium text-indigo-300">Overnight</Text>
+			<Moon size={11} color={c.moon} />
+			<Text className="text-[11px] font-medium text-moon">Overnight</Text>
 		</Pressable>
 	)
 }
 
 export default function HubScreen() {
+	const c = useThemeColors()
 	const router = useRouter()
 	const queryClient = useQueryClient()
 	const today = hubToday()
@@ -82,24 +89,38 @@ export default function HubScreen() {
 	const setSelectedDate = (date: string) =>
 		setPickedDate(date < today ? date : null)
 
+	const {
+		data: checkInStatus,
+		isLoading: checkInStatusIsLoading,
+		error: checkInStatusError,
+	} = useQuery(api.isCheckedIn.queryOptions({}))
+
 	const hubQueryOptions = api.hubVisits.queryOptions({
 		input: isToday ? {} : { date: selectedDate },
 	})
-	const { data: hub, isLoading, error } = useQuery(hubQueryOptions)
+	const {
+		data: hub,
+		isLoading: hubIsLoading,
+		error: hubError,
+	} = useQuery(hubQueryOptions)
 
+	const isCheckedInQueryKey = api.isCheckedIn.queryOptions({}).queryKey
 	const hubQueryKey = hubQueryOptions.queryKey
 	const checkin = useMutation({
 		...api.hubCheckin.mutationOptions({}),
 		onSuccess: () => {
-			queryClient.setQueryData(hubQueryKey, (old: typeof hub | undefined) =>
-				old ? { ...old, isCheckedIn: true } : old,
+			queryClient.setQueryData(
+				isCheckedInQueryKey,
+				(old: typeof checkInStatus | undefined) =>
+					old ? { ...old, isCheckedIn: true } : old,
 			)
+			queryClient.invalidateQueries({ queryKey: isCheckedInQueryKey })
 			queryClient.invalidateQueries({ queryKey: hubQueryKey })
 		},
 	})
 
 	const visitors = hub?.visitors
-	const isCheckedIn = hub?.isCheckedIn ?? false
+	const isCheckedIn = checkInStatus?.isCheckedIn ?? false
 
 	const [sortKey, setSortKey] = useStoredPreference<SortKey>(
 		"hub-sort",
@@ -214,35 +235,53 @@ export default function HubScreen() {
 				)}
 			</View>
 
-			{hub && isToday && !isCheckedIn && (
+			{isToday && checkInStatusIsLoading && (
+				<View className="min-h-12 flex-row py-3 items-center justify-center gap-2 rounded-xl bg-primary opacity-50">
+					<MapPin size={18} color={c.primaryForeground} />
+					<Text className="text-[15px] font-semibold text-primary-foreground">
+						Loading check-in status...
+					</Text>
+				</View>
+			)}
+
+			{isToday && checkInStatusError && (
+				<View className="min-h-12 flex-row py-3 items-center justify-center gap-2 rounded-xl border border-destructive/40 opacity-60">
+					<MapPin size={18} color={c.danger} />
+					<Text className="text-[15px] font-semibold text-destructive">
+						Failed to load check-in status.
+					</Text>
+				</View>
+			)}
+
+			{isToday && checkInStatus && !isCheckedIn && (
 				<Pressable
-					className="min-h-12 flex-row py-3 items-center justify-center gap-2 rounded-xl bg-cyan"
+					className="min-h-12 flex-row py-3 items-center justify-center gap-2 rounded-xl bg-primary"
 					onPress={() => checkin.mutate({})}
 					disabled={checkin.isPending}
 				>
-					<MapPin size={18} color="#0A0F1C" />
-					<Text className="text-[15px] font-semibold text-background">
+					<MapPin size={18} color={c.primaryForeground} />
+					<Text className="text-[15px] font-semibold text-primary-foreground">
 						{checkin.isPending ? "Checking in..." : "Check in to the Hub"}
 					</Text>
 				</Pressable>
 			)}
 
-			{hub && isToday && isCheckedIn && (
+			{isToday && checkInStatus && isCheckedIn && (
 				<View className="min-h-12 flex-row py-3 items-center justify-center gap-2 rounded-xl border border-cyan/20 bg-cyan/10">
-					<CheckCircle size={18} color="#22D3EE" />
+					<CheckCircle size={18} color={c.primary} />
 					<Text className="text-sm font-medium text-primary">
 						You're checked in
 					</Text>
 				</View>
 			)}
 
-			{isLoading && (
+			{hubIsLoading && (
 				<View className="flex-1 items-center justify-center py-20">
 					<Text className="text-sm text-text-tertiary">Loading...</Text>
 				</View>
 			)}
 
-			{error && (
+			{hubError && (
 				<View className="flex-1 items-center justify-center py-20">
 					<Text className="text-sm text-destructive">
 						Failed to load hub visits
@@ -252,7 +291,7 @@ export default function HubScreen() {
 
 			{visitors && visitors.length === 0 && (
 				<View className="flex-1 items-center justify-center gap-3 py-20">
-					<Users size={48} color="#475569" />
+					<Users size={48} color={c.textMuted} />
 					<Text className="text-sm text-text-tertiary">
 						{isToday
 							? "Nobody is in the hub right now"
@@ -296,7 +335,7 @@ export default function HubScreen() {
 					)}
 					{mainList.length === 0 ? (
 						<View className="flex-1 items-center justify-center gap-3 py-20">
-							<Moon size={48} color="#475569" />
+							<Moon size={48} color={c.textMuted} />
 							<Text className="text-sm text-text-tertiary">
 								{isToday
 									? "Only overnight check-ins so far"

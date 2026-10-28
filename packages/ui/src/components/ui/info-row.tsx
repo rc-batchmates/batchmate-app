@@ -1,6 +1,7 @@
 import type { ComponentType } from "react"
 import { useState } from "react"
 import { Linking, Platform, Pressable, View } from "react-native"
+import { useThemeColors } from "../../lib/theme-colors"
 import { Text } from "./text"
 
 export function InfoRow({
@@ -14,6 +15,7 @@ export function InfoRow({
 	value?: string | null
 	mailto?: boolean
 }) {
+	const c = useThemeColors()
 	const [copied, setCopied] = useState(false)
 
 	async function copyValue() {
@@ -51,7 +53,7 @@ export function InfoRow({
 			disabled={!value}
 			className="flex-row items-center gap-3 px-4 py-3.5"
 		>
-			<Icon size={18} color="#64748B" />
+			<Icon size={18} color={c.textTertiary} />
 			<View className="flex-1 gap-0.5">
 				<Text className="text-xs text-text-tertiary">{label}</Text>
 				<Text className="font-mono text-sm font-medium">{value || "—"}</Text>

@@ -13,8 +13,8 @@ function NotFoundPage() {
 				alignItems: "center",
 				justifyContent: "center",
 				minHeight: "100vh",
-				backgroundColor: "#0f172a",
-				color: "white",
+				backgroundColor: "var(--surface-inset)",
+				color: "var(--foreground)",
 				fontFamily: "system-ui, -apple-system, sans-serif",
 				padding: "1rem",
 				textAlign: "center",
@@ -34,7 +34,7 @@ function NotFoundPage() {
 					fontSize: "clamp(3rem, 10vw, 6rem)",
 					fontWeight: 800,
 					margin: 0,
-					color: "rgb(34, 211, 238)",
+					color: "var(--cyan)",
 					lineHeight: 1,
 				}}
 			>
@@ -43,7 +43,7 @@ function NotFoundPage() {
 			<p
 				style={{
 					fontSize: "1.25rem",
-					color: "rgb(148, 163, 184)",
+					color: "var(--text-secondary)",
 					marginTop: "0.75rem",
 					marginBottom: "2rem",
 				}}
@@ -54,8 +54,8 @@ function NotFoundPage() {
 				to="/"
 				style={{
 					padding: "0.75rem 2rem",
-					backgroundColor: "rgb(34, 211, 238)",
-					color: "#0f172a",
+					backgroundColor: "var(--primary)",
+					color: "var(--primary-foreground)",
 					borderRadius: "0.5rem",
 					textDecoration: "none",
 					fontWeight: 600,

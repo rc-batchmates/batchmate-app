@@ -13,7 +13,7 @@ function SupportPage() {
 				<div className="rounded-xl bg-card p-5">
 					<div className="flex items-center gap-3">
 						<div className="flex h-10 w-10 items-center justify-center rounded-full bg-surface-inset">
-							<Mail size={18} color="#22D3EE" />
+							<Mail size={18} className="text-cyan" />
 						</div>
 						<div>
 							<p className="text-sm font-semibold text-foreground">Email</p>

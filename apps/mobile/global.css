@@ -2,3 +2,82 @@
 @source "../../packages/ui/src";
 @source "./app";
 @source "./src";
+
+/* Shared by both schemes; a single ungated value is safe. */
+:root {
+	--radius: 0.75rem;
+}
+
+/* Both palettes sit behind a color-scheme media query. react-native-css moves
+   an ungated :root value ahead of gated ones and returns the first match, so an
+   ungated light block would win even in dark mode. Dark is written as "not
+   light" so it is also the default when the OS reports no scheme. */
+@media not (prefers-color-scheme: light) {
+	:root {
+		--background: #0a0f1c;
+		--foreground: #ffffff;
+		--card: #1e293b;
+		--card-foreground: #ffffff;
+		--popover: #1e293b;
+		--popover-foreground: #ffffff;
+		--primary: #22d3ee;
+		--primary-foreground: #0a0f1c;
+		--secondary: #1e293b;
+		--secondary-foreground: #ffffff;
+		--muted: #0f172a;
+		--muted-foreground: #64748b;
+		--accent: #1e293b;
+		--accent-foreground: #ffffff;
+		--destructive: #ef4444;
+		--destructive-foreground: #ffffff;
+		--border: #1e293b;
+		--input: #1e293b;
+		--ring: #22d3ee;
+		--brand: #22d3ee;
+		--brand-foreground: #0a0f1c;
+		--surface-inset: #0f172a;
+		--text-secondary: #94a3b8;
+		--text-tertiary: #64748b;
+		--text-muted: #475569;
+		--divider: #0f172a;
+		--cyan: #22d3ee;
+		--moon: #a5b4fc;
+		--success: #86efac;
+		--error: #fda4af;
+	}
+}
+
+@media (prefers-color-scheme: light) {
+	:root {
+		--background: #f8fafc;
+		--foreground: #0f172a;
+		--card: #ffffff;
+		--card-foreground: #0f172a;
+		--popover: #ffffff;
+		--popover-foreground: #0f172a;
+		--primary: #0a6680;
+		--primary-foreground: #ffffff;
+		--secondary: #e2e8f0;
+		--secondary-foreground: #0f172a;
+		--muted: #f1f5f9;
+		--muted-foreground: #556377;
+		--accent: #e2e8f0;
+		--accent-foreground: #0f172a;
+		--destructive: #b91c1c;
+		--destructive-foreground: #ffffff;
+		--border: #e2e8f0;
+		--input: #e2e8f0;
+		--ring: #0a6680;
+		--brand: #0a6680;
+		--brand-foreground: #ffffff;
+		--surface-inset: #f1f5f9;
+		--text-secondary: #475569;
+		--text-tertiary: #556377;
+		--text-muted: #606f85;
+		--divider: #e2e8f0;
+		--cyan: #0a6680;
+		--moon: #4f46e5;
+		--success: #166534;
+		--error: #be123c;
+	}
+}

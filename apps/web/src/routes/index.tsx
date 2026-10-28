@@ -57,7 +57,7 @@ function HomePage() {
 							className="h-full w-full object-cover"
 						/>
 					) : (
-						<User size={22} color="#22D3EE" />
+						<User size={22} className="text-cyan" />
 					)}
 				</Link>
 			}
@@ -94,7 +94,7 @@ function HomePage() {
 				className="flex items-center justify-between rounded-xl border border-cyan/20 bg-cyan/5 px-4 py-3 no-underline transition-colors hover:bg-cyan/10"
 			>
 				<div className="flex items-center gap-2.5">
-					<Sparkles size={18} color="#22D3EE" />
+					<Sparkles size={18} className="text-cyan" />
 					<div className="flex flex-col">
 						<span className="text-[15px] font-semibold text-cyan">
 							Study faces

@@ -1,3 +1,4 @@
+import { useThemeColors } from "@batchmate/ui"
 import { Tabs } from "expo-router"
 import { House, Search, User, Users } from "lucide-react-native"
 import { useSafeAreaInsets } from "react-native-safe-area-context"
@@ -7,6 +8,7 @@ import {
 } from "../../../src/components/tab-bar-label"
 
 export default function DemoTabsLayout() {
+	const c = useThemeColors()
 	const insets = useSafeAreaInsets()
 	const tabBarHeight = useTabBarHeight()
 
@@ -15,14 +17,14 @@ export default function DemoTabsLayout() {
 			screenOptions={{
 				headerShown: false,
 				tabBarStyle: {
-					backgroundColor: "#0F172A",
-					borderTopColor: "#1E293B",
+					backgroundColor: c.surface,
+					borderTopColor: c.border,
 					borderTopWidth: 1,
 					paddingBottom: insets.bottom,
 					height: tabBarHeight,
 				},
-				tabBarActiveTintColor: "#22D3EE",
-				tabBarInactiveTintColor: "#64748B",
+				tabBarActiveTintColor: c.primary,
+				tabBarInactiveTintColor: c.textTertiary,
 				tabBarLabel: ({ color, children }) => (
 					<TabBarLabel color={color}>{children}</TabBarLabel>
 				),
