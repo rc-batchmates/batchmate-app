@@ -1,4 +1,9 @@
-import { formatHubDate, hubToday, shiftHubDate } from "@batchmate/ui"
+import {
+	formatHubDate,
+	groupPeopleByBatch,
+	hubToday,
+	shiftHubDate,
+} from "@batchmate/ui"
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 import {
 	createFileRoute,
@@ -26,15 +31,18 @@ import { ScopeChip } from "@/components/scope-chip"
 import { ViewToggle } from "@/components/view-toggle"
 import { api } from "@/lib/api"
 import { authClient, useSession } from "@/lib/auth"
+import { useStoredPreference } from "@/lib/use-stored-preference"
 import { useStoredView } from "@/lib/use-stored-view"
 
-type SortKey = "firstName" | "lastName" | "checkInTime"
+type SortKey = "firstName" | "lastName" | "checkInTime" | "batch"
 
 const SORT_OPTIONS: { id: number; name: string; key: SortKey }[] = [
 	{ id: 1, name: "First name", key: "firstName" },
 	{ id: 2, name: "Last name", key: "lastName" },
 	{ id: 3, name: "Check-in time", key: "checkInTime" },
+	{ id: 4, name: "Batch", key: "batch" },
 ]
+const SORT_KEYS = SORT_OPTIONS.map((option) => option.key)
 
 function hourInNYT(iso: string): number | null {
 	if (!iso) return null
@@ -186,7 +194,11 @@ function HubPage() {
 	const visitors = hub?.visitors
 	const isCheckedIn = hub?.isCheckedIn ?? false
 
-	const [sortKey, setSortKey] = useState<SortKey>("firstName")
+	const [sortKey, setSortKey] = useStoredPreference<SortKey>(
+		"hub-sort",
+		"firstName",
+		SORT_KEYS,
+	)
 	const [showOvernight, setShowOvernight] = useState(false)
 	const [sortOpen, setSortOpen] = useState(false)
 	const [view, setView] = useStoredView("hub")
@@ -230,6 +242,41 @@ function HubPage() {
 
 	const currentSortLabel =
 		SORT_OPTIONS.find((s) => s.key === sortKey)?.name ?? "Sort"
+	const batchGroups = useMemo(
+		() => (sortKey === "batch" ? groupPeopleByBatch(mainList) : []),
+		[mainList, sortKey],
+	)
+
+	const renderPeople = (people: typeof mainList) =>
+		view === "grid" ? (
+			<div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
+				{people.map((visit) => (
+					<PersonGridCard
+						key={visit.personId}
+						personId={visit.personId}
+						name={visit.name}
+						imageUrl={visit.imageUrl}
+						batch={visit.batch}
+						stintType={visit.stintType}
+						badge={overnightIds.has(visit.personId) ? <OvernightBadge /> : null}
+					/>
+				))}
+			</div>
+		) : (
+			<div className="flex flex-col gap-2.5 md:grid md:grid-cols-2 md:gap-3">
+				{people.map((visit) => (
+					<PersonCard
+						key={visit.personId}
+						personId={visit.personId}
+						name={visit.name}
+						imageUrl={visit.imageUrl}
+						batch={visit.batch}
+						stintType={visit.stintType}
+						badge={overnightIds.has(visit.personId) ? <OvernightBadge /> : null}
+					/>
+				))}
+			</div>
+		)
 
 	return (
 		<PageLayout
@@ -358,37 +405,23 @@ function HubPage() {
 									: "Only overnight check-ins that day"}
 							</span>
 						</div>
-					) : view === "grid" ? (
-						<div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
-							{mainList.map((visit) => (
-								<PersonGridCard
-									key={visit.personId}
-									personId={visit.personId}
-									name={visit.name}
-									imageUrl={visit.imageUrl}
-									batch={visit.batch}
-									stintType={visit.stintType}
-									badge={
-										overnightIds.has(visit.personId) ? <OvernightBadge /> : null
-									}
-								/>
-							))}
-						</div>
 					) : (
-						<div className="flex flex-col gap-2.5 md:grid md:grid-cols-2 md:gap-3">
-							{mainList.map((visit) => (
-								<PersonCard
-									key={visit.personId}
-									personId={visit.personId}
-									name={visit.name}
-									imageUrl={visit.imageUrl}
-									batch={visit.batch}
-									stintType={visit.stintType}
-									badge={
-										overnightIds.has(visit.personId) ? <OvernightBadge /> : null
-									}
-								/>
-							))}
+						<div className="flex flex-col gap-6">
+							{sortKey === "batch"
+								? batchGroups.map((group) => (
+										<section key={group.label} className="flex flex-col gap-3">
+											<div className="flex items-baseline gap-2">
+												<h2 className="text-sm font-semibold text-foreground">
+													{group.label}
+												</h2>
+												<span className="text-xs text-text-tertiary">
+													{group.people.length}
+												</span>
+											</div>
+											{renderPeople(group.people)}
+										</section>
+									))
+								: renderPeople(mainList)}
 						</div>
 					)}
 				</>

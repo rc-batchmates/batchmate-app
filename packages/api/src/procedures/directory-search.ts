@@ -36,13 +36,27 @@ export const directorySearch = server.directorySearch.handler(
 
 		return {
 			people: data.map((profile) => {
-				const lastStint = profile.stints?.[profile.stints.length - 1]
+				const stints = profile.stints ?? []
+				const latestStint = stints.reduce<(typeof stints)[number] | null>(
+					(latest, stint) =>
+						!latest || stint.start_date > latest.start_date ? stint : latest,
+					null,
+				)
+				const latestBatchStint = stints.reduce<(typeof stints)[number] | null>(
+					(latest, stint) => {
+						if (!stint.batch?.name) return latest
+						return !latest || stint.start_date > latest.start_date
+							? stint
+							: latest
+					},
+					null,
+				)
 				return {
 					id: profile.id,
 					name: profile.name ?? `${profile.first_name} ${profile.last_name}`,
 					imageUrl: profile.image_path ?? null,
-					batch: lastStint?.batch?.name ?? null,
-					stintType: lastStint?.type ?? null,
+					batch: latestBatchStint?.batch?.name ?? null,
+					stintType: latestStint?.type ?? null,
 					pronouns: profile.pronouns ?? null,
 					role: getRoleFromStints(profile.stints),
 				}
