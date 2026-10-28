@@ -1,9 +1,14 @@
 import { Tabs } from "expo-router"
 import { House, Search, User, Users } from "lucide-react-native"
 import { useSafeAreaInsets } from "react-native-safe-area-context"
+import {
+	TabBarLabel,
+	useTabBarHeight,
+} from "../../../src/components/tab-bar-label"
 
 export default function DemoTabsLayout() {
 	const insets = useSafeAreaInsets()
+	const tabBarHeight = useTabBarHeight()
 
 	return (
 		<Tabs
@@ -14,15 +19,13 @@ export default function DemoTabsLayout() {
 					borderTopColor: "#1E293B",
 					borderTopWidth: 1,
 					paddingBottom: insets.bottom,
-					height: 56 + insets.bottom,
+					height: tabBarHeight,
 				},
 				tabBarActiveTintColor: "#22D3EE",
 				tabBarInactiveTintColor: "#64748B",
-				tabBarLabelStyle: {
-					fontFamily: "Inter",
-					fontSize: 10,
-					fontWeight: "500",
-				},
+				tabBarLabel: ({ color, children }) => (
+					<TabBarLabel color={color}>{children}</TabBarLabel>
+				),
 			}}
 		>
 			<Tabs.Screen

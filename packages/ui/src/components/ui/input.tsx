@@ -13,8 +13,12 @@ function Input({
 }) {
 	return (
 		<TextInput
+			// Height comes from the text itself plus padding. No fixed height and
+			// no line-height: Android's TextInput clips glyphs whenever an explicit
+			// line-height is shorter than the font's own metrics, so `text-base`
+			// (which carries a line-height) is replaced by a size-only `text-[1rem]`.
 			className={cn(
-				"h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-base text-foreground shadow-sm",
+				"w-full rounded-md border border-input bg-transparent px-3 py-2 text-[1rem] text-foreground shadow-sm",
 				editable === false && "opacity-50",
 				className,
 			)}

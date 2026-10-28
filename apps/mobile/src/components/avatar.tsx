@@ -57,6 +57,8 @@ export function Avatar({
 			) : (
 				<Text
 					className={`${INITIALS_TEXT_CLASS[size]} font-semibold text-primary`}
+					// Initials sit in a fixed-size circle, so cap how far they scale.
+					maxFontSizeMultiplier={1.2}
 				>
 					{getInitials(name)}
 				</Text>

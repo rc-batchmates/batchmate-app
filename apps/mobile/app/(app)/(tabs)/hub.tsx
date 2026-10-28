@@ -216,7 +216,7 @@ export default function HubScreen() {
 
 			{hub && isToday && !isCheckedIn && (
 				<Pressable
-					className="h-12 flex-row items-center justify-center gap-2 rounded-xl bg-cyan"
+					className="min-h-12 flex-row py-3 items-center justify-center gap-2 rounded-xl bg-cyan"
 					onPress={() => checkin.mutate({})}
 					disabled={checkin.isPending}
 				>
@@ -228,7 +228,7 @@ export default function HubScreen() {
 			)}
 
 			{hub && isToday && isCheckedIn && (
-				<View className="h-12 flex-row items-center justify-center gap-2 rounded-xl border border-cyan/20 bg-cyan/10">
+				<View className="min-h-12 flex-row py-3 items-center justify-center gap-2 rounded-xl border border-cyan/20 bg-cyan/10">
 					<CheckCircle size={18} color="#22D3EE" />
 					<Text className="text-sm font-medium text-primary">
 						You're checked in

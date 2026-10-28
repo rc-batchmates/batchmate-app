@@ -85,7 +85,10 @@ function PersonCard({
 				{imageUrl ? (
 					<Image source={{ uri: imageUrl }} className="h-full w-full" />
 				) : (
-					<Text className="text-sm font-semibold text-primary">
+					<Text
+						className="text-sm font-semibold text-primary"
+						maxFontSizeMultiplier={1.2}
+					>
 						{getInitials(name)}
 					</Text>
 				)}
