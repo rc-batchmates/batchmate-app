@@ -3,6 +3,7 @@ import { Ban, Cookie, HandCoins } from "lucide-react-native"
 import { type ReactNode, useState } from "react"
 import { Pressable, View } from "react-native"
 import { cn } from "../../lib/cn"
+import { useThemeColors } from "../../lib/theme-colors"
 import { ExternalLink } from "./external-link"
 import { Text } from "./text"
 
@@ -80,7 +81,7 @@ export function SnackBarBalance({
 			<Text
 				className={cn(
 					"font-mono text-3xl font-semibold",
-					settled || credit ? "text-[#4ADE80]" : "text-foreground",
+					settled || credit ? "text-success" : "text-foreground",
 				)}
 			>
 				{balanceCents === undefined ? "—" : formatCents(Math.abs(balanceCents))}
@@ -101,6 +102,7 @@ export function SnackBarEntryRow({
 	onPress?: () => void
 	trailing?: ReactNode
 }) {
+	const c = useThemeColors()
 	const voided = entry.voidedAt !== null
 	const payment = entry.kind === "payment"
 	const Icon = payment ? HandCoins : Cookie
@@ -112,9 +114,9 @@ export function SnackBarEntryRow({
 		>
 			<View className="h-9 w-9 items-center justify-center rounded-full bg-surface-inset">
 				{voided ? (
-					<Ban size={16} color="#64748B" />
+					<Ban size={16} color={c.textTertiary} />
 				) : (
-					<Icon size={16} color={payment ? "#4ADE80" : "#22D3EE"} />
+					<Icon size={16} color={payment ? c.success : c.primary} />
 				)}
 			</View>
 			<View className="flex-1 gap-0.5">
@@ -138,7 +140,7 @@ export function SnackBarEntryRow({
 					voided
 						? "text-text-tertiary line-through"
 						: payment
-							? "text-[#4ADE80]"
+							? "text-success"
 							: "text-foreground",
 				)}
 			>
@@ -246,7 +248,7 @@ export function ConfirmButton({
 				className={cn(
 					"font-semibold",
 					compact ? "text-xs" : "text-sm",
-					armed ? "text-white" : "text-[#F87171]",
+					armed ? "text-white" : "text-destructive",
 				)}
 			>
 				{isPending ? pendingLabel : armed ? confirmLabel : label}
@@ -295,7 +297,7 @@ export function SnackBarEntryDetail({
 						voided
 							? "text-text-tertiary line-through"
 							: payment
-								? "text-[#4ADE80]"
+								? "text-success"
 								: "text-foreground",
 					)}
 				>
@@ -304,7 +306,7 @@ export function SnackBarEntryDetail({
 						: formatCents(entry.amountCents)}
 				</Text>
 				{voided && (
-					<Text className="text-xs font-medium text-[#F87171]">Removed</Text>
+					<Text className="text-xs font-medium text-destructive">Removed</Text>
 				)}
 			</View>
 

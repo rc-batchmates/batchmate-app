@@ -5,6 +5,7 @@ import { type ReactNode, useState } from "react"
 import { Image, Pressable, View } from "react-native"
 import { cn } from "../../lib/cn"
 import { getInitials } from "../../lib/stint-labels"
+import { useThemeColors } from "../../lib/theme-colors"
 import { Input } from "./input"
 import {
 	ConfirmButton,
@@ -180,6 +181,7 @@ export function SnackBarSkuManager({
 	renderSkuActions,
 	header,
 }: SnackBarSkuManagerProps) {
+	const c = useThemeColors()
 	const queryClient = useQueryClient()
 	const skus = useQuery(api.snackBarAdminSkus.queryOptions({}))
 	const [editingId, setEditingId] = useState<string | null>(null)
@@ -282,7 +284,7 @@ export function SnackBarSkuManager({
 									accessibilityLabel={`Edit ${sku.name}`}
 									onPress={() => setEditingId(sku.id)}
 								>
-									<Pencil size={16} color="#22D3EE" />
+									<Pencil size={16} color={c.primary} />
 								</SkuIconButton>
 								<SkuIconButton
 									accessibilityLabel={
@@ -296,9 +298,9 @@ export function SnackBarSkuManager({
 									}
 								>
 									{sku.archived ? (
-										<ArchiveRestore size={16} color="#22D3EE" />
+										<ArchiveRestore size={16} color={c.primary} />
 									) : (
-										<Archive size={16} color="#94A3B8" />
+										<Archive size={16} color={c.textSecondary} />
 									)}
 								</SkuIconButton>
 							</View>
@@ -404,7 +406,7 @@ export function SnackBarAccounts({
 					<Text
 						className={cn(
 							"font-mono text-sm font-semibold",
-							account.balanceCents > 0 ? "text-foreground" : "text-[#4ADE80]",
+							account.balanceCents > 0 ? "text-foreground" : "text-success",
 						)}
 					>
 						{account.balanceCents < 0

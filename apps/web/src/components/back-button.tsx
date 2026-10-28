@@ -13,7 +13,7 @@ export function BackButton() {
 			}
 			className="flex cursor-pointer items-center gap-1 text-sm text-text-tertiary hover:text-foreground"
 		>
-			<ChevronLeft size={14} color="#64748B" />
+			<ChevronLeft size={14} className="text-text-tertiary" />
 			Back
 		</button>
 	)

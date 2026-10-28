@@ -1,4 +1,9 @@
-import { newSnackLinkKey, SnackPurchaseSummary, Text } from "@batchmate/ui"
+import {
+	newSnackLinkKey,
+	SnackPurchaseSummary,
+	Text,
+	useThemeColors,
+} from "@batchmate/ui"
 import { Redirect, useLocalSearchParams, useRouter } from "expo-router"
 import { useCallback, useState } from "react"
 import { ActivityIndicator, ScrollView, View } from "react-native"
@@ -13,6 +18,7 @@ const KEY_PATTERN = /^[A-Za-z0-9_-]{8,64}$/
 // SNACK_LINK_KEY_PARAM in @batchmate/ui for how `?k=` keeps a reopened link
 // from buying twice.
 export default function SnackScreen() {
+	const c = useThemeColors()
 	const params = useLocalSearchParams<{ skuId: string; k?: string }>()
 	const skuId = params.skuId
 	const k = params.k && KEY_PATTERN.test(params.k) ? params.k : null
@@ -65,7 +71,7 @@ export default function SnackScreen() {
 					/>
 				) : (
 					<View className="items-center gap-4 py-16">
-						<ActivityIndicator color="#22D3EE" size="large" />
+						<ActivityIndicator color={c.primary} size="large" />
 						<Text className="text-sm text-text-tertiary">Loading...</Text>
 					</View>
 				)}

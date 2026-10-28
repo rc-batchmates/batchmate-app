@@ -4,6 +4,7 @@ import { Check, Plus, TriangleAlert, Undo2 } from "lucide-react-native"
 import { useEffect } from "react"
 import { ActivityIndicator, AppState, Pressable, View } from "react-native"
 import { cn } from "../../lib/cn"
+import { useThemeColors } from "../../lib/theme-colors"
 import { formatCents, formatDateTime, snackEntryTitle } from "./snack-bar"
 import { Text } from "./text"
 
@@ -86,6 +87,7 @@ export function SnackPurchaseSummary({
 	onViewTab,
 	onExpire,
 }: SnackPurchaseSummaryProps) {
+	const c = useThemeColors()
 	const queryClient = useQueryClient()
 	// Kept outside api.key() so invalidating Snack Bar queries after an undo
 	// doesn't re-run the purchase (which would just return the same entry).
@@ -133,7 +135,7 @@ export function SnackPurchaseSummary({
 	if (purchase.isPending) {
 		return (
 			<View className="items-center gap-4 py-16">
-				<ActivityIndicator color="#22D3EE" size="large" />
+				<ActivityIndicator color={c.primary} size="large" />
 				<Text className="text-sm text-text-tertiary">
 					Adding to your Snack Bar tab...
 				</Text>
@@ -144,7 +146,7 @@ export function SnackPurchaseSummary({
 	if (purchase.isError) {
 		return (
 			<View className="items-center gap-5 rounded-xl border border-destructive/30 bg-card p-6">
-				<TriangleAlert size={32} color="#F87171" />
+				<TriangleAlert size={32} color={c.danger} />
 				<Text className="text-center text-base">
 					{errorText(purchase.error)}
 				</Text>
@@ -176,9 +178,9 @@ export function SnackPurchaseSummary({
 					)}
 				>
 					{undone ? (
-						<Undo2 size={30} color="#64748B" />
+						<Undo2 size={30} color={c.textTertiary} />
 					) : (
-						<Check size={32} color="#22D3EE" />
+						<Check size={32} color={c.primary} />
 					)}
 				</View>
 				<Text className="text-sm text-text-tertiary">
@@ -233,7 +235,7 @@ export function SnackPurchaseSummary({
 								})
 							}
 						>
-							<Plus size={16} color="#22D3EE" />
+							<Plus size={16} color={c.primary} />
 							<Text className="text-sm font-semibold text-primary">
 								{buyAnother.isPending ? "Adding..." : "Buy another"}
 							</Text>
@@ -246,8 +248,8 @@ export function SnackPurchaseSummary({
 							disabled={busy}
 							onPress={() => undo.mutate({ id: entry.id })}
 						>
-							<Undo2 size={16} color="#F87171" />
-							<Text className="text-sm font-semibold text-[#F87171]">
+							<Undo2 size={16} color={c.danger} />
+							<Text className="text-sm font-semibold text-destructive">
 								{undo.isPending ? "Undoing..." : "Undo"}
 							</Text>
 						</Pressable>

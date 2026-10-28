@@ -1,4 +1,4 @@
-import { Text } from "@batchmate/ui"
+import { Text, useThemeColors } from "@batchmate/ui"
 import { type Href, useRouter } from "expo-router"
 import { Download, Nfc, Users } from "lucide-react-native"
 import type { ComponentType } from "react"
@@ -33,6 +33,7 @@ const SECTIONS: {
 ]
 
 export default function SnackBarAdminScreen() {
+	const c = useThemeColors()
 	const router = useRouter()
 	return (
 		<ScrollView
@@ -48,7 +49,7 @@ export default function SnackBarAdminScreen() {
 							className="flex-row items-center gap-3 rounded-xl border border-cyan/20 bg-cyan/5 px-4 py-3.5"
 							onPress={() => router.push(href)}
 						>
-							<Icon size={18} color="#22D3EE" />
+							<Icon size={18} color={c.primary} />
 							<View className="flex-1">
 								<Text className="text-[15px] font-semibold text-primary">
 									{title}

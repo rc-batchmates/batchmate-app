@@ -39,7 +39,7 @@ function SnackBarPage() {
 					to="/snack-bar/admin"
 					className="flex items-center gap-2.5 rounded-xl bg-card px-4 py-3 no-underline hover:bg-card/80"
 				>
-					<ShieldCheck size={18} color="#22D3EE" />
+					<ShieldCheck size={18} className="text-cyan" />
 					<span className="flex-1 text-[15px] font-semibold text-foreground">
 						Admin
 					</span>

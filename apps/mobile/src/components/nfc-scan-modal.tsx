@@ -1,4 +1,4 @@
-import { cn, Text } from "@batchmate/ui"
+import { cn, Text, useThemeColors } from "@batchmate/ui"
 import { Check, Nfc, X } from "lucide-react-native"
 import { useEffect, useRef } from "react"
 import { Animated, Easing, Modal, Pressable, View } from "react-native"
@@ -22,6 +22,7 @@ export function NfcScanModal({
 	onCancel: () => void
 	onDone: () => void
 }) {
+	const c = useThemeColors()
 	const insets = useSafeAreaInsets()
 	const pulse = useRef(new Animated.Value(0)).current
 	const waiting = prompt?.status === "waiting"
@@ -99,11 +100,11 @@ export function NfcScanModal({
 							)}
 						>
 							{waiting ? (
-								<Nfc size={88} color="#22D3EE" strokeWidth={1.5} />
+								<Nfc size={88} color={c.primary} strokeWidth={1.5} />
 							) : failed ? (
-								<X size={88} color="#F87171" strokeWidth={1.75} />
+								<X size={88} color={c.danger} strokeWidth={1.75} />
 							) : (
-								<Check size={88} color="#22D3EE" strokeWidth={1.75} />
+								<Check size={88} color={c.primary} strokeWidth={1.75} />
 							)}
 						</View>
 					</View>
@@ -111,7 +112,7 @@ export function NfcScanModal({
 						className={cn(
 							"text-center font-semibold",
 							waiting ? "text-2xl" : "text-xl",
-							failed && "text-[#F87171]",
+							failed && "text-destructive",
 						)}
 					>
 						{prompt?.status === "waiting"

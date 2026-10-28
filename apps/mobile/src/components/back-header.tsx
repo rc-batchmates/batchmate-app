@@ -1,9 +1,10 @@
-import { Text } from "@batchmate/ui"
+import { Text, useThemeColors } from "@batchmate/ui"
 import { useRouter } from "expo-router"
 import { ChevronLeft } from "lucide-react-native"
 import { Pressable, View } from "react-native"
 
 export function BackHeader({ title }: { title: string }) {
+	const c = useThemeColors()
 	const router = useRouter()
 	return (
 		<View className="flex-row items-center justify-between">
@@ -13,7 +14,7 @@ export function BackHeader({ title }: { title: string }) {
 					router.canGoBack() ? router.back() : router.replace("/")
 				}
 			>
-				<ChevronLeft size={20} color="#94A3B8" />
+				<ChevronLeft size={20} color={c.textSecondary} />
 				<Text className="text-sm font-medium text-text-secondary">Back</Text>
 			</Pressable>
 			<Text className="text-[15px] font-semibold">{title}</Text>

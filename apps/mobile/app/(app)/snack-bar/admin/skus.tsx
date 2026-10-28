@@ -5,6 +5,7 @@ import {
 	SkuIconButton,
 	SnackBarSkuManager,
 	Text,
+	useThemeColors,
 } from "@batchmate/ui"
 import { Nfc, ScanSearch } from "lucide-react-native"
 import { useEffect, useRef, useState } from "react"
@@ -31,6 +32,7 @@ function nfcErrorMessage(error: unknown) {
 }
 
 export default function SnackBarSkusScreen() {
+	const c = useThemeColors()
 	const [nfcStatus, setNfcStatus] = useState<NfcStatus | null>(null)
 	// One NFC operation at a time; its whole lifecycle lives in the modal.
 	const [prompt, setPrompt] = useState<NfcPrompt | null>(null)
@@ -112,7 +114,7 @@ export default function SnackBarSkusScreen() {
 	const nfcPanel = (
 		<View className="gap-3 rounded-xl border border-cyan/20 bg-cyan/5 p-4">
 			<View className="flex-row items-center gap-2">
-				<Nfc size={18} color="#22D3EE" />
+				<Nfc size={18} color={c.primary} />
 				<Text className="flex-1 text-[15px] font-semibold text-primary">
 					NFC tags
 				</Text>
@@ -134,7 +136,7 @@ export default function SnackBarSkusScreen() {
 					</Text>
 					<SecondaryButton
 						label="Identify a tag"
-						icon={<ScanSearch size={14} color="#22D3EE" />}
+						icon={<ScanSearch size={14} color={c.primary} />}
 						disabled={busy}
 						onPress={identifyTag}
 					/>
@@ -167,7 +169,7 @@ export default function SnackBarSkusScreen() {
 										disabled={busy}
 										onPress={() => writeTag(sku)}
 									>
-										<Nfc size={16} color="#22D3EE" />
+										<Nfc size={16} color={c.primary} />
 									</SkuIconButton>
 								)
 							: undefined

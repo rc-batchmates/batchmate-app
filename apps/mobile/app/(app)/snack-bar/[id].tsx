@@ -1,4 +1,4 @@
-import { SnackBarEntryDetail, Text } from "@batchmate/ui"
+import { SnackBarEntryDetail, Text, useThemeColors } from "@batchmate/ui"
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 import { useLocalSearchParams } from "expo-router"
 import { ActivityIndicator, ScrollView } from "react-native"
@@ -7,6 +7,7 @@ import { api } from "../../../src/lib/api"
 import { invalidateSnackBar } from "../../../src/lib/snack-bar"
 
 export default function SnackBarEntryScreen() {
+	const c = useThemeColors()
 	const { id } = useLocalSearchParams<{ id: string }>()
 	const queryClient = useQueryClient()
 	const entry = useQuery(
@@ -24,7 +25,7 @@ export default function SnackBarEntryScreen() {
 		>
 			<BackHeader title="Transaction" />
 			{entry.isLoading ? (
-				<ActivityIndicator color="#22D3EE" />
+				<ActivityIndicator color={c.primary} />
 			) : entry.data ? (
 				<SnackBarEntryDetail
 					entry={entry.data}
