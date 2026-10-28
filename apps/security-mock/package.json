@@ -1,0 +1,17 @@
+{
+	"name": "@batchmate/security-mock",
+	"version": "0.0.0",
+	"private": true,
+	"type": "module",
+	"scripts": {
+		"dev:local": "wrangler dev",
+		"build": "tsc --noEmit"
+	},
+	"dependencies": {
+		"@batchmate/security-api": "workspace:*"
+	},
+	"devDependencies": {
+		"@cloudflare/workers-types": "^4.20260303.0",
+		"typescript": "^5.7.0"
+	}
+}
