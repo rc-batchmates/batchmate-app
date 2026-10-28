@@ -167,10 +167,7 @@ export const contract = oc.router({
 		.route({ method: "GET", path: "/hub" })
 		.input(
 			z.object({
-				date: z
-					.string()
-					.regex(/^\d{4}-\d{2}-\d{2}$/)
-					.optional(),
+				date: z.string().date().optional(),
 			}),
 		)
 		.output(HubResponseSchema),
