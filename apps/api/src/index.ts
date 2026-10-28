@@ -22,6 +22,7 @@ type Env = {
 		RC_BATCHMATE_CLIENT_SECRET: string
 		DOORBOT_TOKEN?: string
 		BASE_URL?: string
+		SKIP_ACCESS_CONTROL_PROVISIONING?: string
 	}
 }
 

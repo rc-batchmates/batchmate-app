@@ -11,6 +11,10 @@ RC_BATCHMATE_CLIENT_ID=""
 RC_BATCHMATE_CLIENT_SECRET=""
 BASE_URL="http://localhost:8787"
 
+# Skip provisioning a door-system user + virtual card on first login.
+# Keep "true" for local dev unless you're working on door access.
+SKIP_ACCESS_CONTROL_PROVISIONING="true"
+
 # Personal access token from recurse.com/settings/apps. Used to open the
 # main entrance via https://doorbot.recurse.com/api/sesame/intercom.
 DOORBOT_TOKEN=""

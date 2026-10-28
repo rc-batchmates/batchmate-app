@@ -19,6 +19,9 @@ export type AuthEnv = {
 	SECURITY_COMPUTER: Fetcher
 	VIRTUAL_CARD_PREFIX?: string
 	VIRTUAL_CARD_SITE_CODE?: string
+	// Local dev only: skip creating door-system users/cards on signup so
+	// login works without touching the real security computer.
+	SKIP_ACCESS_CONTROL_PROVISIONING?: string
 }
 
 export function createAuth(db: Database, env: AuthEnv) {
@@ -98,6 +101,10 @@ export function createAuth(db: Database, env: AuthEnv) {
 			user: {
 				create: {
 					before: async (user) => {
+						if (env.SKIP_ACCESS_CONTROL_PROVISIONING === "true") {
+							return { data: user }
+						}
+
 						// believe it or not, all badges are in the same department as the staff!
 						const RECURSE_CENTER_STAFF_DEPARTMENT_ID = 2
 						const RECURSE_CENTER_ACCESS_GROUP_ID = 2
