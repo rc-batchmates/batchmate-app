@@ -168,6 +168,11 @@ export const contract = oc.router({
 	),
 	hubVisits: oc
 		.route({ method: "GET", path: "/hub" })
+		.input(
+			z.object({
+				date: z.string().date().optional(),
+			}),
+		)
 		.output(HubResponseSchema),
 	isCheckedIn: oc
 		.route({ method: "GET", path: "/hub/is-checked-in" })

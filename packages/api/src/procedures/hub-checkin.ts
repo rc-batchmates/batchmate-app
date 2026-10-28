@@ -2,6 +2,7 @@ import { account } from "@batchmate/db/auth-schema"
 import { ORPCError } from "@orpc/server"
 import { and, eq } from "drizzle-orm"
 import { server } from "../context"
+import { todayInNY } from "../lib/date"
 
 export const hubCheckin = server.hubCheckin.handler(async ({ context }) => {
 	if (!context.user) {
@@ -32,9 +33,7 @@ export const hubCheckin = server.hubCheckin.handler(async ({ context }) => {
 		})
 	}
 
-	const today = new Date().toLocaleDateString("en-CA", {
-		timeZone: "America/New_York",
-	})
+	const today = todayInNY()
 
 	const { error } = await context.recurseApi.PATCH(
 		"/hub_visits/{person_id}/{date}",

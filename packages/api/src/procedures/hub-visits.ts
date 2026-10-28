@@ -73,10 +73,21 @@ async function getRcPersonId(
 }
 
 /** fetches all checked-in users' profiles */
-export const hubVisits = server.hubVisits.handler(async ({ context }) => {
+export const hubVisits = server.hubVisits.handler(async (options) => {
+	const { input, context } = options
 	const { recurseApi } = requireRecurseUser(context)
 
-	const { data, error } = await recurseApi.GET("/hub_visits")
+	const today = todayInNY()
+	const date = input.date ?? today
+	if (date > today) {
+		throw new ORPCError("BAD_REQUEST", {
+			message: "Cannot view hub visits in the future",
+		})
+	}
+
+	const { data, error } = await recurseApi.GET("/hub_visits", {
+		params: { query: { date, per_page: 200 } },
+	})
 
 	if (error || !data) {
 		throw new ORPCError("INTERNAL_SERVER_ERROR", {

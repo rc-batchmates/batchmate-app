@@ -44,6 +44,13 @@ export {
 } from "./lib/batch-groups"
 export { cn } from "./lib/cn"
 export { ROLES, SCOPES } from "./lib/directory-constants"
+export {
+	formatHubDate,
+	hubDateToLocalDate,
+	hubToday,
+	localDateToHubDate,
+	shiftHubDate,
+} from "./lib/hub-date"
 export { getInitials, getSubtitle, stintTypeLabels } from "./lib/stint-labels"
 export {
 	type Card as StudyFacesCard,

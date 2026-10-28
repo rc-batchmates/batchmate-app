@@ -189,7 +189,7 @@ export function StudyFacesGame({
 	const [mode, setMode] = useState<StudyFacesMode>("hub")
 
 	const { data: hub, isLoading: hubLoading } = useQuery({
-		...api.hubVisits.queryOptions({}),
+		...api.hubVisits.queryOptions({ input: {} }),
 		enabled: mode === "hub",
 	})
 
