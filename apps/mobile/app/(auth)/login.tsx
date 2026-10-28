@@ -1,14 +1,17 @@
 import { LoginForm } from "@batchmate/ui"
-import { useRouter } from "expo-router"
+import { useLocalSearchParams, useRouter } from "expo-router"
 import { useState } from "react"
 import { KeyboardAvoidingView, Platform, ScrollView } from "react-native"
 import { signIn } from "../../src/lib/auth"
 import { enterDemoMode } from "../../src/lib/demo"
+import { loginRedirectTarget } from "../../src/lib/login-redirect"
 
 const TAPS_REQUIRED = 5
 
 export default function LoginScreen() {
 	const router = useRouter()
+	const { redirect } = useLocalSearchParams<{ redirect?: string }>()
+	const target = loginRedirectTarget(redirect)
 
 	const [demoTaps, setDemoTaps] = useState(0)
 
@@ -37,9 +40,9 @@ export default function LoginScreen() {
 					onSubmit={async () => {
 						await signIn.social({
 							provider: "recurse",
-							callbackURL: "/(app)",
+							callbackURL: typeof target === "string" ? target : "/(app)",
 						})
-						router.replace("/(app)")
+						router.replace(target)
 					}}
 				/>
 			</ScrollView>

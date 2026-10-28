@@ -18,6 +18,7 @@ export interface BaseContext {
 		id: string
 		name: string
 		email: string
+		rcId?: string | null
 		accessControlUserId: string
 		accessControlVirtualCardId: string
 	} | null
