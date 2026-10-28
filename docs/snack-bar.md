@@ -51,11 +51,15 @@ matters, so dev-written tags only resolve against the DB they were created in.
 - Add admin RC IDs to `snack-bar-admins.ts`.
 - Native modules were added (NFC, sharing, file-system), so this needs a
   store build, not an EAS update. Bump `version` in `app.json`.
-- Serve `/.well-known/assetlinks.json` (Play App Signing SHA-256 only, never
-  the public React Native debug key) and
-  `/.well-known/apple-app-site-association`. Without these, taps open the
-  web page instead of the app.
-- Enable NFC Tag Reading + Associated Domains on the iOS App ID.
+- Deep links: `apps/web/public/.well-known/` holds `assetlinks.json`
+  (Android) and `apple-app-site-association` (iOS); the Worker serves the
+  latter as `application/json`. Replace the placeholder fingerprints in
+  `assetlinks.json` with the Play Console's app signing (and upload) key
+  SHA-256s. Never add the React Native debug key (`FA:C6:17:…`): it's
+  public, so any app signed with it could capture Snack Bar links. Without
+  these files verified, taps open the web page instead of the app.
+- Enable Associated Domains and NFC Tag Reading on the iOS App ID (EAS
+  usually syncs these at build time).
 
 ## Local development
 
