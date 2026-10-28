@@ -93,25 +93,6 @@ export default function HomeScreen() {
 				onUnlockEnd={() => setJustUnlocked(null)}
 			/>
 
-			{/* Study faces */}
-			<Pressable
-				className="flex-row items-center justify-between rounded-xl border border-cyan/20 bg-cyan/5 px-4 py-3"
-				onPress={() => router.push("/(app)/study-faces")}
-			>
-				<View className="flex-row items-center gap-2.5">
-					<Sparkles size={18} color="#22D3EE" />
-					<View>
-						<Text className="text-[15px] font-semibold text-primary">
-							Study faces
-						</Text>
-						<Text className="text-xs text-text-tertiary">
-							Quiz yourself on faces and names
-						</Text>
-					</View>
-				</View>
-				<Text className="text-xs font-medium text-primary">→</Text>
-			</Pressable>
-
 			{/* Snack Bar */}
 			<Pressable
 				className="flex-row items-center justify-between rounded-xl border border-cyan/20 bg-cyan/5 px-4 py-3"
@@ -127,6 +108,25 @@ export default function HomeScreen() {
 							{snackBar && snackBar.balanceCents > 0
 								? `You owe ${formatCents(snackBar.balanceCents)}`
 								: "Your tab and history"}
+						</Text>
+					</View>
+				</View>
+				<Text className="text-xs font-medium text-primary">→</Text>
+			</Pressable>
+
+			{/* Study faces */}
+			<Pressable
+				className="flex-row items-center justify-between rounded-xl border border-cyan/20 bg-cyan/5 px-4 py-3"
+				onPress={() => router.push("/(app)/study-faces")}
+			>
+				<View className="flex-row items-center gap-2.5">
+					<Sparkles size={18} color="#22D3EE" />
+					<View>
+						<Text className="text-[15px] font-semibold text-primary">
+							Study faces
+						</Text>
+						<Text className="text-xs text-text-tertiary">
+							Quiz yourself on faces and names
 						</Text>
 					</View>
 				</View>

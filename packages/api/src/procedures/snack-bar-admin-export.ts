@@ -6,6 +6,7 @@ import {
 	formatSnackBarLocal,
 	requireAdmin,
 	snackBarDayStartMs,
+	unitPriceCents,
 } from "../lib/snack-bar"
 
 const COLUMNS = [
@@ -18,6 +19,8 @@ const COLUMNS = [
 	"kind",
 	"sku_id",
 	"sku_name",
+	"quantity",
+	"unit_price",
 	"amount",
 	"source",
 	"note",
@@ -98,6 +101,8 @@ export const snackBarAdminExport = server.snackBarAdminExport.handler(
 					entry.kind,
 					entry.skuId,
 					entry.skuName,
+					entry.quantity,
+					(unitPriceCents(entry) / 100).toFixed(2),
 					(entry.amountCents / 100).toFixed(2),
 					entry.source,
 					entry.note,

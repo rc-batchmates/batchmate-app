@@ -155,6 +155,9 @@ const SnackLedgerEntrySchema = z.object({
 	kind: z.enum(["purchase", "payment"]),
 	skuId: z.string().nullable(),
 	skuName: z.string().nullable(),
+	quantity: z.number().int(),
+	// Purchases: price per snack. Payments: same as amountCents.
+	unitPriceCents: z.number().int(),
 	amountCents: z.number().int(),
 	source: z.enum(["nfc", "web", "admin"]),
 	note: z.string().nullable(),
@@ -288,6 +291,21 @@ export const contract = oc.router({
 				// Lives in the snack link's URL, so keep it URL-safe.
 				idempotencyKey: z.string().regex(/^[A-Za-z0-9_-]{8,64}$/),
 				source: z.enum(["nfc", "web"]),
+			}),
+		)
+		.output(SnackLedgerMutationResponseSchema),
+	snackBarBuyAnother: oc
+		.route({
+			method: "POST",
+			path: "/snack-bar/transactions/{id}/buy-another",
+		})
+		.input(
+			z.object({
+				id: z.string().min(1),
+				// The quantity the client last saw. If the entry has already moved
+				// past it (a retried or double-sent tap), nothing is added and the
+				// current entry is returned.
+				expectedQuantity: z.number().int().min(1),
 			}),
 		)
 		.output(SnackLedgerMutationResponseSchema),

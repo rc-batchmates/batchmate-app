@@ -1,14 +1,18 @@
-import { SnackBarBalance, SnackBarEntryList, Text } from "@batchmate/ui"
+import {
+	SnackBarBalance,
+	SnackBarEntryList,
+	SnackBarSettleUp,
+	Text,
+} from "@batchmate/ui"
 import { useInfiniteQuery, useQuery } from "@tanstack/react-query"
 import { useRouter } from "expo-router"
-import { Nfc, ShieldCheck } from "lucide-react-native"
+import { ShieldCheck } from "lucide-react-native"
 import { useState } from "react"
 import {
 	ActivityIndicator,
 	Pressable,
 	RefreshControl,
 	ScrollView,
-	View,
 } from "react-native"
 import { BackHeader } from "../../../src/components/back-header"
 import { api } from "../../../src/lib/api"
@@ -56,13 +60,7 @@ export default function SnackBarScreen() {
 
 			<SnackBarBalance balanceCents={summary.data?.balanceCents} />
 
-			<View className="flex-row items-center gap-3 rounded-xl border border-cyan/20 bg-cyan/5 px-4 py-3">
-				<Nfc size={18} color="#22D3EE" />
-				<Text className="flex-1 text-xs text-text-secondary">
-					Tap your phone on a snack's tag to add it to your tab. Pay a Snack Bar
-					admin to settle up.
-				</Text>
-			</View>
+			<SnackBarSettleUp />
 
 			{summary.data?.isAdmin && (
 				<Pressable

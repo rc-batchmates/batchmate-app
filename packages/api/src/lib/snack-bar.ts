@@ -117,6 +117,11 @@ export function canUserVoid(
 	)
 }
 
+// amountCents is always quantity × the price at purchase time, so this is exact.
+export function unitPriceCents(entry: EntryRow["entry"]) {
+	return Math.round(entry.amountCents / entry.quantity)
+}
+
 export function toEntryDto(row: EntryRow, canVoid: boolean): SnackLedgerEntry {
 	const { entry } = row
 	return {
@@ -124,6 +129,8 @@ export function toEntryDto(row: EntryRow, canVoid: boolean): SnackLedgerEntry {
 		kind: entry.kind,
 		skuId: entry.skuId ?? null,
 		skuName: entry.skuName,
+		quantity: entry.quantity,
+		unitPriceCents: unitPriceCents(entry),
 		amountCents: entry.amountCents,
 		source: entry.source,
 		note: entry.note,

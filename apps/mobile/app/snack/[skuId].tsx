@@ -1,6 +1,6 @@
 import { newSnackLinkKey, SnackPurchaseSummary, Text } from "@batchmate/ui"
 import { Redirect, useLocalSearchParams, useRouter } from "expo-router"
-import { useState } from "react"
+import { useCallback, useState } from "react"
 import { ActivityIndicator, ScrollView, View } from "react-native"
 import { useSafeAreaInsets } from "react-native-safe-area-context"
 import { BackHeader } from "../../src/components/back-header"
@@ -20,6 +20,7 @@ export default function SnackScreen() {
 	const insets = useSafeAreaInsets()
 	const { data: session, isPending } = useSession()
 	const [freshKey] = useState(newSnackLinkKey)
+	const goHome = useCallback(() => router.replace("/(app)"), [router])
 
 	// Key first, before the login check, so a tap that has to log in first
 	// still comes back to the same key. <Redirect> (not router.replace in an
@@ -60,6 +61,7 @@ export default function SnackScreen() {
 						idempotencyKey={k}
 						source="nfc"
 						onViewTab={() => router.replace("/snack-bar")}
+						onExpire={goHome}
 					/>
 				) : (
 					<View className="items-center gap-4 py-16">

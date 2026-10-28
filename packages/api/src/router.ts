@@ -20,6 +20,7 @@ import { snackBarAdminSkuCreate } from "./procedures/snack-bar-admin-sku-create"
 import { snackBarAdminSkuUpdate } from "./procedures/snack-bar-admin-sku-update"
 import { snackBarAdminSkus } from "./procedures/snack-bar-admin-skus"
 import { snackBarAdminVoid } from "./procedures/snack-bar-admin-void"
+import { snackBarBuyAnother } from "./procedures/snack-bar-buy-another"
 import { snackBarPurchase } from "./procedures/snack-bar-purchase"
 import { snackBarSku } from "./procedures/snack-bar-sku"
 import { snackBarSummary } from "./procedures/snack-bar-summary"
@@ -47,6 +48,7 @@ export const router = server.router({
 	snackBarTransactions,
 	snackBarTransaction,
 	snackBarPurchase,
+	snackBarBuyAnother,
 	snackBarVoid,
 	snackBarSku,
 	snackBarAdminSkus,

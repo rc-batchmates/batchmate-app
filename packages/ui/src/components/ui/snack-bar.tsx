@@ -3,6 +3,7 @@ import { Ban, Cookie, HandCoins } from "lucide-react-native"
 import { type ReactNode, useState } from "react"
 import { Pressable, View } from "react-native"
 import { cn } from "../../lib/cn"
+import { ExternalLink } from "./external-link"
 import { Text } from "./text"
 
 export function formatCents(cents: number): string {
@@ -44,7 +45,9 @@ export function formatDateTime(iso: string) {
 }
 
 export function snackEntryTitle(entry: SnackLedgerEntry) {
-	return entry.kind === "payment" ? "Payment" : (entry.skuName ?? "Snack")
+	if (entry.kind === "payment") return "Payment"
+	const name = entry.skuName ?? "Snack"
+	return entry.quantity > 1 ? `${name} ×${entry.quantity}` : name
 }
 
 const SOURCE_LABELS: Record<SnackLedgerEntry["source"], string> = {
@@ -308,6 +311,15 @@ export function SnackBarEntryDetail({
 			<View className="overflow-hidden rounded-xl bg-card">
 				<DetailRow label="When" value={formatDateTime(entry.createdAt)} />
 				<View className="h-px bg-divider" />
+				{entry.kind === "purchase" && (
+					<>
+						<DetailRow
+							label="Quantity"
+							value={`${entry.quantity} × ${formatCents(entry.unitPriceCents)}`}
+						/>
+						<View className="h-px bg-divider" />
+					</>
+				)}
 				<DetailRow
 					label="How"
 					value={
@@ -353,6 +365,28 @@ export function SnackBarEntryDetail({
 					</Text>
 				)
 			)}
+		</View>
+	)
+}
+
+// Who people pay to settle their tab. Collection is manual for now.
+export const SNACK_BAR_CONTACT = {
+	label: "Rose Hall (F2'25)",
+	zulipUrl: "https://recurse.zulipchat.com/#narrow/dm/902138",
+}
+
+export function SnackBarSettleUp() {
+	return (
+		<View className="flex-row items-center gap-3 rounded-xl border border-cyan/20 bg-cyan/5 px-4 py-3">
+			<Text className="flex-1 text-xs text-text-secondary">
+				Want to settle your tab? Tell {SNACK_BAR_CONTACT.label} on Zulip!
+			</Text>
+			<ExternalLink
+				href={SNACK_BAR_CONTACT.zulipUrl}
+				className="h-8 items-center justify-center rounded-md bg-cyan px-3"
+			>
+				<Text className="text-xs font-semibold text-background">Message</Text>
+			</ExternalLink>
 		</View>
 	)
 }

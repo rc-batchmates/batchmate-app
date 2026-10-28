@@ -1,0 +1,1 @@
+ALTER TABLE `snack_ledger_entry` ADD `quantity` integer DEFAULT 1 NOT NULL;

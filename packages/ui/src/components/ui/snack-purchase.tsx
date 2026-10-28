@@ -1,7 +1,8 @@
 import type { Client, SnackLedgerEntry } from "@batchmate/api-client"
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
-import { Check, TriangleAlert, Undo2 } from "lucide-react-native"
-import { ActivityIndicator, Pressable, View } from "react-native"
+import { Check, Plus, TriangleAlert, Undo2 } from "lucide-react-native"
+import { useEffect } from "react"
+import { ActivityIndicator, AppState, Pressable, View } from "react-native"
 import { cn } from "../../lib/cn"
 import { formatCents, formatDateTime, snackEntryTitle } from "./snack-bar"
 import { Text } from "./text"
@@ -35,10 +36,35 @@ function errorText(error: unknown) {
 	return error instanceof Error ? error.message : "Something went wrong."
 }
 
-function balanceLine(balanceCents: number) {
-	if (balanceCents > 0) return `You owe ${formatCents(balanceCents)}`
-	if (balanceCents < 0) return `You have ${formatCents(-balanceCents)} credit`
-	return "You're all settled up"
+// How long the summary stays up after the purchase was made. After that it
+// sends you home, so an app left open (or backgrounded) or a browser tab left
+// on the page doesn't sit on it.
+export const SNACK_SUMMARY_TTL_MS = 2 * 60 * 1000
+
+// Calls onExpire once `deadline` passes. Timers are paused or throttled while
+// the app or tab is in the background, so also re-check on returning to the
+// foreground.
+function useExpireAt(deadline: number | null, onExpire: () => void) {
+	useEffect(() => {
+		if (deadline === null) return
+		let done = false
+		const check = () => {
+			if (!done && Date.now() >= deadline) {
+				done = true
+				onExpire()
+			}
+		}
+		check()
+		const timer = setTimeout(check, Math.max(0, deadline - Date.now()) + 250)
+		const subscription = AppState.addEventListener("change", (state) => {
+			if (state === "active") check()
+		})
+		return () => {
+			done = true
+			clearTimeout(timer)
+			subscription.remove()
+		}
+	}, [deadline, onExpire])
 }
 
 export type SnackPurchaseSummaryProps = {
@@ -47,6 +73,9 @@ export type SnackPurchaseSummaryProps = {
 	idempotencyKey: string
 	source: "nfc" | "web"
 	onViewTab: () => void
+	// Leave the summary for home, replacing it in history. Called
+	// SNACK_SUMMARY_TTL_MS after the purchase was made.
+	onExpire: () => void
 }
 
 export function SnackPurchaseSummary({
@@ -55,6 +84,7 @@ export function SnackPurchaseSummary({
 	idempotencyKey,
 	source,
 	onViewTab,
+	onExpire,
 }: SnackPurchaseSummaryProps) {
 	const queryClient = useQueryClient()
 	// Kept outside api.key() so invalidating Snack Bar queries after an undo
@@ -80,13 +110,25 @@ export function SnackPurchaseSummary({
 		retry: 2,
 	})
 
+	const onEntryChanged = (result: PurchaseResult) => {
+		queryClient.setQueryData<PurchaseResult>(queryKey, result)
+		queryClient.invalidateQueries({ queryKey: api.key() })
+	}
 	const undo = useMutation({
 		...api.snackBarVoid.mutationOptions(),
-		onSuccess: (result) => {
-			queryClient.setQueryData<PurchaseResult>(queryKey, result)
-			queryClient.invalidateQueries({ queryKey: api.key() })
-		},
+		onSuccess: onEntryChanged,
 	})
+	const buyAnother = useMutation({
+		...api.snackBarBuyAnother.mutationOptions(),
+		onSuccess: onEntryChanged,
+	})
+	const busy = undo.isPending || buyAnother.isPending
+
+	const createdAt = purchase.data?.entry.createdAt
+	useExpireAt(
+		createdAt ? Date.parse(createdAt) + SNACK_SUMMARY_TTL_MS : null,
+		onExpire,
+	)
 
 	if (purchase.isPending) {
 		return (
@@ -121,7 +163,7 @@ export function SnackPurchaseSummary({
 		)
 	}
 
-	const { entry, balanceCents } = purchase.data
+	const { entry } = purchase.data
 	const undone = entry.voidedAt !== null
 
 	return (
@@ -140,7 +182,11 @@ export function SnackPurchaseSummary({
 					)}
 				</View>
 				<Text className="text-sm text-text-tertiary">
-					{undone ? "Purchase undone" : "You bought a snack"}
+					{undone
+						? "Purchase undone"
+						: entry.quantity > 1
+							? `You bought ${entry.quantity} snacks`
+							: "You bought a snack"}
 				</Text>
 				<View className="items-center gap-1">
 					<Text
@@ -163,32 +209,49 @@ export function SnackPurchaseSummary({
 						{formatDateTime(entry.createdAt)}
 					</Text>
 				</View>
-				<Text className="text-sm text-text-secondary">
-					{balanceLine(balanceCents)}
-				</Text>
 			</View>
 
-			{undo.error && (
+			{(undo.error || buyAnother.error) && (
 				<Text className="text-center text-sm text-destructive">
-					{errorText(undo.error)}
+					{errorText(undo.error ?? buyAnother.error)}
 				</Text>
 			)}
 
 			{!undone &&
 				(entry.canVoid ? (
-					<Pressable
-						className={cn(
-							"h-12 flex-row items-center justify-center gap-2 rounded-md border border-destructive/40 bg-surface-inset",
-							undo.isPending && "opacity-50",
-						)}
-						disabled={undo.isPending}
-						onPress={() => undo.mutate({ id: entry.id })}
-					>
-						<Undo2 size={16} color="#F87171" />
-						<Text className="text-sm font-semibold text-[#F87171]">
-							{undo.isPending ? "Undoing..." : "Undo"}
-						</Text>
-					</Pressable>
+					<>
+						<Pressable
+							className={cn(
+								"h-12 flex-row items-center justify-center gap-2 rounded-md border border-primary/40 bg-surface-inset",
+								busy && "opacity-50",
+							)}
+							disabled={busy}
+							onPress={() =>
+								buyAnother.mutate({
+									id: entry.id,
+									expectedQuantity: entry.quantity,
+								})
+							}
+						>
+							<Plus size={16} color="#22D3EE" />
+							<Text className="text-sm font-semibold text-primary">
+								{buyAnother.isPending ? "Adding..." : "Buy another"}
+							</Text>
+						</Pressable>
+						<Pressable
+							className={cn(
+								"h-12 flex-row items-center justify-center gap-2 rounded-md border border-destructive/40 bg-surface-inset",
+								busy && "opacity-50",
+							)}
+							disabled={busy}
+							onPress={() => undo.mutate({ id: entry.id })}
+						>
+							<Undo2 size={16} color="#F87171" />
+							<Text className="text-sm font-semibold text-[#F87171]">
+								{undo.isPending ? "Undoing..." : "Undo"}
+							</Text>
+						</Pressable>
+					</>
 				) : (
 					<Text className="text-center text-xs text-text-tertiary">
 						Purchases can be undone for 24 hours, until you make a payment. Ask

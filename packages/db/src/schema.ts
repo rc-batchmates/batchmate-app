@@ -55,6 +55,9 @@ export const snackLedgerEntry = sqliteTable(
 		skuId: typeIdColumn("sku")("sku_id").references(() => snackSku.id),
 		// Snapshot of the SKU name at purchase time; prices live in amountCents.
 		skuName: text("sku_name"),
+		// Purchases only ("Buy another" bumps it). amountCents is always
+		// quantity × the unit price at purchase time.
+		quantity: integer("quantity").notNull().default(1),
 		amountCents: integer("amount_cents").notNull(),
 		source: text("source", { enum: ["nfc", "web", "admin"] }).notNull(),
 		note: text("note"),

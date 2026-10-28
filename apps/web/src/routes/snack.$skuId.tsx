@@ -1,5 +1,6 @@
 import { newSnackLinkKey, SnackPurchaseSummary } from "@batchmate/ui"
 import { createFileRoute, redirect, useNavigate } from "@tanstack/react-router"
+import { useCallback } from "react"
 import { PageLayout } from "@/components/page-layout"
 import { api } from "@/lib/api"
 import { requireSession } from "@/lib/require-session"
@@ -32,6 +33,11 @@ function SnackPurchasePage() {
 	const { skuId } = Route.useParams()
 	const { k } = Route.useSearch()
 	const navigate = useNavigate()
+	// Replace, so Back doesn't land on the summary again.
+	const goHome = useCallback(
+		() => navigate({ to: "/", replace: true }),
+		[navigate],
+	)
 
 	return (
 		<PageLayout title="Snack Bar">
@@ -43,6 +49,7 @@ function SnackPurchasePage() {
 					idempotencyKey={k}
 					source="web"
 					onViewTab={() => navigate({ to: "/snack-bar" })}
+					onExpire={goHome}
 				/>
 			)}
 		</PageLayout>

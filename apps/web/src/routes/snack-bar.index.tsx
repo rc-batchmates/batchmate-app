@@ -1,7 +1,11 @@
-import { SnackBarBalance, SnackBarEntryList } from "@batchmate/ui"
+import {
+	SnackBarBalance,
+	SnackBarEntryList,
+	SnackBarSettleUp,
+} from "@batchmate/ui"
 import { useInfiniteQuery, useQuery } from "@tanstack/react-query"
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router"
-import { Nfc, ShieldCheck } from "lucide-react"
+import { ShieldCheck } from "lucide-react"
 import { BackButton } from "@/components/back-button"
 import { PageLayout } from "@/components/page-layout"
 import { api } from "@/lib/api"
@@ -28,13 +32,7 @@ function SnackBarPage() {
 		<PageLayout title="Snack Bar" subtitle={<BackButton />}>
 			<SnackBarBalance balanceCents={summary.data?.balanceCents} />
 
-			<div className="flex items-center gap-3 rounded-xl border border-cyan/20 bg-cyan/5 px-4 py-3">
-				<Nfc size={18} color="#22D3EE" />
-				<span className="text-xs text-text-secondary">
-					Tap your phone on a snack's tag to add it to your tab. Pay a Snack Bar
-					admin to settle up.
-				</span>
-			</div>
+			<SnackBarSettleUp />
 
 			{summary.data?.isAdmin && (
 				<Link
