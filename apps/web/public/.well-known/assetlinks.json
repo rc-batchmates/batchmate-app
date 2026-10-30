@@ -5,8 +5,7 @@
 			"namespace": "android_app",
 			"package_name": "app.batchmate.app",
 			"sha256_cert_fingerprints": [
-				"REPLACE_WITH_PLAY_APP_SIGNING_KEY_SHA256",
-				"REPLACE_WITH_UPLOAD_KEY_SHA256"
+				"21:15:CB:A6:62:43:AB:6B:EF:53:1F:FA:AD:2A:EF:C8:53:2D:1A:65:AB:93:72:BC:3C:2C:21:5A:E9:57:4D:B6"
 			]
 		}
 	}
