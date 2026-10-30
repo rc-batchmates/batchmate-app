@@ -14,10 +14,25 @@
 				"ITSAppUsesNonExemptEncryption": false,
 				"LSApplicationQueriesSchemes": ["mailto"]
 			},
+			"associatedDomains": ["applinks:batchmate.app"],
 			"appleTeamId": "KNBPD99JQM"
 		},
 		"android": {
 			"package": "app.batchmate.app",
+			"intentFilters": [
+				{
+					"action": "VIEW",
+					"autoVerify": true,
+					"data": [
+						{
+							"scheme": "https",
+							"host": "batchmate.app",
+							"pathPrefix": "/snack/"
+						}
+					],
+					"category": ["BROWSABLE", "DEFAULT"]
+				}
+			],
 			"adaptiveIcon": {
 				"foregroundImage": "./assets/adaptive-icon.png",
 				"backgroundColor": "#0F172A"
@@ -37,7 +52,15 @@
 					}
 				}
 			],
-			"expo-web-browser"
+			"expo-web-browser",
+			[
+				"react-native-nfc-manager",
+				{
+					"nfcPermission": "batchmate uses NFC to write and identify Snack Bar tags.",
+					"includeNdefEntitlement": false
+				}
+			],
+			"./plugins/with-snack-bar-nfc"
 		],
 		"experiments": {
 			"autolinkingModuleResolution": true

@@ -1,7 +1,12 @@
-import { type DoorAction, DoorControls, ZoomLinks } from "@batchmate/ui"
+import {
+	type DoorAction,
+	DoorControls,
+	formatCents,
+	ZoomLinks,
+} from "@batchmate/ui"
 import { useMutation, useQuery } from "@tanstack/react-query"
 import { createFileRoute, Link, redirect } from "@tanstack/react-router"
-import { Sparkles, User } from "lucide-react"
+import { Cookie, Sparkles, User } from "lucide-react"
 import { useState } from "react"
 import { PageLayout } from "@/components/page-layout"
 import { api } from "@/lib/api"
@@ -21,6 +26,7 @@ function HomePage() {
 	const { data: session } = useSession()
 	const { error } = useQuery(api.health.queryOptions({}))
 	const { data: zoomRooms } = useQuery(api.zoomRooms.queryOptions({}))
+	const { data: snackBar } = useQuery(api.snackBarSummary.queryOptions({}))
 
 	const [pendingAction, setPendingAction] = useState<DoorAction | null>(null)
 	const [justUnlocked, setJustUnlocked] = useState<DoorAction | null>(null)
@@ -87,6 +93,27 @@ function HomePage() {
 				justUnlockedAction={justUnlocked}
 				onUnlockEnd={() => setJustUnlocked(null)}
 			/>
+
+			{/* Snack Bar */}
+			<Link
+				to="/snack-bar"
+				className="flex items-center justify-between rounded-xl border border-cyan/20 bg-cyan/5 px-4 py-3 no-underline transition-colors hover:bg-cyan/10"
+			>
+				<div className="flex items-center gap-2.5">
+					<Cookie size={18} className="text-cyan" />
+					<div className="flex flex-col">
+						<span className="text-[15px] font-semibold text-cyan">
+							Snack Bar
+						</span>
+						<span className="text-xs text-text-tertiary">
+							{snackBar && snackBar.balanceCents > 0
+								? `You owe ${formatCents(snackBar.balanceCents)}`
+								: "Your tab and history"}
+						</span>
+					</div>
+				</div>
+				<span className="text-xs font-medium text-cyan">→</span>
+			</Link>
 
 			{/* Study faces */}
 			<Link

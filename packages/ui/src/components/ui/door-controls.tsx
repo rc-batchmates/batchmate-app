@@ -10,14 +10,15 @@ import { Animated, Platform, Pressable, View } from "react-native"
 import { useThemeColors } from "../../lib/theme-colors"
 import { Text } from "./text"
 
+// lucide renders these nodes as a list, so each needs a key.
 const StairsIcon = createLucideIcon("Stairs", [
-	["path", { d: "M3 21h6v-6h6v-6h6V3" }],
+	["path", { d: "M3 21h6v-6h6v-6h6V3", key: "steps" }],
 ])
 
 const ElevatorIcon = createLucideIcon("Elevator", [
-	["rect", { x: "5", y: "3", width: "14", height: "18", rx: "1" }],
-	["path", { d: "M9 9l3-3 3 3" }],
-	["path", { d: "M9 15l3 3 3-3" }],
+	["rect", { x: "5", y: "3", width: "14", height: "18", rx: "1", key: "car" }],
+	["path", { d: "M9 9l3-3 3 3", key: "up" }],
+	["path", { d: "M9 15l3 3 3-3", key: "down" }],
 ])
 
 type Floor = "4" | "5"

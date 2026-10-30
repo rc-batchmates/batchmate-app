@@ -146,6 +146,61 @@ export type PresentationsListResponse = z.infer<
 	typeof PresentationsListResponseSchema
 >
 
+const SnackSkuSchema = z.object({
+	id: z.string(),
+	name: z.string(),
+	priceCents: z.number().int(),
+	archived: z.boolean(),
+})
+
+const SnackLedgerEntrySchema = z.object({
+	id: z.string(),
+	kind: z.enum(["purchase", "payment"]),
+	skuId: z.string().nullable(),
+	skuName: z.string().nullable(),
+	quantity: z.number().int(),
+	// Purchases: price per snack. Payments: same as amountCents.
+	unitPriceCents: z.number().int(),
+	amountCents: z.number().int(),
+	source: z.enum(["nfc", "web", "admin"]),
+	note: z.string().nullable(),
+	recordedByName: z.string().nullable(),
+	createdAt: z.string(),
+	voidedAt: z.string().nullable(),
+	canVoid: z.boolean(),
+})
+
+const SnackBarSummarySchema = z.object({
+	balanceCents: z.number().int(),
+	isAdmin: z.boolean(),
+})
+
+const SnackLedgerPageSchema = z.object({
+	entries: z.array(SnackLedgerEntrySchema),
+	nextCursor: z.string().nullable(),
+})
+
+const SnackLedgerMutationResponseSchema = z.object({
+	entry: SnackLedgerEntrySchema,
+	balanceCents: z.number().int(),
+})
+
+const SnackAccountSchema = z.object({
+	userId: z.string(),
+	name: z.string(),
+	image: z.string().nullable(),
+	rcId: z.string().nullable(),
+	balanceCents: z.number().int(),
+	lastActivityAt: z.string(),
+})
+
+const SnackPriceCentsSchema = z.number().int().min(0).max(100_000)
+
+export type SnackSku = z.infer<typeof SnackSkuSchema>
+export type SnackLedgerEntry = z.infer<typeof SnackLedgerEntrySchema>
+export type SnackBarSummary = z.infer<typeof SnackBarSummarySchema>
+export type SnackAccount = z.infer<typeof SnackAccountSchema>
+
 export const contract = oc.router({
 	health: oc.route({ method: "GET", path: "/health" }).output(
 		z.object({
@@ -223,6 +278,133 @@ export const contract = oc.router({
 		.route({ method: "DELETE", path: "/presentations/{id}" })
 		.input(PresentationsDeleteInputSchema)
 		.output(z.object({ success: z.boolean() })),
+	snackBarSummary: oc
+		.route({ method: "GET", path: "/snack-bar" })
+		.output(SnackBarSummarySchema),
+	snackBarTransactions: oc
+		.route({ method: "GET", path: "/snack-bar/transactions" })
+		.input(
+			z.object({
+				cursor: z.string().optional(),
+				limit: z.coerce.number().int().min(1).max(100).optional(),
+			}),
+		)
+		.output(SnackLedgerPageSchema),
+	snackBarTransaction: oc
+		.route({ method: "GET", path: "/snack-bar/transactions/{id}" })
+		.input(z.object({ id: z.string().min(1) }))
+		.output(SnackLedgerEntrySchema),
+	snackBarPurchase: oc
+		.route({ method: "POST", path: "/snack-bar/purchases" })
+		.input(
+			z.object({
+				skuId: z.string().min(1),
+				// Lives in the snack link's URL, so keep it URL-safe.
+				idempotencyKey: z.string().regex(/^[A-Za-z0-9_-]{8,64}$/),
+				source: z.enum(["nfc", "web"]),
+			}),
+		)
+		.output(SnackLedgerMutationResponseSchema),
+	snackBarBuyAnother: oc
+		.route({
+			method: "POST",
+			path: "/snack-bar/transactions/{id}/buy-another",
+		})
+		.input(
+			z.object({
+				id: z.string().min(1),
+				// The quantity the client last saw. If the entry has already moved
+				// past it (a retried or double-sent tap), nothing is added and the
+				// current entry is returned.
+				expectedQuantity: z.number().int().min(1),
+			}),
+		)
+		.output(SnackLedgerMutationResponseSchema),
+	snackBarVoid: oc
+		.route({ method: "DELETE", path: "/snack-bar/transactions/{id}" })
+		.input(z.object({ id: z.string().min(1) }))
+		.output(SnackLedgerMutationResponseSchema),
+	snackBarSku: oc
+		.route({ method: "GET", path: "/snack-bar/skus/{id}" })
+		.input(z.object({ id: z.string().min(1) }))
+		.output(SnackSkuSchema),
+	snackBarAdminSkus: oc
+		.route({ method: "GET", path: "/snack-bar/admin/skus" })
+		.output(z.array(SnackSkuSchema)),
+	snackBarAdminSkuCreate: oc
+		.route({ method: "POST", path: "/snack-bar/admin/skus" })
+		.input(
+			z.object({
+				name: z.string().trim().min(1).max(80),
+				priceCents: SnackPriceCentsSchema,
+			}),
+		)
+		.output(SnackSkuSchema),
+	snackBarAdminSkuUpdate: oc
+		.route({ method: "PATCH", path: "/snack-bar/admin/skus/{id}" })
+		.input(
+			z.object({
+				id: z.string().min(1),
+				name: z.string().trim().min(1).max(80).optional(),
+				priceCents: SnackPriceCentsSchema.optional(),
+				archived: z.boolean().optional(),
+			}),
+		)
+		.output(SnackSkuSchema),
+	snackBarAdminAccounts: oc
+		.route({ method: "GET", path: "/snack-bar/admin/accounts" })
+		.input(
+			z.object({
+				// "unsettled" (default): non-zero balances. "all": anyone with history.
+				scope: z.enum(["unsettled", "all"]).optional(),
+			}),
+		)
+		.output(z.array(SnackAccountSchema)),
+	snackBarAdminAccount: oc
+		.route({ method: "GET", path: "/snack-bar/admin/accounts/{userId}" })
+		.input(z.object({ userId: z.string().min(1) }))
+		.output(
+			z.object({
+				account: SnackAccountSchema,
+				entries: z.array(SnackLedgerEntrySchema),
+			}),
+		),
+	snackBarAdminPayment: oc
+		.route({
+			method: "POST",
+			path: "/snack-bar/admin/accounts/{userId}/payments",
+		})
+		.input(
+			z.object({
+				userId: z.string().min(1),
+				amountCents: SnackPriceCentsSchema.refine((n) => n > 0),
+				note: z.string().trim().max(200).optional(),
+				// Who the money was handed or Venmo'd to.
+				recipient: z.string().trim().max(100).optional(),
+			}),
+		)
+		.output(SnackLedgerMutationResponseSchema),
+	snackBarAdminVoid: oc
+		.route({ method: "DELETE", path: "/snack-bar/admin/transactions/{id}" })
+		.input(z.object({ id: z.string().min(1) }))
+		.output(SnackLedgerMutationResponseSchema),
+	snackBarAdminExport: oc
+		.route({ method: "GET", path: "/snack-bar/admin/export" })
+		.input(
+			z.object({
+				userId: z.string().optional(),
+				// Inclusive YYYY-MM-DD dates in America/New_York.
+				from: z
+					.string()
+					.regex(/^\d{4}-\d{2}-\d{2}$/)
+					.optional(),
+				to: z
+					.string()
+					.regex(/^\d{4}-\d{2}-\d{2}$/)
+					.optional(),
+			}),
+		)
+		.output(z.object({ filename: z.string(), csv: z.string() })),
 })
 
 export type Contract = typeof contract

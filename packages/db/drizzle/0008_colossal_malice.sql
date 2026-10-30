@@ -1,0 +1,1 @@
+ALTER TABLE `snack_ledger_entry` ADD `payment_recipient` text;
