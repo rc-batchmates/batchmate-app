@@ -1,0 +1,15 @@
+{
+	"applinks": {
+		"details": [
+			{
+				"appIDs": ["KNBPD99JQM.app.batchmate.app"],
+				"components": [
+					{
+						"/": "/snack/*",
+						"comment": "Snack Bar NFC tags open the app"
+					}
+				]
+			}
+		]
+	}
+}

@@ -22,6 +22,7 @@ type Env = {
 		RC_BATCHMATE_CLIENT_SECRET: string
 		DOORBOT_TOKEN?: string
 		BASE_URL?: string
+		SKIP_ACCESS_CONTROL_PROVISIONING?: string
 	}
 }
 
@@ -165,6 +166,17 @@ app.use("/api/v1/*", async (c, next) => {
 	}
 
 	await next()
+})
+
+// iOS universal links. The file has no extension (Apple requires the exact
+// name), so the asset server sends it without a Content-Type; Apple expects
+// application/json.
+app.get("/.well-known/apple-app-site-association", async (c) => {
+	const response = await c.env.ASSETS.fetch(c.req.raw)
+	if (!response.ok) return response
+	return new Response(response.body, {
+		headers: { "Content-Type": "application/json" },
+	})
 })
 
 app.get("*", async (c) => {

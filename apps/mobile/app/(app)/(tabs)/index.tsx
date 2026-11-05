@@ -1,13 +1,14 @@
 import {
 	type DoorAction,
 	DoorControls,
+	formatCents,
 	Text,
 	useThemeColors,
 	ZoomLinks,
 } from "@batchmate/ui"
 import { useMutation, useQuery } from "@tanstack/react-query"
 import { useRouter } from "expo-router"
-import { Sparkles, User } from "lucide-react-native"
+import { Cookie, Sparkles, User } from "lucide-react-native"
 import { useState } from "react"
 import { Image, Pressable, ScrollView, View } from "react-native"
 import { api } from "../../../src/lib/api"
@@ -19,6 +20,7 @@ export default function HomeScreen() {
 	const { data: session } = useSession()
 	const health = useQuery(api.health.queryOptions({}))
 	const { data: zoomRooms } = useQuery(api.zoomRooms.queryOptions({}))
+	const { data: snackBar } = useQuery(api.snackBarSummary.queryOptions({}))
 
 	const [pendingAction, setPendingAction] = useState<DoorAction | null>(null)
 	const [justUnlocked, setJustUnlocked] = useState<DoorAction | null>(null)
@@ -92,6 +94,27 @@ export default function HomeScreen() {
 				justUnlockedAction={justUnlocked}
 				onUnlockEnd={() => setJustUnlocked(null)}
 			/>
+
+			{/* Snack Bar */}
+			<Pressable
+				className="flex-row items-center justify-between rounded-xl border border-cyan/20 bg-cyan/5 px-4 py-3"
+				onPress={() => router.push("/snack-bar")}
+			>
+				<View className="flex-row items-center gap-2.5">
+					<Cookie size={18} color={c.primary} />
+					<View>
+						<Text className="text-[15px] font-semibold text-primary">
+							Snack Bar
+						</Text>
+						<Text className="text-xs text-text-tertiary">
+							{snackBar && snackBar.balanceCents > 0
+								? `You owe ${formatCents(snackBar.balanceCents)}`
+								: "Your tab and history"}
+						</Text>
+					</View>
+				</View>
+				<Text className="text-xs font-medium text-primary">→</Text>
+			</Pressable>
 
 			{/* Study faces */}
 			<Pressable

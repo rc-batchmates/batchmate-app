@@ -1,16 +1,18 @@
-import { Redirect, Slot } from "expo-router"
+import { Redirect, Slot, useGlobalSearchParams } from "expo-router"
 import { View } from "react-native"
 import { useSafeAreaInsets } from "react-native-safe-area-context"
 import { useSession } from "../../src/lib/auth"
+import { loginRedirectTarget } from "../../src/lib/login-redirect"
 
 export default function AuthLayout() {
 	const { data: session, isPending } = useSession()
 	const insets = useSafeAreaInsets()
+	const { redirect } = useGlobalSearchParams<{ redirect?: string }>()
 
 	if (isPending) return null
 
 	if (session) {
-		return <Redirect href="/(app)" />
+		return <Redirect href={loginRedirectTarget(redirect)} />
 	}
 
 	return (

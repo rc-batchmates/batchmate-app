@@ -16,6 +16,7 @@ const dark = {
 	textTertiary: "#64748B",
 	textMuted: "#475569",
 	danger: "#F87171",
+	success: "#86EFAC",
 	moon: "#A5B4FC",
 }
 
@@ -31,6 +32,7 @@ const light: typeof dark = {
 	textTertiary: "#556377",
 	textMuted: "#606F85",
 	danger: "#B91C1C",
+	success: "#166534",
 	moon: "#4F46E5",
 }
 

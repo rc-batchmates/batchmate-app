@@ -21,8 +21,13 @@ import { Route as DirectoryRouteImport } from "./routes/directory"
 import { Route as SplatRouteImport } from "./routes/$"
 import { Route as AuthRouteRouteImport } from "./routes/_auth/route"
 import { Route as IndexRouteImport } from "./routes/index"
+import { Route as SnackBarIndexRouteImport } from "./routes/snack-bar.index"
+import { Route as SnackSkuIdRouteImport } from "./routes/snack.$skuId"
+import { Route as SnackBarIdRouteImport } from "./routes/snack-bar.$id"
 import { Route as MemberIdRouteImport } from "./routes/member.$id"
 import { Route as AuthLoginRouteImport } from "./routes/_auth/login"
+import { Route as SnackBarAdminIndexRouteImport } from "./routes/snack-bar.admin.index"
+import { Route as SnackBarAdminAccountUserIdRouteImport } from "./routes/snack-bar.admin.account.$userId"
 
 const TermsRoute = TermsRouteImport.update({
   id: "/terms",
@@ -83,6 +88,21 @@ const IndexRoute = IndexRouteImport.update({
   path: "/",
   getParentRoute: () => rootRouteImport,
 } as any)
+const SnackBarIndexRoute = SnackBarIndexRouteImport.update({
+  id: "/snack-bar/",
+  path: "/snack-bar/",
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SnackSkuIdRoute = SnackSkuIdRouteImport.update({
+  id: "/snack/$skuId",
+  path: "/snack/$skuId",
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SnackBarIdRoute = SnackBarIdRouteImport.update({
+  id: "/snack-bar/$id",
+  path: "/snack-bar/$id",
+  getParentRoute: () => rootRouteImport,
+} as any)
 const MemberIdRoute = MemberIdRouteImport.update({
   id: "/member/$id",
   path: "/member/$id",
@@ -93,6 +113,17 @@ const AuthLoginRoute = AuthLoginRouteImport.update({
   path: "/login",
   getParentRoute: () => AuthRouteRoute,
 } as any)
+const SnackBarAdminIndexRoute = SnackBarAdminIndexRouteImport.update({
+  id: "/snack-bar/admin/",
+  path: "/snack-bar/admin/",
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SnackBarAdminAccountUserIdRoute =
+  SnackBarAdminAccountUserIdRouteImport.update({
+    id: "/snack-bar/admin/account/$userId",
+    path: "/snack-bar/admin/account/$userId",
+    getParentRoute: () => rootRouteImport,
+  } as any)
 
 export interface FileRoutesByFullPath {
   "/": typeof IndexRoute
@@ -108,6 +139,11 @@ export interface FileRoutesByFullPath {
   "/terms": typeof TermsRoute
   "/login": typeof AuthLoginRoute
   "/member/$id": typeof MemberIdRoute
+  "/snack-bar/$id": typeof SnackBarIdRoute
+  "/snack/$skuId": typeof SnackSkuIdRoute
+  "/snack-bar/": typeof SnackBarIndexRoute
+  "/snack-bar/admin/": typeof SnackBarAdminIndexRoute
+  "/snack-bar/admin/account/$userId": typeof SnackBarAdminAccountUserIdRoute
 }
 export interface FileRoutesByTo {
   "/": typeof IndexRoute
@@ -123,6 +159,11 @@ export interface FileRoutesByTo {
   "/terms": typeof TermsRoute
   "/login": typeof AuthLoginRoute
   "/member/$id": typeof MemberIdRoute
+  "/snack-bar/$id": typeof SnackBarIdRoute
+  "/snack/$skuId": typeof SnackSkuIdRoute
+  "/snack-bar": typeof SnackBarIndexRoute
+  "/snack-bar/admin": typeof SnackBarAdminIndexRoute
+  "/snack-bar/admin/account/$userId": typeof SnackBarAdminAccountUserIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -140,6 +181,11 @@ export interface FileRoutesById {
   "/terms": typeof TermsRoute
   "/_auth/login": typeof AuthLoginRoute
   "/member/$id": typeof MemberIdRoute
+  "/snack-bar/$id": typeof SnackBarIdRoute
+  "/snack/$skuId": typeof SnackSkuIdRoute
+  "/snack-bar/": typeof SnackBarIndexRoute
+  "/snack-bar/admin/": typeof SnackBarAdminIndexRoute
+  "/snack-bar/admin/account/$userId": typeof SnackBarAdminAccountUserIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -157,6 +203,11 @@ export interface FileRouteTypes {
     | "/terms"
     | "/login"
     | "/member/$id"
+    | "/snack-bar/$id"
+    | "/snack/$skuId"
+    | "/snack-bar/"
+    | "/snack-bar/admin/"
+    | "/snack-bar/admin/account/$userId"
   fileRoutesByTo: FileRoutesByTo
   to:
     | "/"
@@ -172,6 +223,11 @@ export interface FileRouteTypes {
     | "/terms"
     | "/login"
     | "/member/$id"
+    | "/snack-bar/$id"
+    | "/snack/$skuId"
+    | "/snack-bar"
+    | "/snack-bar/admin"
+    | "/snack-bar/admin/account/$userId"
   id:
     | "__root__"
     | "/"
@@ -188,6 +244,11 @@ export interface FileRouteTypes {
     | "/terms"
     | "/_auth/login"
     | "/member/$id"
+    | "/snack-bar/$id"
+    | "/snack/$skuId"
+    | "/snack-bar/"
+    | "/snack-bar/admin/"
+    | "/snack-bar/admin/account/$userId"
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -204,6 +265,11 @@ export interface RootRouteChildren {
   SupportRoute: typeof SupportRoute
   TermsRoute: typeof TermsRoute
   MemberIdRoute: typeof MemberIdRoute
+  SnackBarIdRoute: typeof SnackBarIdRoute
+  SnackSkuIdRoute: typeof SnackSkuIdRoute
+  SnackBarIndexRoute: typeof SnackBarIndexRoute
+  SnackBarAdminIndexRoute: typeof SnackBarAdminIndexRoute
+  SnackBarAdminAccountUserIdRoute: typeof SnackBarAdminAccountUserIdRoute
 }
 
 declare module "@tanstack/react-router" {
@@ -292,6 +358,27 @@ declare module "@tanstack/react-router" {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    "/snack-bar/": {
+      id: "/snack-bar/"
+      path: "/snack-bar"
+      fullPath: "/snack-bar/"
+      preLoaderRoute: typeof SnackBarIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    "/snack/$skuId": {
+      id: "/snack/$skuId"
+      path: "/snack/$skuId"
+      fullPath: "/snack/$skuId"
+      preLoaderRoute: typeof SnackSkuIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    "/snack-bar/$id": {
+      id: "/snack-bar/$id"
+      path: "/snack-bar/$id"
+      fullPath: "/snack-bar/$id"
+      preLoaderRoute: typeof SnackBarIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     "/member/$id": {
       id: "/member/$id"
       path: "/member/$id"
@@ -305,6 +392,20 @@ declare module "@tanstack/react-router" {
       fullPath: "/login"
       preLoaderRoute: typeof AuthLoginRouteImport
       parentRoute: typeof AuthRouteRoute
+    }
+    "/snack-bar/admin/": {
+      id: "/snack-bar/admin/"
+      path: "/snack-bar/admin"
+      fullPath: "/snack-bar/admin/"
+      preLoaderRoute: typeof SnackBarAdminIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    "/snack-bar/admin/account/$userId": {
+      id: "/snack-bar/admin/account/$userId"
+      path: "/snack-bar/admin/account/$userId"
+      fullPath: "/snack-bar/admin/account/$userId"
+      preLoaderRoute: typeof SnackBarAdminAccountUserIdRouteImport
+      parentRoute: typeof rootRouteImport
     }
   }
 }
@@ -335,6 +436,11 @@ const rootRouteChildren: RootRouteChildren = {
   SupportRoute: SupportRoute,
   TermsRoute: TermsRoute,
   MemberIdRoute: MemberIdRoute,
+  SnackBarIdRoute: SnackBarIdRoute,
+  SnackSkuIdRoute: SnackSkuIdRoute,
+  SnackBarIndexRoute: SnackBarIndexRoute,
+  SnackBarAdminIndexRoute: SnackBarAdminIndexRoute,
+  SnackBarAdminAccountUserIdRoute: SnackBarAdminAccountUserIdRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
