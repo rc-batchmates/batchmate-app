@@ -9,6 +9,7 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from "./routes/__root"
+import { Route as TermsRouteImport } from "./routes/terms"
 import { Route as SupportRouteImport } from "./routes/support"
 import { Route as StudyFacesRouteImport } from "./routes/study-faces"
 import { Route as ProfileRouteImport } from "./routes/profile"
@@ -23,6 +24,11 @@ import { Route as IndexRouteImport } from "./routes/index"
 import { Route as MemberIdRouteImport } from "./routes/member.$id"
 import { Route as AuthLoginRouteImport } from "./routes/_auth/login"
 
+const TermsRoute = TermsRouteImport.update({
+  id: "/terms",
+  path: "/terms",
+  getParentRoute: () => rootRouteImport,
+} as any)
 const SupportRoute = SupportRouteImport.update({
   id: "/support",
   path: "/support",
@@ -99,6 +105,7 @@ export interface FileRoutesByFullPath {
   "/profile": typeof ProfileRoute
   "/study-faces": typeof StudyFacesRoute
   "/support": typeof SupportRoute
+  "/terms": typeof TermsRoute
   "/login": typeof AuthLoginRoute
   "/member/$id": typeof MemberIdRoute
 }
@@ -113,6 +120,7 @@ export interface FileRoutesByTo {
   "/profile": typeof ProfileRoute
   "/study-faces": typeof StudyFacesRoute
   "/support": typeof SupportRoute
+  "/terms": typeof TermsRoute
   "/login": typeof AuthLoginRoute
   "/member/$id": typeof MemberIdRoute
 }
@@ -129,6 +137,7 @@ export interface FileRoutesById {
   "/profile": typeof ProfileRoute
   "/study-faces": typeof StudyFacesRoute
   "/support": typeof SupportRoute
+  "/terms": typeof TermsRoute
   "/_auth/login": typeof AuthLoginRoute
   "/member/$id": typeof MemberIdRoute
 }
@@ -145,6 +154,7 @@ export interface FileRouteTypes {
     | "/profile"
     | "/study-faces"
     | "/support"
+    | "/terms"
     | "/login"
     | "/member/$id"
   fileRoutesByTo: FileRoutesByTo
@@ -159,6 +169,7 @@ export interface FileRouteTypes {
     | "/profile"
     | "/study-faces"
     | "/support"
+    | "/terms"
     | "/login"
     | "/member/$id"
   id:
@@ -174,6 +185,7 @@ export interface FileRouteTypes {
     | "/profile"
     | "/study-faces"
     | "/support"
+    | "/terms"
     | "/_auth/login"
     | "/member/$id"
   fileRoutesById: FileRoutesById
@@ -190,11 +202,19 @@ export interface RootRouteChildren {
   ProfileRoute: typeof ProfileRoute
   StudyFacesRoute: typeof StudyFacesRoute
   SupportRoute: typeof SupportRoute
+  TermsRoute: typeof TermsRoute
   MemberIdRoute: typeof MemberIdRoute
 }
 
 declare module "@tanstack/react-router" {
   interface FileRoutesByPath {
+    "/terms": {
+      id: "/terms"
+      path: "/terms"
+      fullPath: "/terms"
+      preLoaderRoute: typeof TermsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     "/support": {
       id: "/support"
       path: "/support"
@@ -313,6 +333,7 @@ const rootRouteChildren: RootRouteChildren = {
   ProfileRoute: ProfileRoute,
   StudyFacesRoute: StudyFacesRoute,
   SupportRoute: SupportRoute,
+  TermsRoute: TermsRoute,
   MemberIdRoute: MemberIdRoute,
 }
 export const routeTree = rootRouteImport
